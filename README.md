@@ -1,4 +1,7 @@
-# PY-ANS-SDK
+# anssdk
+A javscript sdk for resolving Algorand Name Service (ANS) .algo names. Currently under development.
+
+<!--
 
 ## Install package
 
@@ -11,13 +14,15 @@ yarn add anssdk
 ### Import package
 ```
 import {ansResolver} from 'anssdk'
+(OR)
+const {ansResolver} = require('anssdk')
 
 const algodClient = "" // set up your algodV2 client
 const algodIndexer = "" // set up your algod indexer
 
 //indexer and client must point to mainnet
 
-resolverObj = resolver.ans_resolver(client, indexer)
+resolverObj = resolver.ansResolver(client, indexer)
 ```
 
 ### Resolve .algo name
@@ -25,7 +30,7 @@ resolverObj = resolver.ans_resolver(client, indexer)
 ```
 let name = "ans.algo"
 
-let nameInfo = resolverObj.resolveName(name)
+let nameInfo = await resolverObj.resolveName(name)
 
 if(nameInfo["found"]){
     let address = nameInfo["address"];
@@ -40,7 +45,7 @@ else {
 ```
 let address="" // provide an algorand wallet address here
 
-let names = resolverObj.getNamesOwnedByAddress(address)
+let names = await resolverObj.getNamesOwnedByAddress(address)
 
 if(names.length > 0){
     for (let index in names){
@@ -51,3 +56,5 @@ else {
     //No names registered by this address
 }
 ```
+
+-->

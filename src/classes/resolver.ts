@@ -187,4 +187,6 @@ export class resolver {
             }
         }
     }
+
+    //TODO:Get socials, and metadata
 }
