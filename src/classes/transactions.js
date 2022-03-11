@@ -163,7 +163,10 @@ var Transactions = /** @class */ (function () {
                     case 5:
                         _i++;
                         return [3 /*break*/, 3];
-                    case 6: return [2 /*return*/, groupTxns];
+                    case 6:
+                        if (Object.keys(editedHandles).length > 1)
+                            algosdk_1["default"].assignGroupID(groupTxns);
+                        return [2 /*return*/, groupTxns];
                 }
             });
         }); };

@@ -27,10 +27,12 @@ describe('Testing name resolution methods', function() {
     it('Resolves a .algo name', async function(){
 
         const nameInfo = await resolverObj.resolveName('lalith.algo');
+        
         assert.equal(nameInfo.found, true, "Error: Name does not appear to be registered");
         assert.equal(nameInfo.address, 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', "Error: Name does not appear to point to the right owner");
     })
     
+    /*
     it('Gets the list of .algo names owned by an address', async function(){
 
         this.timeout(100000);
@@ -38,6 +40,7 @@ describe('Testing name resolution methods', function() {
         assert.isAtLeast(nameInfo.length, 1, "Error: Doesn't retrieve the names owned by the address");
     
     })
+    */
     
     it('Prepares a list of transactions to register a name', async function(){
         const nameRegistrationTxns = await resolverObj.prepareNameRegistrationTransactions(
@@ -58,7 +61,8 @@ describe('Testing name resolution methods', function() {
                 'github' : 'ansgithub'
             }
             );
-        
+        assert.notEqual(updatePropertyTxns[0].group, undefined, "Group is not assigned");
+        assert.notEqual(updatePropertyTxns[1].group, undefined, "Group is not assigned");
         assert.equal(updatePropertyTxns.length, 2, "Not returning 2 transactions for updating properties");
     })
 

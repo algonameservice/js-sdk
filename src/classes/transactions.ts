@@ -122,10 +122,12 @@ export class Transactions {
             appArgs.push(new Uint8Array(Buffer.from(method)));
             appArgs.push(new Uint8Array(Buffer.from(network)));
             appArgs.push(new Uint8Array(Buffer.from(handle)));
-
+            
             let txn = await algosdk.makeApplicationNoOpTxn(address, params, this.APP_ID, appArgs, [lsig.address()]);
             groupTxns.push(txn);
         }
+
+        if(Object.keys(editedHandles).length > 1) algosdk.assignGroupID(groupTxns);
 
         return groupTxns;
 

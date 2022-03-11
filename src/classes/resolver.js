@@ -111,7 +111,8 @@ var resolver = /** @class */ (function () {
                                         key: key,
                                         value: value
                                     };
-                                    data.push(kvObj);
+                                    if (key !== 'owner' && value !== '' && value !== 0 && key !== 'name')
+                                        data.push(kvObj);
                                     if (key === 'owner') {
                                         value = kv[j].value.bytes;
                                         value = (algosdk_1["default"].encodeAddress(new Uint8Array(Buffer.from(value, 'base64'))));
@@ -122,7 +123,7 @@ var resolver = /** @class */ (function () {
                             }
                         }
                         if (found) {
-                            return [2 /*return*/, ({ found: true, address: owner })];
+                            return [2 /*return*/, ({ found: true, address: owner, kvPairs: data })];
                         }
                         else
                             return [2 /*return*/, ({ found: false })];

@@ -73,13 +73,11 @@ export class resolver {
                             }
                             else value = Buffer.from(kv[j].value.bytes, 'base64').toString();
 
-                            
-                            
                             let kvObj = {
                                 key: key,
                                 value: value
                             }
-                            data.push(kvObj)
+                            if(key !== 'owner' && value !== '' && value !== 0 && key !== 'name') data.push(kvObj)
 
                             if (key === 'owner') {
                                 
@@ -97,7 +95,7 @@ export class resolver {
                 }
                 
                 if(found) {
-                    return ({ found: true, address: owner})
+                    return ({ found: true, address: owner, kvPairs:data})
                 }
                 else return ({ found: false });
 
