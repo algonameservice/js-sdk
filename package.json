@@ -1,6 +1,6 @@
 {
   "name": "anssdk",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "JavaScript SDK to resolve ANS .algo names",
   "main": "src/index.js",
   "types": "lib",

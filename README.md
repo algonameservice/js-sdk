@@ -1,7 +1,6 @@
 # anssdk
 A javscript sdk for resolving Algorand Name Service (ANS) .algo names. Currently under development.
 
-<!--
 
 ## Install package
 
@@ -56,5 +55,3 @@ else {
     //No names registered by this address
 }
 ```
-
--->
