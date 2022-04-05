@@ -38,6 +38,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 exports.__esModule = true;
 var resolver_1 = require("./classes/resolver");
 var transactions_1 = require("./classes/transactions");
+var constants_1 = require("./constants");
 var ansResolver = /** @class */ (function () {
     function ansResolver(client, indexer) {
         var _this = this;
@@ -114,12 +115,22 @@ var ansResolver = /** @class */ (function () {
                 }
             });
         }); };
-        this.prepareNameRenewalTxns = function (name, sender, years, amt) { return __awaiter(_this, void 0, void 0, function () {
-            var txns, err_4;
+        this.prepareNameRenewalTxns = function (name, sender, years) { return __awaiter(_this, void 0, void 0, function () {
+            var amt, txns, err_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 2, , 3]);
+                        amt = 0;
+                        name = name.split('.algo')[0];
+                        if (name.length < 3)
+                            return [2 /*return*/];
+                        if (name.length === 3)
+                            amt = (constants_1.CONSTANTS.CHAR_3_AMOUNT) * years;
+                        else if (name.length === 4)
+                            amt = (constants_1.CONSTANTS.CHAR_4_AMOUNT) * years;
+                        else if (name.length >= 5)
+                            amt = (constants_1.CONSTANTS.CHAR_5_AMOUNT) * years;
                         return [4 /*yield*/, this.transactionsInstance.prepareNameRenewalTxns(name, sender, years, amt)];
                     case 1:
                         txns = _a.sent();

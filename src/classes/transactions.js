@@ -194,7 +194,6 @@ var Transactions = /** @class */ (function () {
                 switch (_a.label) {
                     case 0:
                         algodClient = this.algodClient;
-                        amt = algosdk_1["default"].algosToMicroalgos(amt);
                         return [4 /*yield*/, algodClient.getTransactionParams()["do"]()];
                     case 1:
                         params = _a.sent();

@@ -81,8 +81,7 @@ describe('Testing name resolution methods', function() {
         const nameRenewalTxns = await resolverObj.prepareNameRenewalTxns(
                 'ans.algo',
                 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
-                2,
-                10
+                2
             );
         
         assert.equal(nameRenewalTxns.length, 2, "Not returning 2 transactions for renewing name");

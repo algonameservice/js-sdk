@@ -148,8 +148,7 @@ export class Transactions {
     }
 
     prepareNameRenewalTxns = async (name:string, sender:string, years:number, amt:number) => {
-        const algodClient = this.algodClient;
-        amt = algosdk.algosToMicroalgos(amt);
+        const algodClient = this.algodClient;        
         const params = await algodClient.getTransactionParams().do();
         let receiver = algosdk.getApplicationAddress(CONSTANTS.APP_ID);
         let closeToRemaninder=undefined;

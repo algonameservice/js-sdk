@@ -58,7 +58,6 @@ mocha_1.describe('Testing name resolution methods', function () {
                     case 0: return [4 /*yield*/, resolverObj.resolveName('lalith.algo')];
                     case 1:
                         nameInfo = _a.sent();
-                        console.log(nameInfo);
                         assert.equal(nameInfo.found, true, "Error: Name does not appear to be registered");
                         assert.equal(nameInfo.address, 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', "Error: Name does not appear to point to the right owner");
                         return [2 /*return*/];
@@ -127,7 +126,7 @@ mocha_1.describe('Testing name resolution methods', function () {
             var nameRenewalTxns;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, resolverObj.prepareNameRenewalTxns('ans.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 2, 10)];
+                    case 0: return [4 /*yield*/, resolverObj.prepareNameRenewalTxns('ans.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 2)];
                     case 1:
                         nameRenewalTxns = _a.sent();
                         assert.equal(nameRenewalTxns.length, 2, "Not returning 2 transactions for renewing name");

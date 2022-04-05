@@ -1,5 +1,6 @@
 import {resolver} from './classes/resolver';
 import { Transactions } from './classes/transactions';
+import {CONSTANTS} from './constants'
 
 export class ansResolver {
 
@@ -48,8 +49,14 @@ export class ansResolver {
         }
     }
 
-    prepareNameRenewalTxns = async (name:string, sender:string, years:number, amt:number) => {
+    prepareNameRenewalTransactions = async (name:string, sender:string, years:number) => {
         try{
+            let amt:number = 0;
+            name = name.split('.algo')[0];
+            if(name.length < 3) return;
+            if(name.length === 3) amt = (CONSTANTS.CHAR_3_AMOUNT)*years;
+            else if(name.length === 4) amt = (CONSTANTS.CHAR_4_AMOUNT)*years;
+            else if(name.length >= 5) amt = (CONSTANTS.CHAR_5_AMOUNT)*years;
             const txns = await this.transactionsInstance.prepareNameRenewalTxns(name, sender, years, amt);
             return txns;
         } catch (err:any) {
