@@ -1,35 +1,51 @@
 # anssdk
-A javscript sdk for resolving Algorand Name Service (ANS) .algo names. Currently under development.
+A javscript sdk to resolve .algo names and perform name operations on ANS .algo names.
 
+## Documentation
 
-## Install package
+Install Package
 
+**`npm`** 
 ```
 npm i anssdk
-(OR)
+```
+
+**`yarn`** 
+```
 yarn add anssdk
 ```
 
-### Import package
+### Import
+
+**`ESM`** import
 ```
 import {ansResolver} from 'anssdk'
-(OR)
-const {ansResolver} = require('anssdk')
+```
 
+**`CJS`** require
+```
+const {ansResolver} = require('anssdk')
+```
+
+### Setup
+
+```
 const algodClient = "" // set up your algodV2 client
 const algodIndexer = "" // set up your algod indexer
 
 //indexer and client must point to mainnet
 
-let resolverObj = ansResolver(client, indexer)
+let sdk = ansResolver(client, indexer)
 ```
 
-### Resolve .algo name
+## Resolve .algo name
+
+Resolve .algo name to get the address of the owner. 
 
 ```
 let name = "ans.algo"
 
-let nameInfo = await resolverObj.resolveName(name)
+let nameInfo = await sdk.resolveName(name)
 
 if(nameInfo["found"]){
     let address = nameInfo["address"];
@@ -39,15 +55,17 @@ else {
 }
 ```
 
-### Get names owned by an address
+## Get names owned by an address
+
+This GET method gets all the names owned by an Algorand address in reverse chronological order of registration. 
 
 ```
 let address="" // provide an algorand wallet address here
 
-let names = await resolverObj.getNamesOwnedByAddress(address);
+let names = await sdk.getNamesOwnedByAddress(address);
 
 // Returns an array of names owned by the address
-// Names appear in a reverse chronological order (most recently purchased appear first)
+// Names appear in a reverse chronological order (names[0] returns recently purchased name)
 
 if(names.length > 0){
     for (let index in names){
@@ -59,27 +77,9 @@ else {
 }
 ```
 
-## Domain Operations
+## Register a new name
 
-### 1. Prepare name registration transactions
-
-#### Setup client and indexer
-
-```
-import {ansResolver} from 'anssdk'
-(OR)
-const {ansResolver} = require('anssdk')
-
-const algodClient = "" // set up your algodV2 client
-const algodIndexer = "" // set up your algod indexer
-
-//indexer and client must point to mainnet
-
-let sdk = resolver.ansResolver(client, indexer)
-```
-
-#### Prepare transactions
-
+This method returns the transactions to be signed to register a .algo name.
 ```
 let nameToRegister = ''; // .algo name to register
 let address = ''; // owner's algorand wallet address
@@ -113,7 +113,9 @@ try{
 }
 ```
 
-### 2. Prepare update name property transactions
+## Update Name (Set name properties)
+
+This method returns transactions to set the social media handles of a domain name
 
 ```
 try{
@@ -137,8 +139,8 @@ try{
 }
 ```
 
-### 3. Prepare name renewal transactions
-
+## Renew Name
+Retrieve transactions to renew a name. The ANS registry currently supports renewal only by the owner hence the transactions will fail if the input address is not the current owner of the name.
 ```
 try{
 
@@ -156,8 +158,8 @@ try{
 }
 ```
 
-### 4. Prepare initiate name transfer transaction
-
+## Initiate transfer
+This method returns a transaction to initiate name transfer. The owner is required to set the price for transfer and the recipient's algorand account address.
 ```
 try{
     let name = '' // .algo name to initiate transfer
@@ -175,7 +177,8 @@ try{
 }
 ```
 
-### 5. Accept name transfer transaction
+## Accept transfer
+Retrieve the transactions to complete the transfer by providing the current owner's address, the transfer recipient's address, and the price set by the owner
 
 ```
 try{
