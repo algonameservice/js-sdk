@@ -57,7 +57,7 @@ else {
 
 ## Get names owned by an address
 
-This GET method gets all the names owned by an Algorand address in reverse chronological order of registration. 
+This method gets all the names owned by an Algorand address in reverse chronological order of registration. 
 
 ```
 let address="" // provide an algorand wallet address here
@@ -148,7 +148,7 @@ try{
     let owner = '' // owner address
     let period = 0 // period for renewal
 
-    const nameRenewalTxns = await sdk.prepareNameRenewalTransactions(name, owner, years);
+    const nameRenewalTxns = await sdk.prepareNameRenewalTransactions(name, owner, period);
 
     // Returns an array of transactions 
     // Sign each and send to network
@@ -182,7 +182,7 @@ Retrieve the transactions to complete the transfer by providing the current owne
 
 ```
 try{
-    let name = '' // .algo name to initiate transfer
+    let name = '' // .algo name to accept transfer
     let owner = '' // current owner
     let newOwner = '' // new owner's address
     let price = 0 // price set in the previous transaction
