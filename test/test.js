@@ -79,7 +79,9 @@ mocha_1.describe('Testing name resolution methods', function () {
             var nameRegistrationTxns;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, resolverObj.prepareNameRegistrationTransactions('ans.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 1)];
+                    case 0:
+                        this.timeout(100000);
+                        return [4 /*yield*/, resolverObj.prepareNameRegistrationTransactions('ansone.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 1)];
                     case 1:
                         nameRegistrationTxns = _a.sent();
                         assert.isAtLeast(nameRegistrationTxns.txns.length, 2, "Not returning transactions for name registration");
@@ -93,10 +95,12 @@ mocha_1.describe('Testing name resolution methods', function () {
             var updatePropertyTxns;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, resolverObj.prepareUpdateNamePropertyTransactions('ans.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', {
-                            'discord': 'ansdiscord',
-                            'github': 'ansgithub'
-                        })];
+                    case 0:
+                        this.timeout(100000);
+                        return [4 /*yield*/, resolverObj.prepareUpdateNamePropertyTransactions('ans.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', {
+                                'discord': 'ansdiscord',
+                                'github': 'ansgithub'
+                            })];
                     case 1:
                         updatePropertyTxns = _a.sent();
                         assert.notEqual(updatePropertyTxns[0].group, undefined, "Group is not assigned");
@@ -112,7 +116,9 @@ mocha_1.describe('Testing name resolution methods', function () {
             var nameInfo;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, resolverObj.preparePaymentTxn('RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 1, 'Test Note')];
+                    case 0:
+                        this.timeout(100000);
+                        return [4 /*yield*/, resolverObj.preparePaymentTxn('RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 1, 'Test Note')];
                     case 1:
                         nameInfo = _a.sent();
                         assert.equal(nameInfo["type"], "pay", "Not returning the payment transaction");
@@ -126,7 +132,9 @@ mocha_1.describe('Testing name resolution methods', function () {
             var nameRenewalTxns;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, resolverObj.prepareNameRenewalTxns('ans.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 2)];
+                    case 0:
+                        this.timeout(100000);
+                        return [4 /*yield*/, resolverObj.prepareNameRenewalTransactions('ans.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 2)];
                     case 1:
                         nameRenewalTxns = _a.sent();
                         assert.equal(nameRenewalTxns.length, 2, "Not returning 2 transactions for renewing name");
@@ -140,7 +148,9 @@ mocha_1.describe('Testing name resolution methods', function () {
             var nameTransferTxn;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, resolverObj.prepareInitiateNameTransferTransaction('lalith.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 'RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE', 1)];
+                    case 0:
+                        this.timeout(100000);
+                        return [4 /*yield*/, resolverObj.prepareInitiateNameTransferTransaction('lalith.algo', 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 'RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE', 1)];
                     case 1:
                         nameTransferTxn = _a.sent();
                         assert.equal(nameTransferTxn["type"], "appl", "Not returning the name transfer transaction");

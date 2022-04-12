@@ -39,15 +39,88 @@ exports.__esModule = true;
 var resolver_1 = require("./classes/resolver");
 var transactions_1 = require("./classes/transactions");
 var constants_1 = require("./constants");
+var algosdk_1 = require("algosdk");
+var errors_1 = require("./classes/errors");
 var ansResolver = /** @class */ (function () {
     function ansResolver(client, indexer) {
         var _this = this;
+        this.isValidAddress = function (address) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2 /*return*/, algosdk_1["default"].isValidAddress(address)];
+            });
+        }); };
+        this.isValidName = function (name) { return __awaiter(_this, void 0, void 0, function () {
+            var lengthOfName, i;
+            return __generator(this, function (_a) {
+                name = name.split('.algo')[0];
+                lengthOfName = name.length;
+                for (i = 0; i < lengthOfName; i++) {
+                    if (!(name.charCodeAt(i) >= constants_1.CONSTANTS.ASCII_0 && name.charCodeAt(i) <= constants_1.CONSTANTS.ASCII_9)) {
+                        if (!(name.charCodeAt(i) >= constants_1.CONSTANTS.ASCII_A && name.charCodeAt(i) <= constants_1.CONSTANTS.ASCII_Z))
+                            throw new errors_1.InvalidNameError();
+                    }
+                }
+                return [2 /*return*/, true];
+            });
+        }); };
+        this.isValidTransaction = function (name, sender, receiver, method) { return __awaiter(_this, void 0, void 0, function () {
+            var nameInfo, nameInfo, nameInfo;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        name = name.split('.algo')[0];
+                        return [4 /*yield*/, this.isValidName(name)];
+                    case 1:
+                        if (!(_a.sent()))
+                            return [2 /*return*/];
+                        return [4 /*yield*/, this.isValidAddress(sender)];
+                    case 2:
+                        if (!(_a.sent()))
+                            throw new errors_1.AddressValidationError();
+                        if (!(!receiver && !method)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.resolveName(name)];
+                    case 3:
+                        nameInfo = _a.sent();
+                        if (nameInfo["found"]) {
+                            if (nameInfo["address"] !== sender)
+                                throw new errors_1.IncorrectOwnerError(name, sender);
+                        }
+                        return [3 /*break*/, 8];
+                    case 4:
+                        if (!(sender && receiver)) return [3 /*break*/, 8];
+                        if (!(method === 'initiate_transfer')) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.resolveName(name)];
+                    case 5:
+                        nameInfo = _a.sent();
+                        if (nameInfo["found"]) {
+                            if (nameInfo["address"] !== sender)
+                                throw new errors_1.IncorrectOwnerError(name, sender);
+                        }
+                        return [3 /*break*/, 8];
+                    case 6:
+                        if (!(method === 'accept_transfer')) return [3 /*break*/, 8];
+                        return [4 /*yield*/, this.resolveName(name)];
+                    case 7:
+                        nameInfo = _a.sent();
+                        if (nameInfo["found"]) {
+                            if (nameInfo["address"] !== receiver)
+                                throw new errors_1.IncorrectOwnerError(name, sender);
+                        }
+                        _a.label = 8;
+                    case 8: return [2 /*return*/, true];
+                }
+            });
+        }); };
         this.resolveName = function (name) { return __awaiter(_this, void 0, void 0, function () {
             var nameInfo;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.resolverInstance.resolveName(name)];
+                    case 0: return [4 /*yield*/, this.isValidName(name)];
                     case 1:
+                        if (!(_a.sent()))
+                            return [2 /*return*/];
+                        return [4 /*yield*/, this.resolverInstance.resolveName(name)];
+                    case 2:
                         nameInfo = _a.sent();
                         return [2 /*return*/, nameInfo];
                 }
@@ -57,44 +130,70 @@ var ansResolver = /** @class */ (function () {
             var accountInfo;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.resolverInstance.getNamesOwnedByAddress(account)];
+                    case 0: return [4 /*yield*/, this.isValidAddress(account)];
                     case 1:
+                        if (!(_a.sent()))
+                            throw new errors_1.AddressValidationError();
+                        return [4 /*yield*/, this.resolverInstance.getNamesOwnedByAddress(account)];
+                    case 2:
                         accountInfo = _a.sent();
                         return [2 /*return*/, accountInfo];
                 }
             });
         }); };
         this.prepareNameRegistrationTransactions = function (name, address, period) { return __awaiter(_this, void 0, void 0, function () {
-            var txns, err_1;
+            var nameInfo, txns, err_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.transactionsInstance.prepareNameRegistrationTransactions(name, address, period)];
+                    case 0: return [4 /*yield*/, this.isValidName(name)];
                     case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.isValidAddress(address)];
+                    case 2:
+                        if (!(_a.sent()))
+                            throw new errors_1.AddressValidationError();
+                        return [4 /*yield*/, this.resolveName(name)];
+                    case 3:
+                        nameInfo = _a.sent();
+                        if (nameInfo["found"])
+                            throw new Error('Name already registered');
+                        _a.label = 4;
+                    case 4:
+                        _a.trys.push([4, 6, , 7]);
+                        return [4 /*yield*/, this.transactionsInstance.prepareNameRegistrationTransactions(name, address, period)];
+                    case 5:
                         txns = _a.sent();
                         return [2 /*return*/, txns];
-                    case 2:
+                    case 6:
                         err_1 = _a.sent();
                         return [2 /*return*/, err_1.message];
-                    case 3: return [2 /*return*/];
+                    case 7: return [2 /*return*/];
                 }
             });
         }); };
         this.prepareUpdateNamePropertyTransactions = function (name, address, editedHandles) { return __awaiter(_this, void 0, void 0, function () {
-            var txns, err_2;
+            var nameInfo, txns, err_2;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.transactionsInstance.prepareUpdateNamePropertyTransactions(name, address, editedHandles)];
+                    case 0: return [4 /*yield*/, this.isValidTransaction(name, address)];
                     case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.resolveName(name)];
+                    case 2:
+                        nameInfo = _a.sent();
+                        if (!nameInfo["found"])
+                            throw new errors_1.NameNotRegisteredError(name);
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, this.transactionsInstance.prepareUpdateNamePropertyTransactions(name, address, editedHandles)];
+                    case 4:
                         txns = _a.sent();
                         return [2 /*return*/, txns];
-                    case 2:
+                    case 5:
                         err_2 = _a.sent();
                         return [2 /*return*/, err_2.message];
-                    case 3: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         }); };
@@ -115,12 +214,21 @@ var ansResolver = /** @class */ (function () {
                 }
             });
         }); };
-        this.prepareNameRenewalTxns = function (name, sender, years) { return __awaiter(_this, void 0, void 0, function () {
-            var amt, txns, err_4;
+        this.prepareNameRenewalTransactions = function (name, sender, years) { return __awaiter(_this, void 0, void 0, function () {
+            var nameInfo, amt, txns, err_4;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
+                    case 0: return [4 /*yield*/, this.isValidTransaction(name, sender)];
+                    case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.resolveName(name)];
+                    case 2:
+                        nameInfo = _a.sent();
+                        if (!nameInfo["found"])
+                            throw new errors_1.NameNotRegisteredError(name);
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
                         amt = 0;
                         name = name.split('.algo')[0];
                         if (name.length < 3)
@@ -132,47 +240,65 @@ var ansResolver = /** @class */ (function () {
                         else if (name.length >= 5)
                             amt = (constants_1.CONSTANTS.CHAR_5_AMOUNT) * years;
                         return [4 /*yield*/, this.transactionsInstance.prepareNameRenewalTxns(name, sender, years, amt)];
-                    case 1:
+                    case 4:
                         txns = _a.sent();
                         return [2 /*return*/, txns];
-                    case 2:
+                    case 5:
                         err_4 = _a.sent();
                         return [2 /*return*/, err_4.message];
-                    case 3: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         }); };
         this.prepareInitiateNameTransferTransaction = function (name, sender, newOwner, price) { return __awaiter(_this, void 0, void 0, function () {
-            var txns, err_5;
+            var nameInfo, txns, err_5;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.transactionsInstance.prepareInitiateNameTransferTransaction(name, sender, newOwner, price)];
+                    case 0: return [4 /*yield*/, this.isValidTransaction(name, sender, newOwner, 'initiate_transfer')];
                     case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.resolveName(name)];
+                    case 2:
+                        nameInfo = _a.sent();
+                        if (!nameInfo["found"])
+                            throw new errors_1.NameNotRegisteredError(name);
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, this.transactionsInstance.prepareInitiateNameTransferTransaction(name, sender, newOwner, price)];
+                    case 4:
                         txns = _a.sent();
                         return [2 /*return*/, txns];
-                    case 2:
+                    case 5:
                         err_5 = _a.sent();
                         return [2 /*return*/, err_5.message];
-                    case 3: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         }); };
         this.prepareAcceptNameTransferTransactions = function (name, sender, receiver, amt) { return __awaiter(_this, void 0, void 0, function () {
-            var txns, err_6;
+            var nameInfo, txns, err_6;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        _a.trys.push([0, 2, , 3]);
-                        return [4 /*yield*/, this.transactionsInstance.prepareAcceptNameTransferTransactions(name, sender, receiver, amt)];
+                    case 0: return [4 /*yield*/, this.isValidTransaction(name, sender, receiver, 'accept_transfer')];
                     case 1:
+                        _a.sent();
+                        return [4 /*yield*/, this.resolveName(name)];
+                    case 2:
+                        nameInfo = _a.sent();
+                        if (!nameInfo["found"])
+                            throw new errors_1.NameNotRegisteredError(name);
+                        _a.label = 3;
+                    case 3:
+                        _a.trys.push([3, 5, , 6]);
+                        return [4 /*yield*/, this.transactionsInstance.prepareAcceptNameTransferTransactions(name, sender, receiver, amt)];
+                    case 4:
                         txns = _a.sent();
                         return [2 /*return*/, txns];
-                    case 2:
+                    case 5:
                         err_6 = _a.sent();
                         return [2 /*return*/, err_6.message];
-                    case 3: return [2 /*return*/];
+                    case 6: return [2 /*return*/];
                 }
             });
         }); };

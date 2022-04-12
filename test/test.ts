@@ -23,7 +23,7 @@ describe('Testing name resolution methods', function() {
 
         resolverObj = new ansResolver(algodClient, indexerClient);
     });
-    
+   
     it('Resolves a .algo name', async function(){
 
         const nameInfo = await resolverObj.resolveName('lalith.algo');
@@ -31,7 +31,7 @@ describe('Testing name resolution methods', function() {
         assert.equal(nameInfo.found, true, "Error: Name does not appear to be registered");
         assert.equal(nameInfo.address, 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', "Error: Name does not appear to point to the right owner");
     })
-    
+
     /*
     it('Gets the list of .algo names owned by an address', async function(){
 
@@ -43,8 +43,9 @@ describe('Testing name resolution methods', function() {
     */
     
     it('Prepares a list of transactions to register a name', async function(){
+        this.timeout(100000);
         const nameRegistrationTxns = await resolverObj.prepareNameRegistrationTransactions(
-            'ans.algo',
+            'ansone.algo',
             'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
             1
             );
@@ -53,6 +54,7 @@ describe('Testing name resolution methods', function() {
     })
 
     it('Prepares a list of transactions to set properties', async function(){
+        this.timeout(100000);
         const updatePropertyTxns = await resolverObj.prepareUpdateNamePropertyTransactions(
             'ans.algo',
             'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
@@ -67,6 +69,7 @@ describe('Testing name resolution methods', function() {
     })
 
     it('Prepares a transaction to transfer funds', async function(){
+        this.timeout(100000);
         const nameInfo = await resolverObj.preparePaymentTxn(
             'RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE',
             'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
@@ -78,16 +81,18 @@ describe('Testing name resolution methods', function() {
     })
 
     it('Prepares a list of transactions to renew name', async function(){
-        const nameRenewalTxns = await resolverObj.prepareNameRenewalTxns(
+        this.timeout(100000);
+        const nameRenewalTxns = await resolverObj.prepareNameRenewalTransactions(
                 'ans.algo',
                 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
                 2
             );
-        
+
         assert.equal(nameRenewalTxns.length, 2, "Not returning 2 transactions for renewing name");
     })
 
     it('Prepares a transaction to initiate name transfer', async function(){
+        this.timeout(100000);
         const nameTransferTxn = await resolverObj.prepareInitiateNameTransferTransaction(
             'lalith.algo',
             'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
@@ -99,6 +104,7 @@ describe('Testing name resolution methods', function() {
     })
 
     it('Prepares a transaction to accept name transfer', async function(){
+        
         const acceptNameTranserTxn = await resolverObj.prepareAcceptNameTransferTransactions(
             'lalith.algo',
             'RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE',
@@ -109,5 +115,4 @@ describe('Testing name resolution methods', function() {
         assert.equal(acceptNameTranserTxn.length, 3, "Not returning 3 transactions for accepting name");
     })
     
-
 });

@@ -5,5 +5,9 @@ export const CONSTANTS = {
     CHAR_5_AMOUNT: 5000000,
     RENEWAL_AMOUNT: 5000000,
     TRANSFER_FEE: 2000000,
-    IPFS_LINK:'https://ipfs.infura.io/ipfs/'
+    IPFS_LINK:'https://ipfs.infura.io/ipfs/',
+    ASCII_A: 97,
+    ASCII_Z: 122,
+    ASCII_0: 48,
+    ASCII_9: 57
 }

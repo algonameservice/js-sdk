@@ -27,7 +27,7 @@ exports.AddressValidationError = AddressValidationError;
 var InvalidNameError = /** @class */ (function (_super) {
     __extends(InvalidNameError, _super);
     function InvalidNameError() {
-        var _this = _super.call(this, "The name must be between 3 and 64 characters") || this;
+        var _this = _super.call(this, "The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters") || this;
         _this.name = "InvalidNameError";
         _this.type = "InvalidNameError";
         return _this;
@@ -35,3 +35,25 @@ var InvalidNameError = /** @class */ (function (_super) {
     return InvalidNameError;
 }(Error));
 exports.InvalidNameError = InvalidNameError;
+var NameNotRegisteredError = /** @class */ (function (_super) {
+    __extends(NameNotRegisteredError, _super);
+    function NameNotRegisteredError(name) {
+        var _this = _super.call(this, "Name " + name + " is not registered") || this;
+        _this.name = "NameNotRegisteredError";
+        _this.type = "NameNotRegisteredError";
+        return _this;
+    }
+    return NameNotRegisteredError;
+}(Error));
+exports.NameNotRegisteredError = NameNotRegisteredError;
+var IncorrectOwnerError = /** @class */ (function (_super) {
+    __extends(IncorrectOwnerError, _super);
+    function IncorrectOwnerError(name, address) {
+        var _this = _super.call(this, "Name " + name + ".algo is not owned by " + address) || this;
+        _this.name = "IncorrectOwnerError";
+        _this.type = "IncorrectOwnerError";
+        return _this;
+    }
+    return IncorrectOwnerError;
+}(Error));
+exports.IncorrectOwnerError = IncorrectOwnerError;
