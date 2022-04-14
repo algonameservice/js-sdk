@@ -32,15 +32,15 @@ describe('Testing name resolution methods', function() {
         assert.equal(nameInfo.address, 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', "Error: Name does not appear to point to the right owner");
     })
 
-    /*
+    
     it('Gets the list of .algo names owned by an address', async function(){
 
         this.timeout(100000);
-        const nameInfo = await resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU');
+        const nameInfo = await resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 2);
         assert.isAtLeast(nameInfo.length, 1, "Error: Doesn't retrieve the names owned by the address");
     
     })
-    */
+    
     
     it('Prepares a list of transactions to register a name', async function(){
         this.timeout(100000);

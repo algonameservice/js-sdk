@@ -65,15 +65,23 @@ mocha_1.describe('Testing name resolution methods', function () {
             });
         });
     });
-    /*
-    it('Gets the list of .algo names owned by an address', async function(){
-
-        this.timeout(100000);
-        const nameInfo = await resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU');
-        assert.isAtLeast(nameInfo.length, 1, "Error: Doesn't retrieve the names owned by the address");
-    
-    })
-    */
+    mocha_1.it('Gets the list of .algo names owned by an address', function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var nameInfo;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.timeout(100000);
+                        return [4 /*yield*/, resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 2)];
+                    case 1:
+                        nameInfo = _a.sent();
+                        console.log(nameInfo);
+                        assert.isAtLeast(nameInfo.length, 1, "Error: Doesn't retrieve the names owned by the address");
+                        return [2 /*return*/];
+                }
+            });
+        });
+    });
     mocha_1.it('Prepares a list of transactions to register a name', function () {
         return __awaiter(this, void 0, void 0, function () {
             var nameRegistrationTxns;
