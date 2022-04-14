@@ -126,7 +126,7 @@ var ansResolver = /** @class */ (function () {
                 }
             });
         }); };
-        this.getNamesOwnedByAddress = function (account) { return __awaiter(_this, void 0, void 0, function () {
+        this.getNamesOwnedByAddress = function (account, limit) { return __awaiter(_this, void 0, void 0, function () {
             var accountInfo;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -134,7 +134,7 @@ var ansResolver = /** @class */ (function () {
                     case 1:
                         if (!(_a.sent()))
                             throw new errors_1.AddressValidationError();
-                        return [4 /*yield*/, this.resolverInstance.getNamesOwnedByAddress(account)];
+                        return [4 /*yield*/, this.resolverInstance.getNamesOwnedByAddress(account, limit)];
                     case 2:
                         accountInfo = _a.sent();
                         return [2 /*return*/, accountInfo];

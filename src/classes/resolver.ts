@@ -107,19 +107,44 @@ export class resolver {
         }
     }
 
-    getNamesOwnedByAddress = async (address:string) => {
+    getNamesOwnedByAddress = async (address:string, limit:number) => {
         const isValidAddress:Boolean = await algosdk.isValidAddress(address);
         if(!isValidAddress) {
             throw new AddressValidationError();
         }
         else {
             let indexer = await this.indexerClient;
-            const accountTxns = await indexer.lookupAccountTransactions(address).do();
+            
+            let nextToken = '';
+            let txnLength = 1;
+            let txns = [];
+            let count=0;
+            while(txnLength > 0){
+                try{
+                    let info = await indexer.lookupAccountTransactions(address).
+                    limit(10000).
+                    afterTime('2022-02-25').
+                    nextToken(nextToken).do();
+                    txnLength=info.transactions.length;
+                    if(txnLength > 0) {
+                        count++;
+                        nextToken = info["next-token"];
+                        txns.push(info.transactions);
+                    }
+                    
+                }catch(err){
+                    return false;
+                }
+            }
 
-            const txns = accountTxns.transactions;
+            let accountTxns:any = [];
+            for(let i=0; i<txns.length; i++){
+                accountTxns=accountTxns.concat(txns[i]);
+            }
+        
+            txns = accountTxns;
             const names:any = [];
             
-
             try{
         
                 for(let i=0; i<txns.length; i++) {
@@ -168,6 +193,10 @@ export class resolver {
                 let details=[];
                 
                 for(let i=0; i<names.length; i++) {
+                    if(limit !== undefined) {
+                        if(details.length >= limit) break;
+                    }
+                    
                     let info:any = await this.resolveName(names[i]);                
                     if(info.found && info.address !== undefined) {
 

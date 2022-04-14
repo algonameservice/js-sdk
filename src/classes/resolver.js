@@ -135,8 +135,8 @@ var resolver = /** @class */ (function () {
                 }
             });
         }); };
-        this.getNamesOwnedByAddress = function (address) { return __awaiter(_this, void 0, void 0, function () {
-            var isValidAddress, indexer, accountTxns, txns, names, i, txn, appArgs, lsigAccount, accountInfo, length_2, i_1, kvPairs, j, key, value, err_2, details, i, info;
+        this.getNamesOwnedByAddress = function (address, limit) { return __awaiter(_this, void 0, void 0, function () {
+            var isValidAddress, indexer, nextToken, txnLength, txns, count, info, err_2, accountTxns, i, names, i, txn, appArgs, lsigAccount, accountInfo, length_2, i_1, kvPairs, j, key, value, err_3, details, i, info;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, algosdk_1["default"].isValidAddress(address)];
@@ -147,31 +147,60 @@ var resolver = /** @class */ (function () {
                     case 2: return [4 /*yield*/, this.indexerClient];
                     case 3:
                         indexer = _a.sent();
-                        return [4 /*yield*/, indexer.lookupAccountTransactions(address)["do"]()];
+                        nextToken = '';
+                        txnLength = 1;
+                        txns = [];
+                        count = 0;
+                        _a.label = 4;
                     case 4:
-                        accountTxns = _a.sent();
-                        txns = accountTxns.transactions;
-                        names = [];
+                        if (!(txnLength > 0)) return [3 /*break*/, 9];
                         _a.label = 5;
                     case 5:
-                        _a.trys.push([5, 11, , 12]);
-                        i = 0;
-                        _a.label = 6;
+                        _a.trys.push([5, 7, , 8]);
+                        return [4 /*yield*/, indexer.lookupAccountTransactions(address).
+                                limit(10000).
+                                afterTime('2022-02-25').
+                                nextToken(nextToken)["do"]()];
                     case 6:
-                        if (!(i < txns.length)) return [3 /*break*/, 10];
+                        info = _a.sent();
+                        txnLength = info.transactions.length;
+                        if (txnLength > 0) {
+                            count++;
+                            nextToken = info["next-token"];
+                            txns.push(info.transactions);
+                        }
+                        return [3 /*break*/, 8];
+                    case 7:
+                        err_2 = _a.sent();
+                        return [2 /*return*/, false];
+                    case 8: return [3 /*break*/, 4];
+                    case 9:
+                        accountTxns = [];
+                        for (i = 0; i < txns.length; i++) {
+                            accountTxns = accountTxns.concat(txns[i]);
+                        }
+                        txns = accountTxns;
+                        names = [];
+                        _a.label = 10;
+                    case 10:
+                        _a.trys.push([10, 16, , 17]);
+                        i = 0;
+                        _a.label = 11;
+                    case 11:
+                        if (!(i < txns.length)) return [3 /*break*/, 15];
                         txn = txns[i];
-                        if (!(txn["tx-type"] === "appl")) return [3 /*break*/, 9];
-                        if (!(txn["application-transaction"]["application-id"] === constants_1.CONSTANTS.APP_ID)) return [3 /*break*/, 9];
+                        if (!(txn["tx-type"] === "appl")) return [3 /*break*/, 14];
+                        if (!(txn["application-transaction"]["application-id"] === constants_1.CONSTANTS.APP_ID)) return [3 /*break*/, 14];
                         appArgs = txn["application-transaction"]["application-args"];
-                        if (!(Buffer.from(appArgs[0], 'base64').toString() === "register_name")) return [3 /*break*/, 7];
+                        if (!(Buffer.from(appArgs[0], 'base64').toString() === "register_name")) return [3 /*break*/, 12];
                         if (!names.includes(Buffer.from(appArgs[1], 'base64').toString()))
                             names.push(Buffer.from(appArgs[1], 'base64').toString());
-                        return [3 /*break*/, 9];
-                    case 7:
-                        if (!(Buffer.from(appArgs[0], 'base64').toString() === "accept_transfer")) return [3 /*break*/, 9];
+                        return [3 /*break*/, 14];
+                    case 12:
+                        if (!(Buffer.from(appArgs[0], 'base64').toString() === "accept_transfer")) return [3 /*break*/, 14];
                         lsigAccount = txn["application-transaction"]["accounts"][0];
                         return [4 /*yield*/, indexer.lookupAccountByID(lsigAccount)["do"]()];
-                    case 8:
+                    case 13:
                         accountInfo = _a.sent();
                         accountInfo = accountInfo.account['apps-local-state'];
                         length_2 = accountInfo.length;
@@ -189,23 +218,27 @@ var resolver = /** @class */ (function () {
                                 }
                             }
                         }
-                        _a.label = 9;
-                    case 9:
+                        _a.label = 14;
+                    case 14:
                         i++;
-                        return [3 /*break*/, 6];
-                    case 10: return [3 /*break*/, 12];
-                    case 11:
-                        err_2 = _a.sent();
+                        return [3 /*break*/, 11];
+                    case 15: return [3 /*break*/, 17];
+                    case 16:
+                        err_3 = _a.sent();
                         return [2 /*return*/, []];
-                    case 12:
-                        if (!(names.length > 0)) return [3 /*break*/, 17];
+                    case 17:
+                        if (!(names.length > 0)) return [3 /*break*/, 22];
                         details = [];
                         i = 0;
-                        _a.label = 13;
-                    case 13:
-                        if (!(i < names.length)) return [3 /*break*/, 16];
+                        _a.label = 18;
+                    case 18:
+                        if (!(i < names.length)) return [3 /*break*/, 21];
+                        if (limit !== undefined) {
+                            if (details.length >= limit)
+                                return [3 /*break*/, 21];
+                        }
                         return [4 /*yield*/, this.resolveName(names[i])];
-                    case 14:
+                    case 19:
                         info = _a.sent();
                         if (info.found && info.address !== undefined) {
                             if (info.address === address) {
@@ -215,12 +248,12 @@ var resolver = /** @class */ (function () {
                         else {
                             i = i - 1;
                         }
-                        _a.label = 15;
-                    case 15:
+                        _a.label = 20;
+                    case 20:
                         i++;
-                        return [3 /*break*/, 13];
-                    case 16: return [2 /*return*/, (details)];
-                    case 17: return [2 /*return*/];
+                        return [3 /*break*/, 18];
+                    case 21: return [2 /*return*/, (details)];
+                    case 22: return [2 /*return*/];
                 }
             });
         }); };

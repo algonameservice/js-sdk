@@ -62,9 +62,9 @@ export class ansResolver {
         return nameInfo;
     }
 
-    getNamesOwnedByAddress = async (account:string) => {
+    getNamesOwnedByAddress = async (account:string, limit:number) => {
         if(!await this.isValidAddress(account)) throw new AddressValidationError();
-        let accountInfo:Object = await this.resolverInstance.getNamesOwnedByAddress(account);
+        let accountInfo:Object = await this.resolverInstance.getNamesOwnedByAddress(account, limit);
         return accountInfo;
     }
 
