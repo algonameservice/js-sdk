@@ -107,7 +107,7 @@ export class resolver {
         }
     }
 
-    getNamesOwnedByAddress = async (address:string, limit:number) => {
+    getNamesOwnedByAddress = async (address:string, socials:boolean, metadata:boolean, limit:number) => {
         const isValidAddress:Boolean = await algosdk.isValidAddress(address);
         if(!isValidAddress) {
             throw new AddressValidationError();
@@ -201,7 +201,15 @@ export class resolver {
                     if(info.found && info.address !== undefined) {
 
                         if(info.address === address){
-                            details.push(names[i]+'.algo');
+                            let domain:any = {
+                                name: '',
+                                owner: '',
+                            }
+                            domain.name = names[i]+'.algo';
+                            domain.owner = address;
+                            if(socials) domain["socials"] = this.getKvPairs(info.kvPairs, 'socials');
+                            if(metadata) domain["metadata"] = this.getKvPairs(info.kvPairs, 'metadata');
+                            details.push(domain);
                         }
                         
                     } else {
@@ -215,5 +223,27 @@ export class resolver {
         }
     }
 
-    //TODO:Get socials, and metadata
+    getKvPairs = (kvPairs:any, type:string) => {
+        let socials = [], metadata= [];
+        for(let i in kvPairs) {
+            let key = kvPairs[i].key;
+            let value = kvPairs[i].value;
+
+            let kvObj = {
+                key: key,
+                value: value
+            };
+            if(key!=='owner') {
+                if(key === 'github' 
+                    || key === 'discord' 
+                    || key === 'twitter' 
+                    || key === 'reddit'
+                    || key === 'telegram'
+                    || key === 'youtube') socials.push(kvObj);
+                else metadata.push(kvObj)
+            }
+        }
+        if(type === 'socials') return socials;
+        else if(type === 'metadata') return metadata;
+    }
 }

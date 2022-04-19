@@ -135,8 +135,8 @@ var resolver = /** @class */ (function () {
                 }
             });
         }); };
-        this.getNamesOwnedByAddress = function (address, limit) { return __awaiter(_this, void 0, void 0, function () {
-            var isValidAddress, indexer, nextToken, txnLength, txns, count, info, err_2, accountTxns, i, names, i, txn, appArgs, lsigAccount, accountInfo, length_2, i_1, kvPairs, j, key, value, err_3, details, i, info;
+        this.getNamesOwnedByAddress = function (address, socials, metadata, limit) { return __awaiter(_this, void 0, void 0, function () {
+            var isValidAddress, indexer, nextToken, txnLength, txns, count, info, err_2, accountTxns, i, names, i, txn, appArgs, lsigAccount, accountInfo, length_2, i_1, kvPairs, j, key, value, err_3, details, i, info, domain;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, algosdk_1["default"].isValidAddress(address)];
@@ -242,7 +242,17 @@ var resolver = /** @class */ (function () {
                         info = _a.sent();
                         if (info.found && info.address !== undefined) {
                             if (info.address === address) {
-                                details.push(names[i] + '.algo');
+                                domain = {
+                                    name: '',
+                                    owner: ''
+                                };
+                                domain.name = names[i] + '.algo';
+                                domain.owner = address;
+                                if (socials)
+                                    domain["socials"] = this.getKvPairs(info.kvPairs, 'socials');
+                                if (metadata)
+                                    domain["metadata"] = this.getKvPairs(info.kvPairs, 'metadata');
+                                details.push(domain);
                             }
                         }
                         else {
@@ -257,6 +267,32 @@ var resolver = /** @class */ (function () {
                 }
             });
         }); };
+        this.getKvPairs = function (kvPairs, type) {
+            var socials = [], metadata = [];
+            for (var i in kvPairs) {
+                var key = kvPairs[i].key;
+                var value = kvPairs[i].value;
+                var kvObj = {
+                    key: key,
+                    value: value
+                };
+                if (key !== 'owner') {
+                    if (key === 'github'
+                        || key === 'discord'
+                        || key === 'twitter'
+                        || key === 'reddit'
+                        || key === 'telegram'
+                        || key === 'youtube')
+                        socials.push(kvObj);
+                    else
+                        metadata.push(kvObj);
+                }
+            }
+            if (type === 'socials')
+                return socials;
+            else if (type === 'metadata')
+                return metadata;
+        };
         this.algodClient = client;
         this.indexerClient = indexer;
         this.APP_ID = constants_1.CONSTANTS.APP_ID;

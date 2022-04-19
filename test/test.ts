@@ -36,7 +36,7 @@ describe('Testing name resolution methods', function() {
     it('Gets the list of .algo names owned by an address', async function(){
 
         this.timeout(100000);
-        const nameInfo = await resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 2);
+        const nameInfo = await resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', false, false, 1);
         assert.isAtLeast(nameInfo.length, 1, "Error: Doesn't retrieve the names owned by the address");
     
     })

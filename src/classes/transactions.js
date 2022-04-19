@@ -193,6 +193,7 @@ var Transactions = /** @class */ (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        name = name.split('.algo')[0];
                         algodClient = this.algodClient;
                         return [4 /*yield*/, algodClient.getTransactionParams()["do"]()];
                     case 1:
@@ -201,7 +202,6 @@ var Transactions = /** @class */ (function () {
                         closeToRemaninder = undefined;
                         note = undefined;
                         paymentTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
-                        name = name.split('.algo')[0];
                         return [4 /*yield*/, this.generateLsig(name)];
                     case 2:
                         lsig = _a.sent();

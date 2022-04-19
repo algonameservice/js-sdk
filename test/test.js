@@ -72,7 +72,7 @@ mocha_1.describe('Testing name resolution methods', function () {
                 switch (_a.label) {
                     case 0:
                         this.timeout(100000);
-                        return [4 /*yield*/, resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 2)];
+                        return [4 /*yield*/, resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', false, false, 1)];
                     case 1:
                         nameInfo = _a.sent();
                         console.log(nameInfo);
