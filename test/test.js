@@ -75,7 +75,7 @@ mocha_1.describe('Testing name resolution methods', function () {
                         return [4 /*yield*/, resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', false, false, 1)];
                     case 1:
                         nameInfo = _a.sent();
-                        console.log(nameInfo);
+                        console.log(nameInfo[0].name);
                         assert.isAtLeast(nameInfo.length, 1, "Error: Doesn't retrieve the names owned by the address");
                         return [2 /*return*/];
                 }

@@ -61,15 +61,18 @@ This method gets all the names owned by an Algorand address in reverse chronolog
 
 ```
 let address="" // provide an algorand wallet address here
+let getSocials = true; // get socials with .algo name
+let getMetadata = true; // get metadata like expiry, avatar with .algo name;
+let limit = 1; // number of names to be retrieved
 
-let names = await sdk.getNamesOwnedByAddress(address);
+let names = await sdk.getNamesOwnedByAddress(address, getSocials, getMetadata, limit);
 
 // Returns an array of names owned by the address
 // Names appear in a reverse chronological order (names[0] returns recently purchased name)
 
 if(names.length > 0){
     for (let index in names){
-        console.log(names[index]);
+        console.log(names[index].name);
     }
 }    
 else {
