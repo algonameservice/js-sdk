@@ -36,12 +36,12 @@ describe('Testing name resolution methods', function() {
     it('Gets the list of .algo names owned by an address', async function(){
 
         this.timeout(100000);
-        const nameInfo = await resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', false, false, 1);
+        const nameInfo = await resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', true, true);
         assert.isAtLeast(nameInfo.length, 1, "Error: Doesn't retrieve the names owned by the address");
     
     })
     
-    
+    /*
     it('Prepares a list of transactions to register a name', async function(){
         this.timeout(100000);
         const nameRegistrationTxns = await resolverObj.prepareNameRegistrationTransactions(
@@ -114,5 +114,6 @@ describe('Testing name resolution methods', function() {
         
         assert.equal(acceptNameTranserTxn.length, 3, "Not returning 3 transactions for accepting name");
     })
+    */
     
 });
