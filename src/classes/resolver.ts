@@ -38,6 +38,7 @@ export class resolver {
             const lsig = await this.generateLsig(name);
             
             try {
+                
                 let accountInfo = await indexer.lookupAccountByID(lsig.address()).do();
                 
                 accountInfo = accountInfo.account['apps-local-state'];
@@ -107,19 +108,49 @@ export class resolver {
         }
     }
 
-    getNamesOwnedByAddress = async (address:string) => {
+    getNamesOwnedByAddress = async (address:string, socials?:boolean, metadata?:boolean, limit?:number) => {
         const isValidAddress:Boolean = await algosdk.isValidAddress(address);
         if(!isValidAddress) {
             throw new AddressValidationError();
         }
         else {
             let indexer = await this.indexerClient;
-            const accountTxns = await indexer.lookupAccountTransactions(address).do();
+            
+            let nextToken = '';
+            let txnLength = 1;
+            let txns = [];
+            let timeObjects = [];
+            timeObjects.push(new Date());
+            while(txnLength > 0){
+                try{
+                    let info = await indexer.searchForTransactions().
+                        address(address).
+                        addressRole("sender").
+                        afterTime("2022-02-24").
+                        txType("appl").
+                        applicationID(CONSTANTS.APP_ID).
+                        nextToken(nextToken).do();
+                    
+                    txnLength=info.transactions.length;
+                    if(txnLength > 0) {
+                        nextToken = info["next-token"];
+                        txns.push(info.transactions);
+                    }
+                    
+                }catch(err){
+                    return false;
+                }
+            }
+            timeObjects.push(new Date());
 
-            const txns = accountTxns.transactions;
+            let accountTxns:any = [];
+            for(let i=0; i<txns.length; i++){
+                accountTxns=accountTxns.concat(txns[i]);
+            }
+        
+            txns = accountTxns;
             const names:any = [];
             
-
             try{
         
                 for(let i=0; i<txns.length; i++) {
@@ -128,8 +159,8 @@ export class resolver {
                     if(txn["tx-type"] === "appl") {
                         
                         if(txn["application-transaction"]["application-id"] === CONSTANTS.APP_ID) {
-                            
                             let appArgs = txn["application-transaction"]["application-args"];
+                            
                             if(Buffer.from(appArgs[0], 'base64').toString() === "register_name") {
                                 if(!names.includes(Buffer.from(appArgs[1], 'base64').toString())) names.push(Buffer.from(appArgs[1], 'base64').toString())
                             }
@@ -139,15 +170,14 @@ export class resolver {
                                 accountInfo = accountInfo.account['apps-local-state'];
 
                                 const length = accountInfo.length;
+                                
                                 for(let i=0; i<length; i++){
                                     if(accountInfo[i].id === CONSTANTS.APP_ID) {
                                         let kvPairs = accountInfo[i]["key-value"];
                                         for(let j=0; j<kvPairs.length; j++) {
-                                            let key = Buffer.from(kvPairs[j].key, 'base64');
-                                            let value = Buffer.from(kvPairs[j].value.bytes, 'base64');
-
+                                            let key = Buffer.from(kvPairs[j].key, 'base64').toString();
+                                            let value = Buffer.from(kvPairs[j].value.bytes, 'base64').toString();
                                             if(key === 'name') {
-                                                
                                                 if(!names.includes(value)) names.push(value);
                                                 break;
                                             }
@@ -162,29 +192,72 @@ export class resolver {
             } catch (err) {
                 return []
             }
-
+            
             if(names.length > 0) {
 
                 let details=[];
                 
                 for(let i=0; i<names.length; i++) {
+                    
+                    if(limit !== undefined) {
+                        if(details.length >= limit) break;
+                    }
+                    
                     let info:any = await this.resolveName(names[i]);                
                     if(info.found && info.address !== undefined) {
 
                         if(info.address === address){
-                            details.push(names[i]+'.algo');
+                            let domain:any = {
+                                name: '',
+                            }
+                            domain.name = names[i]+'.algo';
+                            if(socials) domain["socials"] = this.getKvPairs(info.kvPairs, 'socials');
+                            if(metadata) domain["metadata"] = this.getKvPairs(info.kvPairs, 'metadata');
+                            details.push(domain);
                         }
                         
                     } else {
+                        console.log('Missed a name');
                         i = i-1;
                     }
+                    timeObjects.push(new Date());
                     
                 }
+                timeObjects.forEach((time, index) => {
+                    if(index === 0) console.log(`Started at: ${time.toTimeString()}`);
+                    else if(index === 1) console.log(`Got Transactions: ${time.toTimeString()}`);
+                    else {
+                        console.log(`Domain ${index-1} Time: ${time.toTimeString()}`)
+                    }
+                    
+                })
                 
                 return (details);
             }
         }
     }
 
-    //TODO:Get socials, and metadata
+    getKvPairs = (kvPairs:any, type:string) => {
+        let socials = [], metadata= [];
+        for(let i in kvPairs) {
+            let key = kvPairs[i].key;
+            let value = kvPairs[i].value;
+
+            let kvObj = {
+                key: key,
+                value: value
+            };
+            if(key!=='owner') {
+                if(key === 'github' 
+                    || key === 'discord' 
+                    || key === 'twitter' 
+                    || key === 'reddit'
+                    || key === 'telegram'
+                    || key === 'youtube') socials.push(kvObj);
+                else metadata.push(kvObj)
+            }
+        }
+        if(type === 'socials') return socials;
+        else if(type === 'metadata') return metadata;
+    }
 }
