@@ -1,3 +1,5 @@
 node_modules/
 test/api_key.js
 *.js
+*.d.ts
+.npmignore

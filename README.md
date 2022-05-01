@@ -1,16 +1,19 @@
 # anssdk
+
 A javscript sdk to resolve .algo names and perform name operations on ANS .algo names.
 
 ## Documentation
 
 Install Package
 
-**`npm`** 
+**`npm`**
+
 ```
 npm i anssdk
 ```
 
-**`yarn`** 
+**`yarn`**
+
 ```
 yarn add anssdk
 ```
@@ -18,11 +21,13 @@ yarn add anssdk
 ### Import
 
 **`ESM`** import
+
 ```
 import {ansResolver} from 'anssdk'
 ```
 
 **`CJS`** require
+
 ```
 const {ansResolver} = require('anssdk')
 ```
@@ -40,7 +45,7 @@ let sdk = ansResolver(client, indexer)
 
 ## Resolve .algo name
 
-Resolve .algo name to get the address of the owner. 
+Resolve .algo name to get the address of the owner.
 
 ```
 let name = "ans.algo"
@@ -57,7 +62,7 @@ else {
 
 ## Get names owned by an address
 
-This method gets all the names owned by an Algorand address in reverse chronological order of registration. 
+This method gets all the names owned by an Algorand address in reverse chronological order of registration.
 
 ```
 let address="" // provide an algorand wallet address here
@@ -74,7 +79,7 @@ if(names.length > 0){
     for (let index in names){
         console.log(names[index].name);
     }
-}    
+}
 else {
     //No names registered by this address
 }
@@ -83,6 +88,7 @@ else {
 ## Register a new name
 
 This method returns the transactions to be signed to register a .algo name.
+
 ```
 let nameToRegister = ''; // .algo name to register
 let address = ''; // owner's algorand wallet address
@@ -143,7 +149,9 @@ try{
 ```
 
 ## Renew Name
+
 Retrieve transactions to renew a name. The ANS registry currently supports renewal only by the owner hence the transactions will fail if the input address is not the current owner of the name.
+
 ```
 try{
 
@@ -153,7 +161,7 @@ try{
 
     const nameRenewalTxns = await sdk.prepareNameRenewalTransactions(name, owner, period);
 
-    // Returns an array of transactions 
+    // Returns an array of transactions
     // Sign each and send to network
 
 } catch (err) {
@@ -162,7 +170,9 @@ try{
 ```
 
 ## Initiate transfer
+
 This method returns a transaction to initiate name transfer. The owner is required to set the price for transfer and the recipient's algorand account address.
+
 ```
 try{
     let name = '' // .algo name to initiate transfer
@@ -172,7 +182,7 @@ try{
 
     const nameTransferTransaction = await sdk.prepareInitiateNameTransferTransaction(name, owner, newOwner, price);
 
-    // Returns a transaction to be signed by `owner` 
+    // Returns a transaction to be signed by `owner`
     // Sign and send to network
 
 } catch (err) {
@@ -181,6 +191,7 @@ try{
 ```
 
 ## Accept transfer
+
 Retrieve the transactions to complete the transfer by providing the current owner's address, the transfer recipient's address, and the price set by the owner
 
 ```
