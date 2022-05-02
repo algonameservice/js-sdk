@@ -2,29 +2,28 @@ import algosdk from "algosdk";
 import { CONSTANTS } from "../constants";
 import { generateTeal } from "./generateTeal";
 
+const APP_ID = CONSTANTS.APP_ID;
+
 export class Transactions {
   private algodClient: any;
-  private APP_ID: any;
-
+  
   constructor(client?: any) {
     this.algodClient = client;
-    this.APP_ID = CONSTANTS.APP_ID;
   }
 
-  generateLsig = async (name: string) => {
+  async generateLsig (name: string) {
     const client = this.algodClient;
     let program = await client.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
 
-    const lsig = new algosdk.LogicSigAccount(program);
-    return lsig;
-  };
+    return new algosdk.LogicSigAccount(program);
+  }
 
-  prepareNameRegistrationTransactions = async (
+  async prepareNameRegistrationTransactions (
     name: string,
     address: string,
     period: number
-  ) => {
+  ) {
     const algodClient = this.algodClient;
 
     /* 1st Txn - Payment to Smart Contract */
@@ -36,11 +35,11 @@ export class Transactions {
     params.fee = 1000;
     params.flatFee = true;
 
-    let receiver = algosdk.getApplicationAddress(CONSTANTS.APP_ID);
+    let receiver = algosdk.getApplicationAddress(APP_ID);
     let sender = address;
 
     if (period === undefined) period = 0;
-    else period = period - 1;
+    else period--;
 
     if (name.length < 3) return;
     else if (name.length === 3)
@@ -87,7 +86,7 @@ export class Transactions {
     const txn3 = await algosdk.makeApplicationOptInTxnFromObject({
       from: lsig.address(),
       suggestedParams: params,
-      appIndex: this.APP_ID,
+      appIndex: APP_ID,
     });
 
     groupTxns.push(txn3);
@@ -102,7 +101,7 @@ export class Transactions {
 
     const appArgs = [];
 
-    period = period + 1;
+    period++;
 
     appArgs.push(new Uint8Array(Buffer.from(method)));
     appArgs.push(new Uint8Array(Buffer.from(name)));
@@ -110,7 +109,7 @@ export class Transactions {
     const txn4 = await algosdk.makeApplicationNoOpTxn(
       address,
       params,
-      this.APP_ID,
+      APP_ID,
       appArgs,
       [lsig.address()]
     );
@@ -125,13 +124,13 @@ export class Transactions {
       txns: groupTxns,
       unsignedOptinTxn: groupTxns[2],
     };
-  };
+  }
 
-  prepareUpdateNamePropertyTransactions = async (
+  async prepareUpdateNamePropertyTransactions (
     name: string,
     address: string,
     editedHandles: any
-  ) => {
+  ) {
     const algodClient = this.algodClient;
 
     const lsig = await this.generateLsig(name);
@@ -155,7 +154,7 @@ export class Transactions {
       const txn = await algosdk.makeApplicationNoOpTxn(
         address,
         params,
-        this.APP_ID,
+        APP_ID,
         appArgs,
         [lsig.address()]
       );
@@ -165,14 +164,14 @@ export class Transactions {
     if (Object.keys(editedHandles).length > 1) algosdk.assignGroupID(groupTxns);
 
     return groupTxns;
-  };
+  }
 
-  preparePaymentTxn = async (
+  async preparePaymentTxn (
     sender: string,
     receiver: string,
     amt: number,
     note?: any
-  ) => {
+  ) {
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
     amt = algosdk.algosToMicroalgos(amt);
@@ -190,18 +189,18 @@ export class Transactions {
     );
 
     return txn;
-  };
+  }
 
-  prepareNameRenewalTxns = async (
+  async prepareNameRenewalTxns (
     name: string,
     sender: string,
     years: number,
     amt: number
-  ) => {
+  ) {
     name = name.split(".algo")[0];
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
-    const receiver = algosdk.getApplicationAddress(CONSTANTS.APP_ID);
+    const receiver = algosdk.getApplicationAddress(APP_ID);
     const closeToRemaninder = undefined;
     const note = undefined;
     const paymentTxn = algosdk.makePaymentTxnWithSuggestedParams(
@@ -222,7 +221,7 @@ export class Transactions {
     const applicationTxn = algosdk.makeApplicationNoOpTxn(
       sender,
       params,
-      CONSTANTS.APP_ID,
+      APP_ID,
       appArgs,
       [lsig.address()]
     );
@@ -231,14 +230,14 @@ export class Transactions {
 
     const groupTxns = [paymentTxn, applicationTxn];
     return groupTxns;
-  };
+  }
 
-  prepareInitiateNameTransferTransaction = async (
+  async prepareInitiateNameTransferTransaction (
     name: string,
     sender: string,
     newOwner: string,
     price: number
-  ) => {
+  ) {
     const algodClient = this.algodClient;
     price = algosdk.algosToMicroalgos(price);
     const params = await algodClient.getTransactionParams().do();
@@ -253,19 +252,19 @@ export class Transactions {
     const applicationTxn = algosdk.makeApplicationNoOpTxn(
       sender,
       params,
-      CONSTANTS.APP_ID,
+      APP_ID,
       appArgs,
       [lsig.address(), newOwner]
     );
     return applicationTxn;
-  };
+  }
 
-  prepareAcceptNameTransferTransactions = async (
+  async prepareAcceptNameTransferTransactions (
     name: string,
     sender: string,
     receiver: string,
     amt: number
-  ) => {
+  ) {
     amt = algosdk.algosToMicroalgos(amt);
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
@@ -281,7 +280,7 @@ export class Transactions {
       params
     );
 
-    receiver = algosdk.getApplicationAddress(CONSTANTS.APP_ID);
+    receiver = algosdk.getApplicationAddress(APP_ID);
 
     const paymentToSmartContractTxn = algosdk.makePaymentTxnWithSuggestedParams(
       sender,
@@ -302,7 +301,7 @@ export class Transactions {
     const applicationTxn = algosdk.makeApplicationNoOpTxn(
       sender,
       params,
-      CONSTANTS.APP_ID,
+      APP_ID,
       appArgs,
       [lsig.address()]
     );
@@ -319,5 +318,5 @@ export class Transactions {
       applicationTxn,
     ];
     return groupTxns;
-  };
+  }
 }

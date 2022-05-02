@@ -23,13 +23,13 @@ yarn add anssdk
 **`ESM`** import
 
 ```
-import {ansResolver} from 'anssdk'
+import {AnsResolver} from 'anssdk'
 ```
 
 **`CJS`** require
 
 ```
-const {ansResolver} = require('anssdk')
+const {AnsResolver} = require('anssdk')
 ```
 
 ### Setup
@@ -40,7 +40,7 @@ const algodIndexer = "" // set up your algod indexer
 
 //indexer and client must point to mainnet
 
-let sdk = ansResolver(client, indexer)
+let sdk = AnsResolver(client, indexer)
 ```
 
 ## Resolve .algo name

@@ -1,4 +1,4 @@
-import { resolver } from "./classes/resolver";
+import { Resolver } from "./classes/resolver";
 import { Transactions } from "./classes/transactions";
 import { CONSTANTS } from "./constants";
 import algosdk from "algosdk";
@@ -9,20 +9,20 @@ import {
   NameNotRegisteredError,
 } from "./classes/errors";
 
-export class ansResolver {
+export class AnsResolver {
   private resolverInstance: any;
   private transactionsInstance: any;
 
   constructor(client: any, indexer: any) {
-    this.resolverInstance = new resolver(client, indexer);
+    this.resolverInstance = new Resolver(client, indexer);
     this.transactionsInstance = new Transactions(client);
   }
 
-  isValidAddress = async (address: string) => {
+  async isValidAddress (address: string){
     return algosdk.isValidAddress(address);
-  };
+  }
 
-  isValidName = async (name: any) => {
+  async isValidName (name: any) {
     name = name.split(".algo")[0];
     const lengthOfName = name.length;
     for (let i = 0; i < lengthOfName; i++) {
@@ -42,14 +42,14 @@ export class ansResolver {
       }
     }
     return true;
-  };
+  }
 
-  isValidTransaction = async (
+  async isValidTransaction (
     name: string,
     sender: string,
     receiver?: string,
     method?: string
-  ) => {
+  ) {
     name = name.split(".algo")[0];
     if (!(await this.isValidName(name))) return;
     if (!(await this.isValidAddress(sender)))
@@ -76,20 +76,20 @@ export class ansResolver {
       }
     }
     return true;
-  };
+  }
 
-  resolveName = async (name: string) => {
+  async resolveName (name: string) {
     if (!(await this.isValidName(name))) return;
     const nameInfo = await this.resolverInstance.resolveName(name);
     return nameInfo;
-  };
+  }
 
-  getNamesOwnedByAddress = async (
+  async getNamesOwnedByAddress (
     account: string,
     socials?: boolean,
     metadata?: boolean,
     limit?: number
-  ) => {
+  ) {
     if (!(await this.isValidAddress(account)))
       throw new AddressValidationError();
     const accountInfo = await this.resolverInstance.getNamesOwnedByAddress(
@@ -99,13 +99,13 @@ export class ansResolver {
       limit
     );
     return accountInfo;
-  };
+  }
 
-  prepareNameRegistrationTransactions = async (
+  async prepareNameRegistrationTransactions (
     name: string,
     address: string,
     period: number
-  ) => {
+  ) {
     await this.isValidName(name);
     if (!(await this.isValidAddress(address)))
       throw new AddressValidationError();
@@ -122,13 +122,13 @@ export class ansResolver {
     } catch (err: any) {
       return err.message;
     }
-  };
+  }
 
-  prepareUpdateNamePropertyTransactions = async (
+  async prepareUpdateNamePropertyTransactions(
     name: string,
     address: string,
     editedHandles: any
-  ) => {
+  ) {
     await this.isValidTransaction(name, address);
     const nameInfo: any = await this.resolveName(name);
     if (!nameInfo["found"]) throw new NameNotRegisteredError(name);
@@ -143,14 +143,14 @@ export class ansResolver {
     } catch (err: any) {
       return err.message;
     }
-  };
+  }
 
-  preparePaymentTxn = async (
+  async preparePaymentTxn (
     sender: string,
     receiver: string,
     amt: number,
     note?: any
-  ) => {
+  ) {
     try {
       const txns = await this.transactionsInstance.preparePaymentTxn(
         sender,
@@ -162,13 +162,13 @@ export class ansResolver {
     } catch (err: any) {
       return err.message;
     }
-  };
+  }
 
-  prepareNameRenewalTransactions = async (
+  async prepareNameRenewalTransactions (
     name: string,
     sender: string,
     years: number
-  ) => {
+  ){
     await this.isValidTransaction(name, sender);
     const nameInfo: any = await this.resolveName(name);
     if (!nameInfo["found"]) throw new NameNotRegisteredError(name);
@@ -189,14 +189,14 @@ export class ansResolver {
     } catch (err: any) {
       return err.message;
     }
-  };
+  }
 
-  prepareInitiateNameTransferTransaction = async (
+  async prepareInitiateNameTransferTransaction (
     name: string,
     sender: string,
     newOwner: string,
     price: number
-  ) => {
+  ) {
     await this.isValidTransaction(name, sender, newOwner, "initiate_transfer");
     const nameInfo: any = await this.resolveName(name);
     if (!nameInfo["found"]) throw new NameNotRegisteredError(name);
@@ -212,14 +212,14 @@ export class ansResolver {
     } catch (err: any) {
       return err.message;
     }
-  };
+  }
 
-  prepareAcceptNameTransferTransactions = async (
+  async prepareAcceptNameTransferTransactions (
     name: string,
     sender: string,
     receiver: string,
     amt: number
-  ) => {
+  ) {
     await this.isValidTransaction(name, sender, receiver, "accept_transfer");
     const nameInfo: any = await this.resolveName(name);
     if (!nameInfo["found"]) throw new NameNotRegisteredError(name);
@@ -235,5 +235,5 @@ export class ansResolver {
     } catch (err: any) {
       return err.message;
     }
-  };
+  }
 }

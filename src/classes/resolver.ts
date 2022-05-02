@@ -4,29 +4,26 @@ import { InvalidNameError, AddressValidationError } from "./errors";
 import { generateTeal } from "./generateTeal";
 
 declare const Buffer: any;
+const APP_ID = CONSTANTS.APP_ID;
 
-export class resolver {
+export class Resolver {
   private algodClient: any;
   private indexerClient: any;
-  private APP_ID: any;
-
+  
   constructor(client?: any, indexer?: any) {
     this.algodClient = client;
     this.indexerClient = indexer;
-
-    this.APP_ID = CONSTANTS.APP_ID;
   }
 
-  generateLsig = async (name: string) => {
+  async generateLsig (name: string) {
     const client = this.algodClient;
     let program = await client.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
+    return new algosdk.LogicSigAccount(program);
+  }
 
-    const lsig = algosdk.makeLogicSig(program);
-    return lsig;
-  };
-
-  resolveName = async (name: string) => {
+  async resolveName (name: string) {
+  
     if (name.length === 0 || name.length > 64) {
       throw new InvalidNameError();
     } else {
@@ -47,8 +44,7 @@ export class resolver {
           metadata: any = [];
         for (let i = 0; i < length; i++) {
           const app = accountInfo[i];
-
-          if (app.id === this.APP_ID) {
+          if (app.id === APP_ID) {
             const kv = app["key-value"];
             const decodedKvPairs = this.decodeKvPairs(kv);
             socials = this.filterKvPairs(decodedKvPairs, "socials");
@@ -70,14 +66,14 @@ export class resolver {
         return { found: false };
       }
     }
-  };
+  }
 
-  getNamesOwnedByAddress = async (
+  async getNamesOwnedByAddress (
     address: string,
     socials?: boolean,
     metadata?: boolean,
     limit?: number
-  ) => {
+  ) {
     const isValidAddress: boolean = await algosdk.isValidAddress(address);
     if (!isValidAddress) {
       throw new AddressValidationError();
@@ -95,7 +91,7 @@ export class resolver {
             .addressRole("sender")
             .afterTime("2022-02-24")
             .txType("appl")
-            .applicationID(CONSTANTS.APP_ID)
+            .applicationID(APP_ID)
             .nextToken(nextToken)
             .do();
 
@@ -145,9 +141,9 @@ export class resolver {
         return details;
       }
     }
-  };
+  }
 
-  filterKvPairs = (kvPairs: any, type: string) => {
+  filterKvPairs (kvPairs: any, type: string) {
     const socials = [],
       metadata = [];
   
@@ -165,9 +161,9 @@ export class resolver {
     }
     if (type === "socials") return socials;
     else if (type === "metadata") return metadata;
-  };
+  }
 
-  decodeKvPairs = (kvPairs: any) => {
+  decodeKvPairs (kvPairs: any) {
     const decodedKvPairs = kvPairs.map((kvPair:any) => {
       const decodedKvPair = {
         key: "",
@@ -190,9 +186,9 @@ export class resolver {
     });
 
     return decodedKvPairs;
-  };
+  }
 
-  filterDomainRegistrationTxns = async (txns:any) => {
+  async filterDomainRegistrationTxns (txns:any) {
     const names:any = [];
     const indexer = this.indexerClient;
     try {
@@ -202,7 +198,7 @@ export class resolver {
           if (txn["tx-type"] === "appl") {
             if (
               txn["application-transaction"]["application-id"] ===
-              CONSTANTS.APP_ID
+              APP_ID
             ) {
               const appArgs =
                 txn["application-transaction"]["application-args"];
@@ -228,7 +224,7 @@ export class resolver {
                 const length = accountInfo.length;
 
                 for (let i = 0; i < length; i++) {
-                  if (accountInfo[i].id === CONSTANTS.APP_ID) {
+                  if (accountInfo[i].id === APP_ID) {
                     const kvPairs = accountInfo[i]["key-value"];
                     const domainInfo = this.decodeKvPairs(kvPairs).filter(
                       (domain:any) => domain.key === "name"

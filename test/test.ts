@@ -3,7 +3,7 @@ import { describe, it, beforeEach } from "mocha";
 const { assert } = require("chai");
 
 let indexerClient: any, algodClient: any, resolverObj: any;
-const { ansResolver } = require("../src/index.js");
+const { AnsResolver } = require("../src/index.js");
 const APIKEY = require("./api_key");
 
 describe("Testing name resolution methods", function () {
@@ -20,7 +20,7 @@ describe("Testing name resolution methods", function () {
       ""
     );
 
-    resolverObj = new ansResolver(algodClient, indexerClient);
+    resolverObj = new AnsResolver(algodClient, indexerClient);
   });
 
   it("Resolves a .algo name", async function () {
