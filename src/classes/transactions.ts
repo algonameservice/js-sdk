@@ -1,8 +1,6 @@
 import algosdk from "algosdk";
-import { CONSTANTS } from "../constants";
+import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "../constants";
 import { generateTeal } from "./generateTeal";
-
-const APP_ID = CONSTANTS.APP_ID;
 
 export class Transactions {
   private algodClient: any;
@@ -43,11 +41,11 @@ export class Transactions {
 
     if (name.length < 3) return;
     else if (name.length === 3)
-      amount = CONSTANTS.CHAR_3_AMOUNT + period * CONSTANTS.CHAR_3_AMOUNT;
+      amount = REGISTRATION_PRICE.CHAR_3_AMOUNT + period * REGISTRATION_PRICE.CHAR_3_AMOUNT;
     else if (name.length === 4)
-      amount = CONSTANTS.CHAR_4_AMOUNT + period * CONSTANTS.CHAR_4_AMOUNT;
+      amount = REGISTRATION_PRICE.CHAR_4_AMOUNT + period * REGISTRATION_PRICE.CHAR_4_AMOUNT;
     else if (name.length >= 5)
-      amount = CONSTANTS.CHAR_5_AMOUNT + period * CONSTANTS.CHAR_5_AMOUNT;
+      amount = REGISTRATION_PRICE.CHAR_5_AMOUNT + period * REGISTRATION_PRICE.CHAR_5_AMOUNT;
 
     const closeToRemaninder = undefined;
     const note = undefined;
@@ -285,7 +283,7 @@ export class Transactions {
     const paymentToSmartContractTxn = algosdk.makePaymentTxnWithSuggestedParams(
       sender,
       receiver,
-      CONSTANTS.TRANSFER_FEE,
+      TRANSFER_FEE,
       closeToRemaninder,
       note,
       params

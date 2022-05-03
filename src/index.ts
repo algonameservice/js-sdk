@@ -1,6 +1,6 @@
 import { Resolver } from "./classes/resolver";
 import { Transactions } from "./classes/transactions";
-import { CONSTANTS } from "./constants";
+import { ASCII_CODES, REGISTRATION_PRICE } from "./constants";
 import algosdk from "algosdk";
 import {
   AddressValidationError,
@@ -28,14 +28,14 @@ export class AnsResolver {
     for (let i = 0; i < lengthOfName; i++) {
       if (
         !(
-          name.charCodeAt(i) >= CONSTANTS.ASCII_0 &&
-          name.charCodeAt(i) <= CONSTANTS.ASCII_9
+          name.charCodeAt(i) >= ASCII_CODES.ASCII_0 &&
+          name.charCodeAt(i) <= ASCII_CODES.ASCII_9
         )
       ) {
         if (
           !(
-            name.charCodeAt(i) >= CONSTANTS.ASCII_A &&
-            name.charCodeAt(i) <= CONSTANTS.ASCII_Z
+            name.charCodeAt(i) >= ASCII_CODES.ASCII_A &&
+            name.charCodeAt(i) <= ASCII_CODES.ASCII_Z
           )
         )
           throw new InvalidNameError();
@@ -80,8 +80,7 @@ export class AnsResolver {
 
   async resolveName (name: string) {
     if (!(await this.isValidName(name))) return;
-    const nameInfo = await this.resolverInstance.resolveName(name);
-    return nameInfo;
+    return await this.resolverInstance.resolveName(name);
   }
 
   async getNamesOwnedByAddress (
@@ -92,13 +91,13 @@ export class AnsResolver {
   ) {
     if (!(await this.isValidAddress(account)))
       throw new AddressValidationError();
-    const accountInfo = await this.resolverInstance.getNamesOwnedByAddress(
+    return await this.resolverInstance.getNamesOwnedByAddress(
       account,
       socials,
       metadata,
       limit
     );
-    return accountInfo;
+    
   }
 
   async prepareNameRegistrationTransactions (
@@ -133,13 +132,11 @@ export class AnsResolver {
     const nameInfo: any = await this.resolveName(name);
     if (!nameInfo["found"]) throw new NameNotRegisteredError(name);
     try {
-      const txns =
-        await this.transactionsInstance.prepareUpdateNamePropertyTransactions(
+      return await this.transactionsInstance.prepareUpdateNamePropertyTransactions(
           name,
           address,
           editedHandles
         );
-      return txns;
     } catch (err: any) {
       return err.message;
     }
@@ -152,13 +149,12 @@ export class AnsResolver {
     note?: any
   ) {
     try {
-      const txns = await this.transactionsInstance.preparePaymentTxn(
+      return await this.transactionsInstance.preparePaymentTxn(
         sender,
         receiver,
         amt,
         note
       );
-      return txns;
     } catch (err: any) {
       return err.message;
     }
@@ -176,16 +172,15 @@ export class AnsResolver {
       let amt = 0;
       name = name.split(".algo")[0];
       if (name.length < 3) return;
-      if (name.length === 3) amt = CONSTANTS.CHAR_3_AMOUNT * years;
-      else if (name.length === 4) amt = CONSTANTS.CHAR_4_AMOUNT * years;
-      else if (name.length >= 5) amt = CONSTANTS.CHAR_5_AMOUNT * years;
-      const txns = await this.transactionsInstance.prepareNameRenewalTxns(
+      if (name.length === 3) amt = REGISTRATION_PRICE.CHAR_3_AMOUNT * years;
+      else if (name.length === 4) amt = REGISTRATION_PRICE.CHAR_4_AMOUNT * years;
+      else if (name.length >= 5) amt = REGISTRATION_PRICE.CHAR_5_AMOUNT * years;
+      return await this.transactionsInstance.prepareNameRenewalTxns(
         name,
         sender,
         years,
         amt
       );
-      return txns;
     } catch (err: any) {
       return err.message;
     }
@@ -201,14 +196,12 @@ export class AnsResolver {
     const nameInfo: any = await this.resolveName(name);
     if (!nameInfo["found"]) throw new NameNotRegisteredError(name);
     try {
-      const txns =
-        await this.transactionsInstance.prepareInitiateNameTransferTransaction(
+      return await this.transactionsInstance.prepareInitiateNameTransferTransaction(
           name,
           sender,
           newOwner,
           price
         );
-      return txns;
     } catch (err: any) {
       return err.message;
     }
@@ -224,14 +217,12 @@ export class AnsResolver {
     const nameInfo: any = await this.resolveName(name);
     if (!nameInfo["found"]) throw new NameNotRegisteredError(name);
     try {
-      const txns =
-        await this.transactionsInstance.prepareAcceptNameTransferTransactions(
+      return await this.transactionsInstance.prepareAcceptNameTransferTransactions(
           name,
           sender,
           receiver,
           amt
         );
-      return txns;
     } catch (err: any) {
       return err.message;
     }

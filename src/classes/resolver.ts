@@ -1,10 +1,9 @@
 import algosdk from "algosdk";
-import { CONSTANTS } from "../constants";
+import { APP_ID, ALLOWED_SOCIALS } from "../constants";
 import { InvalidNameError, AddressValidationError } from "./errors";
 import { generateTeal } from "./generateTeal";
 
 declare const Buffer: any;
-const APP_ID = CONSTANTS.APP_ID;
 
 export class Resolver {
   private algodClient: any;
@@ -156,7 +155,7 @@ export class Resolver {
         value: value,
       };
 
-      if (CONSTANTS.ALLOWED_SOCIALS.includes(key)) socials.push(kvObj);
+      if (ALLOWED_SOCIALS.includes(key)) socials.push(kvObj);
       else metadata.push(kvObj);
     }
     if (type === "socials") return socials;
@@ -164,7 +163,7 @@ export class Resolver {
   }
 
   decodeKvPairs (kvPairs: any) {
-    const decodedKvPairs = kvPairs.map((kvPair:any) => {
+    return kvPairs.map((kvPair:any) => {
       const decodedKvPair = {
         key: "",
         value: "",
@@ -185,7 +184,6 @@ export class Resolver {
       return decodedKvPair;
     });
 
-    return decodedKvPairs;
   }
 
   async filterDomainRegistrationTxns (txns:any) {
