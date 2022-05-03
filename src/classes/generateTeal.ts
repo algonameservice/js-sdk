@@ -1,5 +1,5 @@
 export function generateTeal(name: string) {
-  const tealCode = `#pragma version 4
+  return `#pragma version 4
     byte "${name}"
     len
     int 3
@@ -388,5 +388,4 @@ export function generateTeal(name: string) {
     main_l31:
     return`;
 
-  return tealCode;
 }
