@@ -177,7 +177,7 @@ export class Transactions {
     note = enc.encode(note);
     const closeToRemaninder = undefined;
 
-    const txn = algosdk.makePaymentTxnWithSuggestedParams(
+    return algosdk.makePaymentTxnWithSuggestedParams(
       sender,
       receiver,
       amt,
@@ -186,7 +186,6 @@ export class Transactions {
       params
     );
 
-    return txn;
   }
 
   async prepareNameRenewalTxns (
@@ -226,8 +225,7 @@ export class Transactions {
 
     algosdk.assignGroupID([paymentTxn, applicationTxn]);
 
-    const groupTxns = [paymentTxn, applicationTxn];
-    return groupTxns;
+    return [paymentTxn, applicationTxn];
   }
 
   async prepareInitiateNameTransferTransaction (
@@ -247,14 +245,13 @@ export class Transactions {
     appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
     appArgs.push(algosdk.encodeUint64(price));
 
-    const applicationTxn = algosdk.makeApplicationNoOpTxn(
+    return algosdk.makeApplicationNoOpTxn(
       sender,
       params,
       APP_ID,
       appArgs,
       [lsig.address(), newOwner]
     );
-    return applicationTxn;
   }
 
   async prepareAcceptNameTransferTransactions (
@@ -310,11 +307,10 @@ export class Transactions {
       applicationTxn,
     ]);
 
-    const groupTxns = [
+    return [
       paymentToOwnerTxn,
       paymentToSmartContractTxn,
       applicationTxn,
     ];
-    return groupTxns;
   }
 }

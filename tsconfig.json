@@ -1,8 +1,11 @@
 {
+  "include": ["src/**/*"],
   "compilerOptions": {
-                
+    "allowJs": false,                
     "target": "ESNEXT",
     "module": "commonjs",
+    "declaration": true,
+    "outDir": "types",
     "strict": true,
     "esModuleInterop": true, 
     "forceConsistentCasingInFileNames": true 

@@ -111,13 +111,12 @@ export class AnsResolver {
     const nameInfo: any = await this.resolveName(name);
     if (nameInfo["found"]) throw new Error("Name already registered");
     try {
-      const txns =
-        await this.transactionsInstance.prepareNameRegistrationTransactions(
+      return await this.transactionsInstance.prepareNameRegistrationTransactions(
           name,
           address,
           period
         );
-      return txns;
+
     } catch (err: any) {
       return err.message;
     }
