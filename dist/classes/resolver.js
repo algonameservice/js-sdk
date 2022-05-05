@@ -632,8 +632,36 @@ var Resolver = class {
     }
     return names;
   }
+  async owner(name) {
+    const domainInformation = await this.resolveName(name.split(".algo")[0]);
+    if (domainInformation.found === true) {
+      return domainInformation.address;
+    } else
+      return "Not Registered";
+  }
+  async text(name, key) {
+    const domainInformation = await this.resolveName(name);
+    if (domainInformation.found === true) {
+      const textRecords = domainInformation.socials.filter((social) => social.key === key);
+      if (textRecords.length > 0)
+        return domainInformation.socials.filter((social) => social.key === key)[0].value;
+      else
+        return "Property Not Set";
+    } else
+      return "Not Registered";
+  }
+  async expiry(name) {
+    const domainInformation = await this.resolveName(name.split(".algo")[0]);
+    if (domainInformation.found === true) {
+      return new Date(domainInformation.metadata.filter((data) => data.key === "expiry")[0].value * 1e3);
+    } else
+      return "Not Registered";
+  }
+  async content() {
+  }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Resolver
 });
+//# sourceMappingURL=resolver.js.map

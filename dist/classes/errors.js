@@ -68,3 +68,4 @@ var IncorrectOwnerError = class extends Error {
   InvalidNameError,
   NameNotRegisteredError
 });
+//# sourceMappingURL=errors.js.map

@@ -58,3 +58,4 @@ var ALLOWED_SOCIALS = [
   REGISTRATION_PRICE,
   TRANSFER_FEE
 });
+//# sourceMappingURL=constants.js.map

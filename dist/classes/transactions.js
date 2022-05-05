@@ -552,7 +552,10 @@ var Transactions = class {
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
     appArgs.push(import_algosdk.default.encodeUint64(price));
-    return import_algosdk.default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [lsig.address(), newOwner]);
+    return import_algosdk.default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [
+      lsig.address(),
+      newOwner
+    ]);
   }
   async prepareAcceptNameTransferTransactions(name, sender, receiver, amt) {
     amt = import_algosdk.default.algosToMicroalgos(amt);
@@ -573,14 +576,11 @@ var Transactions = class {
       paymentToSmartContractTxn,
       applicationTxn
     ]);
-    return [
-      paymentToOwnerTxn,
-      paymentToSmartContractTxn,
-      applicationTxn
-    ];
+    return [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn];
   }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   Transactions
 });
+//# sourceMappingURL=transactions.js.map

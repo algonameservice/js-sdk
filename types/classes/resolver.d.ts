@@ -22,4 +22,8 @@ export declare class Resolver {
     }[] | undefined;
     decodeKvPairs(kvPairs: any): any;
     filterDomainRegistrationTxns(txns: any): Promise<any>;
+    owner(name: string): Promise<any>;
+    text(name: string, key: string): Promise<any>;
+    expiry(name: string): Promise<Date | "Not Registered">;
+    content(): Promise<void>;
 }

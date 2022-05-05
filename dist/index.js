@@ -22,7 +22,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  AnsResolver: () => AnsResolver
+  ANS: () => ANS
 });
 module.exports = __toCommonJS(src_exports);
 
@@ -537,8 +537,8 @@ var Resolver = class {
     }
   }
   async getNamesOwnedByAddress(address, socials, metadata, limit) {
-    const isValidAddress = await import_algosdk.default.isValidAddress(address);
-    if (!isValidAddress) {
+    const isValidAddress2 = await import_algosdk.default.isValidAddress(address);
+    if (!isValidAddress2) {
       throw new AddressValidationError();
     } else {
       const indexer = await this.indexerClient;
@@ -663,6 +663,33 @@ var Resolver = class {
       return [];
     }
     return names;
+  }
+  async owner(name) {
+    const domainInformation = await this.resolveName(name.split(".algo")[0]);
+    if (domainInformation.found === true) {
+      return domainInformation.address;
+    } else
+      return "Not Registered";
+  }
+  async text(name, key) {
+    const domainInformation = await this.resolveName(name);
+    if (domainInformation.found === true) {
+      const textRecords = domainInformation.socials.filter((social) => social.key === key);
+      if (textRecords.length > 0)
+        return domainInformation.socials.filter((social) => social.key === key)[0].value;
+      else
+        return "Property Not Set";
+    } else
+      return "Not Registered";
+  }
+  async expiry(name) {
+    const domainInformation = await this.resolveName(name.split(".algo")[0]);
+    if (domainInformation.found === true) {
+      return new Date(domainInformation.metadata.filter((data) => data.key === "expiry")[0].value * 1e3);
+    } else
+      return "Not Registered";
+  }
+  async content() {
   }
 };
 
@@ -791,7 +818,10 @@ var Transactions = class {
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
     appArgs.push(import_algosdk2.default.encodeUint64(price));
-    return import_algosdk2.default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [lsig.address(), newOwner]);
+    return import_algosdk2.default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [
+      lsig.address(),
+      newOwner
+    ]);
   }
   async prepareAcceptNameTransferTransactions(name, sender, receiver, amt) {
     amt = import_algosdk2.default.algosToMicroalgos(amt);
@@ -812,152 +842,158 @@ var Transactions = class {
       paymentToSmartContractTxn,
       applicationTxn
     ]);
-    return [
-      paymentToOwnerTxn,
-      paymentToSmartContractTxn,
-      applicationTxn
-    ];
+    return [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn];
   }
 };
 
-// src/index.ts
+// src/utility/common.ts
 var import_algosdk3 = __toESM(require("algosdk"));
-var AnsResolver = class {
-  resolverInstance;
-  transactionsInstance;
-  constructor(client, indexer) {
-    this.resolverInstance = new Resolver(client, indexer);
-    this.transactionsInstance = new Transactions(client);
-  }
-  async isValidAddress(address) {
-    return import_algosdk3.default.isValidAddress(address);
-  }
-  async isValidName(name) {
-    name = name.split(".algo")[0];
-    const lengthOfName = name.length;
-    for (let i = 0; i < lengthOfName; i++) {
-      if (!(name.charCodeAt(i) >= ASCII_CODES.ASCII_0 && name.charCodeAt(i) <= ASCII_CODES.ASCII_9)) {
-        if (!(name.charCodeAt(i) >= ASCII_CODES.ASCII_A && name.charCodeAt(i) <= ASCII_CODES.ASCII_Z))
-          throw new InvalidNameError();
-      }
+function isValidAddress(address) {
+  return import_algosdk3.default.isValidAddress(address);
+}
+function isValidName(name) {
+  name = name.split(".algo")[0];
+  const lengthOfName = name.length;
+  for (let i = 0; i < lengthOfName; i++) {
+    if (!(name.charCodeAt(i) >= ASCII_CODES.ASCII_0 && name.charCodeAt(i) <= ASCII_CODES.ASCII_9)) {
+      if (!(name.charCodeAt(i) >= ASCII_CODES.ASCII_A && name.charCodeAt(i) <= ASCII_CODES.ASCII_Z))
+        return false;
     }
-    return true;
   }
-  async isValidTransaction(name, sender, receiver, method) {
-    name = name.split(".algo")[0];
-    if (!await this.isValidName(name))
-      return;
-    if (!await this.isValidAddress(sender))
+  return true;
+}
+
+// src/index.ts
+var Name = class {
+  name = "";
+  resolver;
+  transactions;
+  constructor(options) {
+    const { name, client, indexer } = options;
+    this.name = name;
+    this.resolver = new Resolver(client, indexer);
+    this.transactions = new Transactions(client);
+  }
+  async isRegistered() {
+    const status = await this.resolver.resolveName(this.name);
+    return status.found;
+  }
+  async getOwner() {
+    return await this.resolver.owner(this.name);
+  }
+  async getContent() {
+    return await this.resolver.content(this.name);
+  }
+  async getText(key) {
+    return await this.resolver.text(this.name, key);
+  }
+  async getAllInformation() {
+    return await this.resolver.resolveName(this.name);
+  }
+  async getExpiry() {
+    return await this.resolver.expiry(this.name);
+  }
+  async isValidTransaction(sender, receiver, method) {
+    if (!await this.isRegistered())
+      throw new NameNotRegisteredError(this.name);
+    if (!isValidAddress(sender))
+      throw new AddressValidationError();
+    if (receiver) {
+      if (!isValidAddress(receiver))
+        throw new AddressValidationError();
+    }
+    const owner = await this.getOwner();
+    if (!await isValidName(this.name))
+      throw new InvalidNameError();
+    if (!await isValidAddress(sender))
       throw new AddressValidationError();
     if (!receiver && !method) {
-      const nameInfo = await this.resolveName(name);
-      if (nameInfo["found"]) {
-        if (nameInfo["address"] !== sender)
-          throw new IncorrectOwnerError(name, sender);
+      if (owner !== sender) {
+        throw new IncorrectOwnerError(this.name, sender);
       }
     } else if (sender && receiver) {
       if (method === "initiate_transfer") {
-        const nameInfo = await this.resolveName(name);
-        if (nameInfo["found"]) {
-          if (nameInfo["address"] !== sender)
-            throw new IncorrectOwnerError(name, sender);
+        if (owner !== sender) {
+          throw new IncorrectOwnerError(this.name, sender);
         }
       } else if (method === "accept_transfer") {
-        const nameInfo = await this.resolveName(name);
-        if (nameInfo["found"]) {
-          if (nameInfo["address"] !== receiver)
-            throw new IncorrectOwnerError(name, sender);
+        if (owner !== receiver) {
+          throw new IncorrectOwnerError(this.name, receiver);
         }
       }
     }
     return true;
   }
-  async resolveName(name) {
-    if (!await this.isValidName(name))
-      return;
-    return await this.resolverInstance.resolveName(name);
-  }
-  async getNamesOwnedByAddress(account, socials, metadata, limit) {
-    if (!await this.isValidAddress(account))
-      throw new AddressValidationError();
-    return await this.resolverInstance.getNamesOwnedByAddress(account, socials, metadata, limit);
-  }
-  async prepareNameRegistrationTransactions(name, address, period) {
-    await this.isValidName(name);
-    if (!await this.isValidAddress(address))
-      throw new AddressValidationError();
-    const nameInfo = await this.resolveName(name);
-    if (nameInfo["found"])
+  async register(address, period) {
+    if (await this.isRegistered())
       throw new Error("Name already registered");
-    try {
-      return await this.transactionsInstance.prepareNameRegistrationTransactions(name, address, period);
-    } catch (err) {
-      return err.message;
+    if (!isValidAddress(address))
+      throw new AddressValidationError();
+    else {
+      return await this.transactions.prepareNameRegistrationTransactions(this.name, address, period);
     }
   }
-  async prepareUpdateNamePropertyTransactions(name, address, editedHandles) {
-    await this.isValidTransaction(name, address);
-    const nameInfo = await this.resolveName(name);
-    if (!nameInfo["found"])
-      throw new NameNotRegisteredError(name);
-    try {
-      return await this.transactionsInstance.prepareUpdateNamePropertyTransactions(name, address, editedHandles);
-    } catch (err) {
-      return err.message;
-    }
+  async update(address, editedHandles) {
+    await this.isValidTransaction(address);
+    return await this.transactions.prepareUpdateNamePropertyTransactions(this.name, address, editedHandles);
   }
-  async preparePaymentTxn(sender, receiver, amt, note) {
-    try {
-      return await this.transactionsInstance.preparePaymentTxn(sender, receiver, amt, note);
-    } catch (err) {
-      return err.message;
-    }
+  async renew(address, years) {
+    await this.isValidTransaction(address);
+    return await this.transactions.prepareNameRenewalTxns(this.name, address, years);
   }
-  async prepareNameRenewalTransactions(name, sender, years) {
-    await this.isValidTransaction(name, sender);
-    const nameInfo = await this.resolveName(name);
-    if (!nameInfo["found"])
-      throw new NameNotRegisteredError(name);
-    try {
-      let amt = 0;
-      name = name.split(".algo")[0];
-      if (name.length < 3)
-        return;
-      if (name.length === 3)
-        amt = REGISTRATION_PRICE.CHAR_3_AMOUNT * years;
-      else if (name.length === 4)
-        amt = REGISTRATION_PRICE.CHAR_4_AMOUNT * years;
-      else if (name.length >= 5)
-        amt = REGISTRATION_PRICE.CHAR_5_AMOUNT * years;
-      return await this.transactionsInstance.prepareNameRenewalTxns(name, sender, years, amt);
-    } catch (err) {
-      return err.message;
-    }
+  async initTransfer(owner, newOwner, price) {
+    await this.isValidTransaction(owner, newOwner, "initiate_transfer");
+    return await this.transactions.prepareInitiateNameTransferTransaction(this.name, owner, newOwner, price);
   }
-  async prepareInitiateNameTransferTransaction(name, sender, newOwner, price) {
-    await this.isValidTransaction(name, sender, newOwner, "initiate_transfer");
-    const nameInfo = await this.resolveName(name);
-    if (!nameInfo["found"])
-      throw new NameNotRegisteredError(name);
-    try {
-      return await this.transactionsInstance.prepareInitiateNameTransferTransaction(name, sender, newOwner, price);
-    } catch (err) {
-      return err.message;
-    }
+  async acceptTransfer(newOwner, owner, price) {
+    await this.isValidTransaction(newOwner, owner, "accept_transfer");
+    return await this.transactions.prepareAcceptNameTransferTransactions(this.name, newOwner, owner, price);
   }
-  async prepareAcceptNameTransferTransactions(name, sender, receiver, amt) {
-    await this.isValidTransaction(name, sender, receiver, "accept_transfer");
-    const nameInfo = await this.resolveName(name);
-    if (!nameInfo["found"])
-      throw new NameNotRegisteredError(name);
-    try {
-      return await this.transactionsInstance.prepareAcceptNameTransferTransactions(name, sender, receiver, amt);
-    } catch (err) {
-      return err.message;
-    }
+};
+var Address = class {
+  address = "";
+  resolver;
+  constructor(options) {
+    const { address, client, indexer } = options;
+    this.address = address;
+    this.resolver = new Resolver(client, indexer);
+  }
+  async getNames(options) {
+    const socials = (options == null ? void 0 : options.socials) || false, metadata = (options == null ? void 0 : options.metadata) || false, limit = options == null ? void 0 : options.metadata;
+    return await this.resolver.getNamesOwnedByAddress(this.address, socials, metadata, limit);
+  }
+};
+var ANS = class {
+  client;
+  indexer;
+  constructor(client, indexer) {
+    this.client = client;
+    this.indexer = indexer;
+  }
+  name(name) {
+    if (name.length > 0)
+      name = name.toLowerCase();
+    name = name.split(".algo")[0];
+    if (!isValidName(name))
+      throw new InvalidNameError();
+    return new Name({
+      client: this.client,
+      indexer: this.indexer,
+      name
+    });
+  }
+  address(address) {
+    if (!isValidAddress(address))
+      throw new AddressValidationError();
+    return new Address({
+      client: this.client,
+      indexer: this.indexer,
+      address
+    });
   }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  AnsResolver
+  ANS
 });
+//# sourceMappingURL=index.js.map

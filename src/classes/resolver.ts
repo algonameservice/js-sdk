@@ -8,21 +8,20 @@ declare const Buffer: any;
 export class Resolver {
   private algodClient: any;
   private indexerClient: any;
-  
+
   constructor(client?: any, indexer?: any) {
     this.algodClient = client;
     this.indexerClient = indexer;
   }
 
-  async generateLsig (name: string) {
+  async generateLsig(name: string) {
     const client = this.algodClient;
     let program = await client.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
     return new algosdk.LogicSigAccount(program);
   }
 
-  async resolveName (name: string) {
-  
+  async resolveName(name: string) {
     if (name.length === 0 || name.length > 64) {
       throw new InvalidNameError();
     } else {
@@ -49,7 +48,7 @@ export class Resolver {
             socials = this.filterKvPairs(decodedKvPairs, "socials");
             metadata = this.filterKvPairs(decodedKvPairs, "metadata");
             found = true;
-            owner = metadata.filter((kv:any) => kv.key === "owner")[0].value;
+            owner = metadata.filter((kv: any) => kv.key === "owner")[0].value;
           }
         }
 
@@ -67,7 +66,7 @@ export class Resolver {
     }
   }
 
-  async getNamesOwnedByAddress (
+  async getNamesOwnedByAddress(
     address: string,
     socials?: boolean,
     metadata?: boolean,
@@ -111,7 +110,7 @@ export class Resolver {
 
       txns = accountTxns;
       const names: any = await this.filterDomainRegistrationTxns(txns);
-      
+
       if (names.length > 0) {
         const details = [];
 
@@ -127,10 +126,8 @@ export class Resolver {
                 name: "",
               };
               domain.name = names[i] + ".algo";
-              if (socials)
-                domain["socials"] = info.socials;
-              if (metadata)
-                domain["metadata"] = info.metadata;
+              if (socials) domain["socials"] = info.socials;
+              if (metadata) domain["metadata"] = info.metadata;
               details.push(domain);
             }
           } else {
@@ -142,10 +139,10 @@ export class Resolver {
     }
   }
 
-  filterKvPairs (kvPairs: any, type: string) {
+  filterKvPairs(kvPairs: any, type: string) {
     const socials = [],
       metadata = [];
-  
+
     for (const i in kvPairs) {
       const key = kvPairs[i].key;
       const value = kvPairs[i].value;
@@ -162,8 +159,8 @@ export class Resolver {
     else if (type === "metadata") return metadata;
   }
 
-  decodeKvPairs (kvPairs: any) {
-    return kvPairs.map((kvPair:any) => {
+  decodeKvPairs(kvPairs: any) {
+    return kvPairs.map((kvPair: any) => {
       const decodedKvPair = {
         key: "",
         value: "",
@@ -183,91 +180,93 @@ export class Resolver {
       }
       return decodedKvPair;
     });
-
   }
 
-  async filterDomainRegistrationTxns (txns:any) {
-    const names:any = [];
+  async filterDomainRegistrationTxns(txns: any) {
+    const names: any = [];
     const indexer = this.indexerClient;
     try {
-        for (let i = 0; i < txns.length; i++) {
-          const txn = txns[i];
+      for (let i = 0; i < txns.length; i++) {
+        const txn = txns[i];
 
-          if (txn["tx-type"] === "appl") {
+        if (txn["tx-type"] === "appl") {
+          if (txn["application-transaction"]["application-id"] === APP_ID) {
+            const appArgs = txn["application-transaction"]["application-args"];
+
             if (
-              txn["application-transaction"]["application-id"] ===
-              APP_ID
+              Buffer.from(appArgs[0], "base64").toString() === "register_name"
             ) {
-              const appArgs =
-                txn["application-transaction"]["application-args"];
+              if (!names.includes(Buffer.from(appArgs[1], "base64").toString()))
+                names.push(Buffer.from(appArgs[1], "base64").toString());
+            } else if (
+              Buffer.from(appArgs[0], "base64").toString() === "accept_transfer"
+            ) {
+              const lsigAccount = txn["application-transaction"]["accounts"][0];
+              let accountInfo = await indexer
+                .lookupAccountByID(lsigAccount)
+                .do();
+              accountInfo = accountInfo.account["apps-local-state"];
 
-              if (
-                Buffer.from(appArgs[0], "base64").toString() === "register_name"
-              ) {
-                if (
-                  !names.includes(Buffer.from(appArgs[1], "base64").toString())
-                )
-                  names.push(Buffer.from(appArgs[1], "base64").toString());
-              } else if (
-                Buffer.from(appArgs[0], "base64").toString() ===
-                "accept_transfer"
-              ) {
-                const lsigAccount =
-                  txn["application-transaction"]["accounts"][0];
-                let accountInfo = await indexer
-                  .lookupAccountByID(lsigAccount)
-                  .do();
-                accountInfo = accountInfo.account["apps-local-state"];
+              const length = accountInfo.length;
 
-                const length = accountInfo.length;
-
-                for (let i = 0; i < length; i++) {
-                  if (accountInfo[i].id === APP_ID) {
-                    const kvPairs = accountInfo[i]["key-value"];
-                    const domainInfo = this.decodeKvPairs(kvPairs).filter(
-                      (domain:any) => domain.key === "name"
-                    );
-                    if (!names.includes(domainInfo[0].value))
-                      names.push(domainInfo[0].value);
-                  }
+              for (let i = 0; i < length; i++) {
+                if (accountInfo[i].id === APP_ID) {
+                  const kvPairs = accountInfo[i]["key-value"];
+                  const domainInfo = this.decodeKvPairs(kvPairs).filter(
+                    (domain: any) => domain.key === "name"
+                  );
+                  if (!names.includes(domainInfo[0].value))
+                    names.push(domainInfo[0].value);
                 }
               }
             }
           }
         }
-      } catch (err) {
-        return [];
       }
-
-      return names;
+    } catch (err) {
+      return [];
     }
 
-  async owner(name:string) {
-    const domainInformation:any = await this.resolveName(name.split('.algo')[0]);
-    if(domainInformation.found === true) {
+    return names;
+  }
+
+  async owner(name: string) {
+    const domainInformation: any = await this.resolveName(
+      name.split(".algo")[0]
+    );
+    if (domainInformation.found === true) {
       return domainInformation.address;
-    } else return 'Not Registered';
+    } else return "Not Registered";
   }
 
-  async text(name:string,key:string) {
-    const domainInformation:any = await this.resolveName(name);
-    if(domainInformation.found === true) {
-      const textRecords = domainInformation.socials.filter(social => social.key === key);
-      if(textRecords.length > 0)  return domainInformation.socials.filter(social => social.key === key)[0].value;
-      else return 'Property Not Set';
-    } else return 'Not Registered';
+  async text(name: string, key: string) {
+    const domainInformation: any = await this.resolveName(name);
+    if (domainInformation.found === true) {
+      const textRecords = domainInformation.socials.filter(
+        (social: any) => social.key === key
+      );
+      if (textRecords.length > 0)
+        return domainInformation.socials.filter(
+          (social: any) => social.key === key
+        )[0].value;
+      else return "Property Not Set";
+    } else return "Not Registered";
   }
 
-  async expiry(name:string) {
-    const domainInformation:any = await this.resolveName(name.split('.algo')[0]);
-    if(domainInformation.found === true) {
-      return new Date(domainInformation.metadata.filter(data => data.key === 'expiry')[0].value*1000);
-    } else return 'Not Registered';
+  async expiry(name: string) {
+    const domainInformation: any = await this.resolveName(
+      name.split(".algo")[0]
+    );
+    if (domainInformation.found === true) {
+      return new Date(
+        domainInformation.metadata.filter(
+          (data: any) => data.key === "expiry"
+        )[0].value * 1000
+      );
+    } else return "Not Registered";
   }
 
-  async content(){
+  async content() {
     //TODO: Must return the content value
   }
-
-    
 }

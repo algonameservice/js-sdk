@@ -4,12 +4,12 @@ import { generateTeal } from "./generateTeal";
 
 export class Transactions {
   private algodClient: any;
-  
+
   constructor(client?: any) {
     this.algodClient = client;
   }
 
-  async generateLsig (name: string) {
+  async generateLsig(name: string) {
     const client = this.algodClient;
     let program = await client.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
@@ -17,7 +17,7 @@ export class Transactions {
     return new algosdk.LogicSigAccount(program);
   }
 
-  async prepareNameRegistrationTransactions (
+  async prepareNameRegistrationTransactions(
     name: string,
     address: string,
     period: number
@@ -41,11 +41,17 @@ export class Transactions {
 
     if (name.length < 3) return;
     else if (name.length === 3)
-      amount = REGISTRATION_PRICE.CHAR_3_AMOUNT + period * REGISTRATION_PRICE.CHAR_3_AMOUNT;
+      amount =
+        REGISTRATION_PRICE.CHAR_3_AMOUNT +
+        period * REGISTRATION_PRICE.CHAR_3_AMOUNT;
     else if (name.length === 4)
-      amount = REGISTRATION_PRICE.CHAR_4_AMOUNT + period * REGISTRATION_PRICE.CHAR_4_AMOUNT;
+      amount =
+        REGISTRATION_PRICE.CHAR_4_AMOUNT +
+        period * REGISTRATION_PRICE.CHAR_4_AMOUNT;
     else if (name.length >= 5)
-      amount = REGISTRATION_PRICE.CHAR_5_AMOUNT + period * REGISTRATION_PRICE.CHAR_5_AMOUNT;
+      amount =
+        REGISTRATION_PRICE.CHAR_5_AMOUNT +
+        period * REGISTRATION_PRICE.CHAR_5_AMOUNT;
 
     const closeToRemaninder = undefined;
     const note = undefined;
@@ -124,7 +130,7 @@ export class Transactions {
     };
   }
 
-  async prepareUpdateNamePropertyTransactions (
+  async prepareUpdateNamePropertyTransactions(
     name: string,
     address: string,
     editedHandles: any
@@ -164,7 +170,7 @@ export class Transactions {
     return groupTxns;
   }
 
-  async preparePaymentTxn (
+  async preparePaymentTxn(
     sender: string,
     receiver: string,
     amt: number,
@@ -185,10 +191,9 @@ export class Transactions {
       note,
       params
     );
-
   }
 
-  async prepareNameRenewalTxns (
+  async prepareNameRenewalTxns(
     name: string,
     sender: string,
     years: number,
@@ -228,7 +233,7 @@ export class Transactions {
     return [paymentTxn, applicationTxn];
   }
 
-  async prepareInitiateNameTransferTransaction (
+  async prepareInitiateNameTransferTransaction(
     name: string,
     sender: string,
     newOwner: string,
@@ -245,16 +250,13 @@ export class Transactions {
     appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
     appArgs.push(algosdk.encodeUint64(price));
 
-    return algosdk.makeApplicationNoOpTxn(
-      sender,
-      params,
-      APP_ID,
-      appArgs,
-      [lsig.address(), newOwner]
-    );
+    return algosdk.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [
+      lsig.address(),
+      newOwner,
+    ]);
   }
 
-  async prepareAcceptNameTransferTransactions (
+  async prepareAcceptNameTransferTransactions(
     name: string,
     sender: string,
     receiver: string,
@@ -307,10 +309,6 @@ export class Transactions {
       applicationTxn,
     ]);
 
-    return [
-      paymentToOwnerTxn,
-      paymentToSmartContractTxn,
-      applicationTxn,
-    ];
+    return [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn];
   }
 }

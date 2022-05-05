@@ -387,5 +387,4 @@ export function generateTeal(name: string) {
     b main_l23
     main_l31:
     return`;
-
 }
