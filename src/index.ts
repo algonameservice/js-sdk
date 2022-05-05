@@ -8,21 +8,83 @@ import {
   InvalidNameError,
   NameNotRegisteredError,
 } from "./classes/errors";
+import { NameConstructor, AddressConstructor, DomainInformation, Domains, DomainOptions } from "./interfaces/interfaces";
 
-export class AnsResolver {
-  private resolverInstance: any;
-  private transactionsInstance: any;
-
-  constructor(client: any, indexer: any) {
-    this.resolverInstance = new Resolver(client, indexer);
-    this.transactionsInstance = new Transactions(client);
+class Name {
+  private name = '';
+  private resolver: any;
+  private transactions:any;
+  constructor(options: NameConstructor) {
+    const {name, client, indexer} = options;    
+    this.name = name;
+    this.resolver = new Resolver(client, indexer);
+    this.transactions = new Transactions(client);
   }
 
-  async isValidAddress (address: string){
+  async isRegistered():Promise<boolean> {
+    return await this.resolver.resolveName(this.name).found;
+  }
+
+  //GET METHODS
+  async getOwner():Promise<string> {
+    return await this.resolver.owner(this.name);
+  }
+
+  async getContent ():Promise<string> {
+    return await this.resolver.content(this.name);
+  }
+
+  async getText(key:string):Promise<string> {
+    return await this.resolver.text(this.name, key);
+  }
+
+  async getAllInformation():Promise<DomainInformation> {
+    return await this.resolver.resolveName(this.name);
+  }
+
+  async getExpiry():Promise<Date | string>{
+    return await this.resolver.expiry(this.name);
+  }
+
+  async register(address: string, period:number) {
+    //TODO: Return registration txns
+  }
+
+}
+
+class Address {
+  private address = '';
+  private resolver: any;
+  constructor(options: AddressConstructor) {
+    const {address, client, indexer} = options;
+    this.address = address;
+    this.resolver = new Resolver(client, indexer);
+  }
+
+  async getNames(options?: DomainOptions): Promise<Domains | []> {
+    const socials = options?.socials || false, metadata = options?.metadata || false, limit = options?.metadata;
+    return await this.resolver.getNamesOwnedByAddress(this.address, socials, metadata, limit);
+  }
+}
+
+export class ANS {
+  private resolver: any;
+  private transactionsInstance: any;
+  private client: any;
+  private indexer:any;
+
+  constructor(client: any, indexer: any) {
+    this.resolver = new Resolver(client, indexer);
+    this.transactionsInstance = new Transactions(client);
+    this.client = client;
+    this.indexer = indexer;
+  }
+
+  isValidAddress (address: string): boolean{
     return algosdk.isValidAddress(address);
   }
 
-  async isValidName (name: any) {
+  isValidName (name: any): boolean {
     name = name.split(".algo")[0];
     const lengthOfName = name.length;
     for (let i = 0; i < lengthOfName; i++) {
@@ -38,12 +100,34 @@ export class AnsResolver {
             name.charCodeAt(i) <= ASCII_CODES.ASCII_Z
           )
         )
-          throw new InvalidNameError();
+          return false;
       }
     }
     return true;
   }
 
+  name(name:string) : Name {
+    if(name.length > 0) name = name.toLowerCase();
+    if (!(this.isValidName(name))) throw new InvalidNameError();
+    return new Name({
+      client: this.client,
+      indexer: this.indexer,
+      resolver: this.resolver,
+      name: name
+    })
+  }
+
+  address(address: string): Address {
+    if(!this.isValidAddress(address)) throw new AddressValidationError();
+    return new Address({
+      client: this.client,
+      indexer: this.indexer,
+      resolver: this.resolver,
+      address: address
+    })
+  }
+
+  /*
   async isValidTransaction (
     name: string,
     sender: string,
@@ -226,4 +310,5 @@ export class AnsResolver {
       return err.message;
     }
   }
+  */
 }

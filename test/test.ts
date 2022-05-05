@@ -2,8 +2,8 @@ const algosdk: any = require("algosdk");
 import { describe, it, beforeEach } from "mocha";
 const { assert } = require("chai");
 
-let indexerClient: any, algodClient: any, resolverObj: any;
-const { AnsResolver } = require("../src/index.js");
+let indexerClient: any, algodClient: any, sdk: any;
+const { ANS } = require("../src/index.js");
 const APIKEY = require("./api_key");
 
 describe("Testing name resolution methods", function () {
@@ -20,40 +20,42 @@ describe("Testing name resolution methods", function () {
       ""
     );
 
-    resolverObj = new AnsResolver(algodClient, indexerClient);
+    sdk = new ANS(algodClient, indexerClient);
   });
 
   it("Resolves a .algo name", async function () {
-    const nameInfo = await resolverObj.resolveName("lalith.algo");
-
-    assert.equal(
-      nameInfo.found,
-      true,
-      "Error: Name does not appear to be registered"
-    );
-    assert.equal(
-      nameInfo.address,
-      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
-      "Error: Name does not appear to point to the right owner"
-    );
+    const address = await sdk.name('lalith.algo').getOwner();
+    assert.equal(address, 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 'Name resolution failed');
   });
 
+  it("Get all information about name", async function () {
+    const information = await sdk.name('lalith.algo').getAllInformation();
+    assert.equal(information.address, 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', 'Could not fetch all information');
+  });
+
+  it("Gets a specific text record", async function () {
+    const text = await sdk.name('lalith.algo').getText('discord');
+    assert.equal(text, 'Lalith Medury#0811', 'Could not fetch text record');
+  });
+
+  it("Gets expiry of domain", async function () {
+    const expiry = await sdk.name('lalith.algo').getExpiry();
+    assert.notEqual(expiry, null, 'Could not fetch expiry of domain');
+  });
+
+  
   it("Gets the list of .algo names owned by an address", async function () {
     this.timeout(100000);
-    const nameInfo = await resolverObj.getNamesOwnedByAddress(
-      "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
-      true,
-      true,
-      2
-    );
+    const nameInfo = await sdk.address("RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE").getNames();
     assert.isAtLeast(
       nameInfo.length,
       1,
       "Error: Doesn't retrieve the names owned by the address"
     );
+    
   });
 
-  
+  /*
   it('Prepares a list of transactions to register a name', async function(){
       this.timeout(100000);
       const nameRegistrationTxns = await resolverObj.prepareNameRegistrationTransactions(
@@ -126,5 +128,6 @@ describe("Testing name resolution methods", function () {
       
       assert.equal(acceptNameTranserTxn.length, 3, "Not returning 3 transactions for accepting name");
   })
+  */
     
 });

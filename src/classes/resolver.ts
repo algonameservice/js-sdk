@@ -242,5 +242,32 @@ export class Resolver {
       return names;
     }
 
+  async owner(name:string) {
+    const domainInformation:any = await this.resolveName(name.split('.algo')[0]);
+    if(domainInformation.found === true) {
+      return domainInformation.address;
+    } else return 'Not Registered';
+  }
+
+  async text(name:string,key:string) {
+    const domainInformation:any = await this.resolveName(name);
+    if(domainInformation.found === true) {
+      const textRecords = domainInformation.socials.filter(social => social.key === key);
+      if(textRecords.length > 0)  return domainInformation.socials.filter(social => social.key === key)[0].value;
+      else return 'Property Not Set';
+    } else return 'Not Registered';
+  }
+
+  async expiry(name:string) {
+    const domainInformation:any = await this.resolveName(name.split('.algo')[0]);
+    if(domainInformation.found === true) {
+      return new Date(domainInformation.metadata.filter(data => data.key === 'expiry')[0].value*1000);
+    } else return 'Not Registered';
+  }
+
+  async content(){
+    //TODO: Must return the content value
+  }
+
     
 }
