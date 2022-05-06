@@ -1,9 +1,5 @@
 import { Resolver } from "./resolver.js";
-import {
-  AddressConstructor,
-  Domains,
-  DomainOptions
-} from "./interfaces.js";
+import { AddressConstructor, Domains, DomainOptions } from "./interfaces.js";
 
 export class Address {
   private address = "";

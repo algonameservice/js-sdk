@@ -1,9 +1,6 @@
-import {
-  AddressValidationError,
-  InvalidNameError,
-} from "./errors.js";
+import { AddressValidationError, InvalidNameError } from "./errors.js";
 import { isValidAddress, isValidName } from "./validation.js";
-import { Name } from './name.js';
+import { Name } from "./name.js";
 import { Address } from "./address.js";
 
 export class ANS {

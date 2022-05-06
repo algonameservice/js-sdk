@@ -75,7 +75,7 @@ export class Name {
     }
     if (!(await isValidAddress(sender))) {
       throw new AddressValidationError();
-    } 
+    }
     if (!receiver && !method) {
       if (owner !== sender) {
         throw new IncorrectOwnerError(this.name, sender);
@@ -100,8 +100,7 @@ export class Name {
     }
     if (!isValidAddress(address)) {
       throw new AddressValidationError();
-    } 
-    else {
+    } else {
       return await this.transactions.prepareNameRegistrationTransactions(
         this.name,
         address,

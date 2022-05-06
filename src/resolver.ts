@@ -157,8 +157,7 @@ export class Resolver {
     }
     if (type === "socials") {
       return socials;
-    }
-    else if (type === "metadata"){ 
+    } else if (type === "metadata") {
       return metadata;
     }
   }
@@ -254,11 +253,10 @@ export class Resolver {
         return domainInformation.socials.filter(
           (social: any) => social.key === key
         )[0].value;
-      }
-      else {
+      } else {
         return "Property Not Set";
       }
-    } else{ 
+    } else {
       return "Not Registered";
     }
   }

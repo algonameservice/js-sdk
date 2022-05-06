@@ -11,7 +11,7 @@ export class Transactions {
   }
 
   async generateLsig(name: string) {
-    name = name.split('.algo')[0];
+    name = name.split(".algo")[0];
     const client = this.algodClient;
     let program = await client.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
@@ -19,20 +19,15 @@ export class Transactions {
     return new algosdk.LogicSigAccount(program);
   }
 
-  calculatePrice(name:string, period:number) {
+  calculatePrice(name: string, period: number) {
     let amount = 0;
-    name = name.split('.algo')[0];
+    name = name.split(".algo")[0];
     if (name.length === 3) {
-      amount =
-        REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
-    }
-    else if (name.length === 4) {
-      amount =
-        REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
-    }
-    else if (name.length >= 5) {
-      amount =
-        REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
+      amount = REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
+    } else if (name.length === 4) {
+      amount = REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
+    } else if (name.length >= 5) {
+      amount = REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
     }
     return amount;
   }
@@ -43,7 +38,7 @@ export class Transactions {
     period: number
   ) {
     const algodClient = this.algodClient;
-    if(name.split('.algo')[0].length < 3) throw new InvalidNameError();
+    if (name.split(".algo")[0].length < 3) throw new InvalidNameError();
     /* 1st Txn - Payment to Smart Contract */
 
     let amount = 0;
@@ -59,7 +54,7 @@ export class Transactions {
     if (period === undefined) {
       period = 1;
     }
-    
+
     amount = this.calculatePrice(name, period);
 
     const closeToRemaninder = undefined;
@@ -204,11 +199,7 @@ export class Transactions {
     );
   }
 
-  async prepareNameRenewalTxns(
-    name: string,
-    sender: string,
-    years: number
-  ) {
+  async prepareNameRenewalTxns(name: string, sender: string, years: number) {
     name = name.split(".algo")[0];
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
