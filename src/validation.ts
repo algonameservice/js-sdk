@@ -1,5 +1,5 @@
 import algosdk from "algosdk";
-import { ASCII_CODES } from "../constants";
+import { ASCII_CODES } from "./constants.js";
 
 export function isValidAddress(address: string): boolean {
   return algosdk.isValidAddress(address);

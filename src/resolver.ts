@@ -1,7 +1,7 @@
 import algosdk from "algosdk";
-import { APP_ID, ALLOWED_SOCIALS } from "../constants";
-import { InvalidNameError, AddressValidationError } from "./errors";
-import { generateTeal } from "./generateTeal";
+import { APP_ID, ALLOWED_SOCIALS } from "./constants.js";
+import { InvalidNameError, AddressValidationError } from "./errors.js";
+import { generateTeal } from "./generateTeal.js";
 
 declare const Buffer: any;
 
@@ -155,8 +155,12 @@ export class Resolver {
       if (ALLOWED_SOCIALS.includes(key)) socials.push(kvObj);
       else metadata.push(kvObj);
     }
-    if (type === "socials") return socials;
-    else if (type === "metadata") return metadata;
+    if (type === "socials") {
+      return socials;
+    }
+    else if (type === "metadata"){ 
+      return metadata;
+    }
   }
 
   decodeKvPairs(kvPairs: any) {
@@ -215,8 +219,9 @@ export class Resolver {
                   const domainInfo = this.decodeKvPairs(kvPairs).filter(
                     (domain: any) => domain.key === "name"
                   );
-                  if (!names.includes(domainInfo[0].value))
+                  if (!names.includes(domainInfo[0].value)) {
                     names.push(domainInfo[0].value);
+                  }
                 }
               }
             }
@@ -245,12 +250,17 @@ export class Resolver {
       const textRecords = domainInformation.socials.filter(
         (social: any) => social.key === key
       );
-      if (textRecords.length > 0)
+      if (textRecords.length > 0) {
         return domainInformation.socials.filter(
           (social: any) => social.key === key
         )[0].value;
-      else return "Property Not Set";
-    } else return "Not Registered";
+      }
+      else {
+        return "Property Not Set";
+      }
+    } else{ 
+      return "Not Registered";
+    }
   }
 
   async expiry(name: string) {

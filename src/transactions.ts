@@ -1,6 +1,7 @@
 import algosdk from "algosdk";
-import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "../constants";
-import { generateTeal } from "./generateTeal";
+import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
+import { InvalidNameError } from "./errors.js";
+import { generateTeal } from "./generateTeal.js";
 
 export class Transactions {
   private algodClient: any;
@@ -10,11 +11,30 @@ export class Transactions {
   }
 
   async generateLsig(name: string) {
+    name = name.split('.algo')[0];
     const client = this.algodClient;
     let program = await client.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
 
     return new algosdk.LogicSigAccount(program);
+  }
+
+  calculatePrice(name:string, period:number) {
+    let amount = 0;
+    name = name.split('.algo')[0];
+    if (name.length === 3) {
+      amount =
+        REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
+    }
+    else if (name.length === 4) {
+      amount =
+        REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
+    }
+    else if (name.length >= 5) {
+      amount =
+        REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
+    }
+    return amount;
   }
 
   async prepareNameRegistrationTransactions(
@@ -23,7 +43,7 @@ export class Transactions {
     period: number
   ) {
     const algodClient = this.algodClient;
-
+    if(name.split('.algo')[0].length < 3) throw new InvalidNameError();
     /* 1st Txn - Payment to Smart Contract */
 
     let amount = 0;
@@ -36,22 +56,11 @@ export class Transactions {
     let receiver = algosdk.getApplicationAddress(APP_ID);
     let sender = address;
 
-    if (period === undefined) period = 0;
-    else period--;
-
-    if (name.length < 3) return;
-    else if (name.length === 3)
-      amount =
-        REGISTRATION_PRICE.CHAR_3_AMOUNT +
-        period * REGISTRATION_PRICE.CHAR_3_AMOUNT;
-    else if (name.length === 4)
-      amount =
-        REGISTRATION_PRICE.CHAR_4_AMOUNT +
-        period * REGISTRATION_PRICE.CHAR_4_AMOUNT;
-    else if (name.length >= 5)
-      amount =
-        REGISTRATION_PRICE.CHAR_5_AMOUNT +
-        period * REGISTRATION_PRICE.CHAR_5_AMOUNT;
+    if (period === undefined) {
+      period = 1;
+    }
+    
+    amount = this.calculatePrice(name, period);
 
     const closeToRemaninder = undefined;
     const note = undefined;
@@ -165,7 +174,9 @@ export class Transactions {
       groupTxns.push(txn);
     }
 
-    if (Object.keys(editedHandles).length > 1) algosdk.assignGroupID(groupTxns);
+    if (Object.keys(editedHandles).length > 1) {
+      algosdk.assignGroupID(groupTxns);
+    }
 
     return groupTxns;
   }
@@ -196,8 +207,7 @@ export class Transactions {
   async prepareNameRenewalTxns(
     name: string,
     sender: string,
-    years: number,
-    amt: number
+    years: number
   ) {
     name = name.split(".algo")[0];
     const algodClient = this.algodClient;
@@ -208,7 +218,7 @@ export class Transactions {
     const paymentTxn = algosdk.makePaymentTxnWithSuggestedParams(
       sender,
       receiver,
-      amt,
+      this.calculatePrice(name, years),
       closeToRemaninder,
       note,
       params
