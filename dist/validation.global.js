@@ -31149,6 +31149,36 @@
     }
   });
 
+  // src/constants.js
+  var require_constants2 = __commonJS({
+    "src/constants.js"(exports2) {
+      "use strict";
+      exports2.__esModule = true;
+      exports2.APP_ID = 628095415;
+      exports2.REGISTRATION_PRICE = {
+        CHAR_3_AMOUNT: 15e7,
+        CHAR_4_AMOUNT: 5e7,
+        CHAR_5_AMOUNT: 5e6
+      };
+      exports2.TRANSFER_FEE = 2e6;
+      exports2.IPFS_LINK = "https://ipfs.infura.io/ipfs/";
+      exports2.ASCII_CODES = {
+        ASCII_A: 97,
+        ASCII_Z: 122,
+        ASCII_0: 48,
+        ASCII_9: 57
+      };
+      exports2.ALLOWED_SOCIALS = [
+        "github",
+        "twitter",
+        "telegram",
+        "youtube",
+        "reddit",
+        "discord"
+      ];
+    }
+  });
+
   // node_modules/algosdk/dist/esm/index.js
   var esm_exports = {};
   __export(esm_exports, {
@@ -36736,558 +36766,22 @@
   __reExport(esm_exports, main_exports);
   var esm_default = main_exports;
 
-  // src/constants.ts
-  var APP_ID = 628095415;
-  var REGISTRATION_PRICE = {
-    CHAR_3_AMOUNT: 15e7,
-    CHAR_4_AMOUNT: 5e7,
-    CHAR_5_AMOUNT: 5e6
-  };
-  var TRANSFER_FEE = 2e6;
-
-  // src/classes/generateTeal.ts
-  function generateTeal(name) {
-    return `#pragma version 4
-    byte "${name}"
-    len
-    int 3
-    ==
-    bnz main_l22
-    byte "${name}"
-    len
-    int 4
-    ==
-    bnz main_l13
-    byte "${name}"
-    len
-    int 5
-    >=
-    bnz main_l4
-    err
-    main_l4:
-    gtxn 0 Amount
-    int 5000000
-    >=
-    assert
-    byte "${name}"
-    len
-    int 64
-    <=
-    assert
-    int 0
-    store 0
-    main_l5:
-    load 0
-    byte "${name}"
-    len
-    <
-    bnz main_l12
-    global GroupSize
-    int 2
-    ==
-    global GroupSize
-    int 4
-    ==
-    ||
-    assert
-    gtxn 0 Sender
-    gtxn 1 Sender
-    ==
-    assert
-    gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-    ==
-    assert
-    global GroupSize
-    int 2
-    ==
-    bnz main_l11
-    global GroupSize
-    int 4
-    ==
-    bnz main_l10
-    int 0
-    return
-    main_l9:
-    int 1
-    assert
-    int 1
-    b main_l31
-    main_l10:
-    gtxn 1 Receiver
-    gtxn 2 Sender
-    ==
-    gtxn 2 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 2 OnCompletion
-    int OptIn
-    ==
-    &&
-    gtxn 3 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 3 Sender
-    gtxn 0 Sender
-    ==
-    &&
-    gtxna 3 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 3 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l9
-    main_l11:
-    gtxn 1 ApplicationID
-    int 628095415
-    ==
-    gtxna 1 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 1 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l9
-    main_l12:
-    byte "${name}"
-    load 0
-    getbyte
-    int 97
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 122
-    <=
-    &&
-    byte "${name}"
-    load 0
-    getbyte
-    int 48
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 57
-    <=
-    &&
-    ||
-    assert
-    load 0
-    int 1
-    +
-    store 0
-    b main_l5
-    main_l13:
-    gtxn 0 Amount
-    int 50000000
-    >=
-    assert
-    byte "${name}"
-    len
-    int 64
-    <=
-    assert
-    int 0
-    store 0
-    main_l14:
-    load 0
-    byte "${name}"
-    len
-    <
-    bnz main_l21
-    global GroupSize
-    int 2
-    ==
-    global GroupSize
-    int 4
-    ==
-    ||
-    assert
-    gtxn 0 Sender
-    gtxn 1 Sender
-    ==
-    assert
-    gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-    ==
-    assert
-    global GroupSize
-    int 2
-    ==
-    bnz main_l20
-    global GroupSize
-    int 4
-    ==
-    bnz main_l19
-    int 0
-    return
-    main_l18:
-    int 1
-    assert
-    int 1
-    b main_l31
-    main_l19:
-    gtxn 1 Receiver
-    gtxn 2 Sender
-    ==
-    gtxn 2 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 2 OnCompletion
-    int OptIn
-    ==
-    &&
-    gtxn 3 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 3 Sender
-    gtxn 0 Sender
-    ==
-    &&
-    gtxna 3 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 3 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l18
-    main_l20:
-    gtxn 1 ApplicationID
-    int 628095415
-    ==
-    gtxna 1 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 1 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l18
-    main_l21:
-    byte "${name}"
-    load 0
-    getbyte
-    int 97
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 122
-    <=
-    &&
-    byte "${name}"
-    load 0
-    getbyte
-    int 48
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 57
-    <=
-    &&
-    ||
-    assert
-    load 0
-    int 1
-    +
-    store 0
-    b main_l14
-    main_l22:
-    gtxn 0 Amount
-    int 150000000
-    >=
-    assert
-    byte "${name}"
-    len
-    int 64
-    <=
-    assert
-    int 0
-    store 0
-    main_l23:
-    load 0
-    byte "${name}"
-    len
-    <
-    bnz main_l30
-    global GroupSize
-    int 2
-    ==
-    global GroupSize
-    int 4
-    ==
-    ||
-    assert
-    gtxn 0 Sender
-    gtxn 1 Sender
-    ==
-    assert
-    gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-    ==
-    assert
-    global GroupSize
-    int 2
-    ==
-    bnz main_l29
-    global GroupSize
-    int 4
-    ==
-    bnz main_l28
-    int 0
-    return
-    main_l27:
-    int 1
-    assert
-    int 1
-    b main_l31
-    main_l28:
-    gtxn 1 Receiver
-    gtxn 2 Sender
-    ==
-    gtxn 2 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 2 OnCompletion
-    int OptIn
-    ==
-    &&
-    gtxn 3 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 3 Sender
-    gtxn 0 Sender
-    ==
-    &&
-    gtxna 3 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 3 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l27
-    main_l29:
-    gtxn 1 ApplicationID
-    int 628095415
-    ==
-    gtxna 1 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 1 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l27
-    main_l30:
-    byte "${name}"
-    load 0
-    getbyte
-    int 97
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 122
-    <=
-    &&
-    byte "${name}"
-    load 0
-    getbyte
-    int 48
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 57
-    <=
-    &&
-    ||
-    assert
-    load 0
-    int 1
-    +
-    store 0
-    b main_l23
-    main_l31:
-    return`;
+  // src/validation.ts
+  var import_constants = __toESM(require_constants2());
+  function isValidAddress2(address) {
+    return esm_default.isValidAddress(address);
   }
-
-  // src/classes/transactions.ts
-  var Transactions = class {
-    algodClient;
-    constructor(client) {
-      this.algodClient = client;
-    }
-    async generateLsig(name) {
-      const client = this.algodClient;
-      let program = await client.compile(generateTeal(name)).do();
-      program = new Uint8Array(Buffer.from(program.result, "base64"));
-      return new esm_default.LogicSigAccount(program);
-    }
-    async prepareNameRegistrationTransactions(name, address, period) {
-      const algodClient = this.algodClient;
-      let amount = 0;
-      const lsig = await this.generateLsig(name);
-      const params = await algodClient.getTransactionParams().do();
-      params.fee = 1e3;
-      params.flatFee = true;
-      let receiver = esm_default.getApplicationAddress(APP_ID);
-      let sender = address;
-      if (period === void 0)
-        period = 0;
-      else
-        period--;
-      if (name.length < 3)
-        return;
-      else if (name.length === 3)
-        amount = REGISTRATION_PRICE.CHAR_3_AMOUNT + period * REGISTRATION_PRICE.CHAR_3_AMOUNT;
-      else if (name.length === 4)
-        amount = REGISTRATION_PRICE.CHAR_4_AMOUNT + period * REGISTRATION_PRICE.CHAR_4_AMOUNT;
-      else if (name.length >= 5)
-        amount = REGISTRATION_PRICE.CHAR_5_AMOUNT + period * REGISTRATION_PRICE.CHAR_5_AMOUNT;
-      const closeToRemaninder = void 0;
-      const note = void 0;
-      const txn1 = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
-      const groupTxns = [];
-      groupTxns.push(txn1);
-      sender = address;
-      receiver = lsig.address();
-      amount = 915e3;
-      const txn2 = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
-      groupTxns.push(txn2);
-      const txn3 = await esm_default.makeApplicationOptInTxnFromObject({
-        from: lsig.address(),
-        suggestedParams: params,
-        appIndex: APP_ID
-      });
-      groupTxns.push(txn3);
-      sender = lsig.address();
-      receiver = address;
-      amount = 0;
-      const method2 = "register_name";
-      const appArgs = [];
-      period++;
-      appArgs.push(new Uint8Array(Buffer.from(method2)));
-      appArgs.push(new Uint8Array(Buffer.from(name)));
-      appArgs.push(esm_default.encodeUint64(period));
-      const txn4 = await esm_default.makeApplicationNoOpTxn(address, params, APP_ID, appArgs, [lsig.address()]);
-      groupTxns.push(txn4);
-      esm_default.assignGroupID(groupTxns);
-      const signedOptinTxn = esm_default.signLogicSigTransaction(groupTxns[2], lsig);
-      return {
-        optinTxn: signedOptinTxn,
-        txns: groupTxns,
-        unsignedOptinTxn: groupTxns[2]
-      };
-    }
-    async prepareUpdateNamePropertyTransactions(name, address, editedHandles) {
-      const algodClient = this.algodClient;
-      const lsig = await this.generateLsig(name);
-      const params = await algodClient.getTransactionParams().do();
-      params.fee = 1e3;
-      params.flatFee = true;
-      const method2 = "update_name";
-      const groupTxns = [];
-      for (const key in editedHandles) {
-        const appArgs = [];
-        const network = key;
-        const handle = editedHandles[key];
-        appArgs.push(new Uint8Array(Buffer.from(method2)));
-        appArgs.push(new Uint8Array(Buffer.from(network)));
-        appArgs.push(new Uint8Array(Buffer.from(handle)));
-        const txn = await esm_default.makeApplicationNoOpTxn(address, params, APP_ID, appArgs, [lsig.address()]);
-        groupTxns.push(txn);
+  function isValidName(name) {
+    name = name.split(".algo")[0];
+    const lengthOfName = name.length;
+    for (let i = 0; i < lengthOfName; i++) {
+      if (!(name.charCodeAt(i) >= import_constants.ASCII_CODES.ASCII_0 && name.charCodeAt(i) <= import_constants.ASCII_CODES.ASCII_9)) {
+        if (!(name.charCodeAt(i) >= import_constants.ASCII_CODES.ASCII_A && name.charCodeAt(i) <= import_constants.ASCII_CODES.ASCII_Z))
+          return false;
       }
-      if (Object.keys(editedHandles).length > 1)
-        esm_default.assignGroupID(groupTxns);
-      return groupTxns;
     }
-    async preparePaymentTxn(sender, receiver, amt, note) {
-      const algodClient = this.algodClient;
-      const params = await algodClient.getTransactionParams().do();
-      amt = esm_default.algosToMicroalgos(amt);
-      const enc = new TextEncoder();
-      note = enc.encode(note);
-      const closeToRemaninder = void 0;
-      return esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
-    }
-    async prepareNameRenewalTxns(name, sender, years, amt) {
-      name = name.split(".algo")[0];
-      const algodClient = this.algodClient;
-      const params = await algodClient.getTransactionParams().do();
-      const receiver = esm_default.getApplicationAddress(APP_ID);
-      const closeToRemaninder = void 0;
-      const note = void 0;
-      const paymentTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
-      const lsig = await this.generateLsig(name);
-      const appArgs = [];
-      appArgs.push(new Uint8Array(Buffer.from("renew_name")));
-      appArgs.push(esm_default.encodeUint64(years));
-      const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [lsig.address()]);
-      esm_default.assignGroupID([paymentTxn, applicationTxn]);
-      return [paymentTxn, applicationTxn];
-    }
-    async prepareInitiateNameTransferTransaction(name, sender, newOwner, price) {
-      const algodClient = this.algodClient;
-      price = esm_default.algosToMicroalgos(price);
-      const params = await algodClient.getTransactionParams().do();
-      name = name.split(".algo")[0];
-      const lsig = await this.generateLsig(name);
-      const appArgs = [];
-      appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
-      appArgs.push(esm_default.encodeUint64(price));
-      return esm_default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [
-        lsig.address(),
-        newOwner
-      ]);
-    }
-    async prepareAcceptNameTransferTransactions(name, sender, receiver, amt) {
-      amt = esm_default.algosToMicroalgos(amt);
-      const algodClient = this.algodClient;
-      const params = await algodClient.getTransactionParams().do();
-      const closeToRemaninder = void 0;
-      const note = void 0;
-      const paymentToOwnerTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
-      receiver = esm_default.getApplicationAddress(APP_ID);
-      const paymentToSmartContractTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, TRANSFER_FEE, closeToRemaninder, note, params);
-      name = name.split(".algo")[0];
-      const lsig = await this.generateLsig(name);
-      const appArgs = [];
-      appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
-      const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [lsig.address()]);
-      esm_default.assignGroupID([
-        paymentToOwnerTxn,
-        paymentToSmartContractTxn,
-        applicationTxn
-      ]);
-      return [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn];
-    }
-  };
+    return true;
+  }
 })();
 /*
  * [hi-base32]{@link https://github.com/emn178/hi-base32}
@@ -37338,4 +36832,4 @@
  * @copyright Chen, Yi-Cyuan 2015-2018
  * @license MIT
  */
-//# sourceMappingURL=transactions.global.js.map
+//# sourceMappingURL=validation.global.js.map

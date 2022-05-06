@@ -16,7 +16,7 @@ var __copyProps = (to, from, except, desc) => {
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// src/classes/errors.ts
+// src/errors.ts
 var errors_exports = {};
 __export(errors_exports, {
   AddressValidationError: () => AddressValidationError,

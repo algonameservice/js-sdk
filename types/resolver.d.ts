@@ -25,5 +25,5 @@ export declare class Resolver {
     owner(name: string): Promise<any>;
     text(name: string, key: string): Promise<any>;
     expiry(name: string): Promise<Date | "Not Registered">;
-    content(): Promise<void>;
+    content(name: string): Promise<void>;
 }

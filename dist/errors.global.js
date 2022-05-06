@@ -1,5 +1,5 @@
 (() => {
-  // src/classes/errors.ts
+  // src/errors.ts
   var AddressValidationError = class extends Error {
     name;
     type;

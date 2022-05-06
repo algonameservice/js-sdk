@@ -31149,6 +31149,119 @@
     }
   });
 
+  // src/constants.js
+  var require_constants2 = __commonJS({
+    "src/constants.js"(exports2) {
+      "use strict";
+      exports2.__esModule = true;
+      exports2.APP_ID = 628095415;
+      exports2.REGISTRATION_PRICE = {
+        CHAR_3_AMOUNT: 15e7,
+        CHAR_4_AMOUNT: 5e7,
+        CHAR_5_AMOUNT: 5e6
+      };
+      exports2.TRANSFER_FEE = 2e6;
+      exports2.IPFS_LINK = "https://ipfs.infura.io/ipfs/";
+      exports2.ASCII_CODES = {
+        ASCII_A: 97,
+        ASCII_Z: 122,
+        ASCII_0: 48,
+        ASCII_9: 57
+      };
+      exports2.ALLOWED_SOCIALS = [
+        "github",
+        "twitter",
+        "telegram",
+        "youtube",
+        "reddit",
+        "discord"
+      ];
+    }
+  });
+
+  // src/errors.js
+  var require_errors = __commonJS({
+    "src/errors.js"(exports2) {
+      "use strict";
+      var __extends = exports2 && exports2.__extends || function() {
+        var extendStatics = function(d, b) {
+          extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
+            d2.__proto__ = b2;
+          } || function(d2, b2) {
+            for (var p in b2)
+              if (b2.hasOwnProperty(p))
+                d2[p] = b2[p];
+          };
+          return extendStatics(d, b);
+        };
+        return function(d, b) {
+          extendStatics(d, b);
+          function __() {
+            this.constructor = d;
+          }
+          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+      }();
+      exports2.__esModule = true;
+      var AddressValidationError2 = function(_super) {
+        __extends(AddressValidationError3, _super);
+        function AddressValidationError3() {
+          var _this = _super.call(this, "This is not a valid Algorand address") || this;
+          _this.name = "InvalidAddressError";
+          _this.type = "InvalidAddressError";
+          return _this;
+        }
+        return AddressValidationError3;
+      }(Error);
+      exports2.AddressValidationError = AddressValidationError2;
+      var InvalidNameError2 = function(_super) {
+        __extends(InvalidNameError3, _super);
+        function InvalidNameError3() {
+          var _this = _super.call(this, "The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters") || this;
+          _this.name = "InvalidNameError";
+          _this.type = "InvalidNameError";
+          return _this;
+        }
+        return InvalidNameError3;
+      }(Error);
+      exports2.InvalidNameError = InvalidNameError2;
+      var NameNotRegisteredError = function(_super) {
+        __extends(NameNotRegisteredError2, _super);
+        function NameNotRegisteredError2(name) {
+          var _this = _super.call(this, "Name " + name + " is not registered") || this;
+          _this.name = "NameNotRegisteredError";
+          _this.type = "NameNotRegisteredError";
+          return _this;
+        }
+        return NameNotRegisteredError2;
+      }(Error);
+      exports2.NameNotRegisteredError = NameNotRegisteredError;
+      var IncorrectOwnerError = function(_super) {
+        __extends(IncorrectOwnerError2, _super);
+        function IncorrectOwnerError2(name, address) {
+          var _this = _super.call(this, "Name " + name + ".algo is not owned by " + address) || this;
+          _this.name = "IncorrectOwnerError";
+          _this.type = "IncorrectOwnerError";
+          return _this;
+        }
+        return IncorrectOwnerError2;
+      }(Error);
+      exports2.IncorrectOwnerError = IncorrectOwnerError;
+    }
+  });
+
+  // src/generateTeal.js
+  var require_generateTeal = __commonJS({
+    "src/generateTeal.js"(exports2) {
+      "use strict";
+      exports2.__esModule = true;
+      function generateTeal2(name) {
+        return '#pragma version 4\n    byte "' + name + '"\n    len\n    int 3\n    ==\n    bnz main_l22\n    byte "' + name + '"\n    len\n    int 4\n    ==\n    bnz main_l13\n    byte "' + name + '"\n    len\n    int 5\n    >=\n    bnz main_l4\n    err\n    main_l4:\n    gtxn 0 Amount\n    int 5000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l5:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l12\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l11\n    global GroupSize\n    int 4\n    ==\n    bnz main_l10\n    int 0\n    return\n    main_l9:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l10:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l11:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l12:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l5\n    main_l13:\n    gtxn 0 Amount\n    int 50000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l14:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l21\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l20\n    global GroupSize\n    int 4\n    ==\n    bnz main_l19\n    int 0\n    return\n    main_l18:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l19:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l20:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l21:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l14\n    main_l22:\n    gtxn 0 Amount\n    int 150000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l23:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l30\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l29\n    global GroupSize\n    int 4\n    ==\n    bnz main_l28\n    int 0\n    return\n    main_l27:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l28:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l29:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l30:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l23\n    main_l31:\n    return';
+      }
+      exports2.generateTeal = generateTeal2;
+    }
+  });
+
   // node_modules/algosdk/dist/esm/index.js
   var esm_exports = {};
   __export(esm_exports, {
@@ -36736,430 +36849,10 @@
   __reExport(esm_exports, main_exports);
   var esm_default = main_exports;
 
-  // src/constants.ts
-  var APP_ID = 628095415;
-  var ALLOWED_SOCIALS = [
-    "github",
-    "twitter",
-    "telegram",
-    "youtube",
-    "reddit",
-    "discord"
-  ];
-
-  // src/classes/errors.ts
-  var AddressValidationError = class extends Error {
-    name;
-    type;
-    constructor() {
-      super(`This is not a valid Algorand address`);
-      this.name = "InvalidAddressError";
-      this.type = "InvalidAddressError";
-    }
-  };
-  var InvalidNameError = class extends Error {
-    name;
-    type;
-    constructor() {
-      super(`The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters`);
-      this.name = "InvalidNameError";
-      this.type = "InvalidNameError";
-    }
-  };
-
-  // src/classes/generateTeal.ts
-  function generateTeal(name) {
-    return `#pragma version 4
-    byte "${name}"
-    len
-    int 3
-    ==
-    bnz main_l22
-    byte "${name}"
-    len
-    int 4
-    ==
-    bnz main_l13
-    byte "${name}"
-    len
-    int 5
-    >=
-    bnz main_l4
-    err
-    main_l4:
-    gtxn 0 Amount
-    int 5000000
-    >=
-    assert
-    byte "${name}"
-    len
-    int 64
-    <=
-    assert
-    int 0
-    store 0
-    main_l5:
-    load 0
-    byte "${name}"
-    len
-    <
-    bnz main_l12
-    global GroupSize
-    int 2
-    ==
-    global GroupSize
-    int 4
-    ==
-    ||
-    assert
-    gtxn 0 Sender
-    gtxn 1 Sender
-    ==
-    assert
-    gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-    ==
-    assert
-    global GroupSize
-    int 2
-    ==
-    bnz main_l11
-    global GroupSize
-    int 4
-    ==
-    bnz main_l10
-    int 0
-    return
-    main_l9:
-    int 1
-    assert
-    int 1
-    b main_l31
-    main_l10:
-    gtxn 1 Receiver
-    gtxn 2 Sender
-    ==
-    gtxn 2 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 2 OnCompletion
-    int OptIn
-    ==
-    &&
-    gtxn 3 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 3 Sender
-    gtxn 0 Sender
-    ==
-    &&
-    gtxna 3 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 3 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l9
-    main_l11:
-    gtxn 1 ApplicationID
-    int 628095415
-    ==
-    gtxna 1 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 1 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l9
-    main_l12:
-    byte "${name}"
-    load 0
-    getbyte
-    int 97
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 122
-    <=
-    &&
-    byte "${name}"
-    load 0
-    getbyte
-    int 48
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 57
-    <=
-    &&
-    ||
-    assert
-    load 0
-    int 1
-    +
-    store 0
-    b main_l5
-    main_l13:
-    gtxn 0 Amount
-    int 50000000
-    >=
-    assert
-    byte "${name}"
-    len
-    int 64
-    <=
-    assert
-    int 0
-    store 0
-    main_l14:
-    load 0
-    byte "${name}"
-    len
-    <
-    bnz main_l21
-    global GroupSize
-    int 2
-    ==
-    global GroupSize
-    int 4
-    ==
-    ||
-    assert
-    gtxn 0 Sender
-    gtxn 1 Sender
-    ==
-    assert
-    gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-    ==
-    assert
-    global GroupSize
-    int 2
-    ==
-    bnz main_l20
-    global GroupSize
-    int 4
-    ==
-    bnz main_l19
-    int 0
-    return
-    main_l18:
-    int 1
-    assert
-    int 1
-    b main_l31
-    main_l19:
-    gtxn 1 Receiver
-    gtxn 2 Sender
-    ==
-    gtxn 2 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 2 OnCompletion
-    int OptIn
-    ==
-    &&
-    gtxn 3 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 3 Sender
-    gtxn 0 Sender
-    ==
-    &&
-    gtxna 3 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 3 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l18
-    main_l20:
-    gtxn 1 ApplicationID
-    int 628095415
-    ==
-    gtxna 1 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 1 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l18
-    main_l21:
-    byte "${name}"
-    load 0
-    getbyte
-    int 97
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 122
-    <=
-    &&
-    byte "${name}"
-    load 0
-    getbyte
-    int 48
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 57
-    <=
-    &&
-    ||
-    assert
-    load 0
-    int 1
-    +
-    store 0
-    b main_l14
-    main_l22:
-    gtxn 0 Amount
-    int 150000000
-    >=
-    assert
-    byte "${name}"
-    len
-    int 64
-    <=
-    assert
-    int 0
-    store 0
-    main_l23:
-    load 0
-    byte "${name}"
-    len
-    <
-    bnz main_l30
-    global GroupSize
-    int 2
-    ==
-    global GroupSize
-    int 4
-    ==
-    ||
-    assert
-    gtxn 0 Sender
-    gtxn 1 Sender
-    ==
-    assert
-    gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
-    ==
-    assert
-    global GroupSize
-    int 2
-    ==
-    bnz main_l29
-    global GroupSize
-    int 4
-    ==
-    bnz main_l28
-    int 0
-    return
-    main_l27:
-    int 1
-    assert
-    int 1
-    b main_l31
-    main_l28:
-    gtxn 1 Receiver
-    gtxn 2 Sender
-    ==
-    gtxn 2 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 2 OnCompletion
-    int OptIn
-    ==
-    &&
-    gtxn 3 ApplicationID
-    int 628095415
-    ==
-    &&
-    gtxn 3 Sender
-    gtxn 0 Sender
-    ==
-    &&
-    gtxna 3 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 3 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l27
-    main_l29:
-    gtxn 1 ApplicationID
-    int 628095415
-    ==
-    gtxna 1 ApplicationArgs 0
-    byte "register_name"
-    ==
-    &&
-    gtxna 1 ApplicationArgs 1
-    byte "${name}"
-    ==
-    &&
-    assert
-    b main_l27
-    main_l30:
-    byte "${name}"
-    load 0
-    getbyte
-    int 97
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 122
-    <=
-    &&
-    byte "${name}"
-    load 0
-    getbyte
-    int 48
-    >=
-    byte "${name}"
-    load 0
-    getbyte
-    int 57
-    <=
-    &&
-    ||
-    assert
-    load 0
-    int 1
-    +
-    store 0
-    b main_l23
-    main_l31:
-    return`;
-  }
-
-  // src/classes/resolver.ts
+  // src/resolver.ts
+  var import_constants = __toESM(require_constants2());
+  var import_errors = __toESM(require_errors());
+  var import_generateTeal = __toESM(require_generateTeal());
   var Resolver = class {
     algodClient;
     indexerClient;
@@ -37169,13 +36862,13 @@
     }
     async generateLsig(name) {
       const client = this.algodClient;
-      let program = await client.compile(generateTeal(name)).do();
+      let program = await client.compile((0, import_generateTeal.generateTeal)(name)).do();
       program = new Uint8Array(Buffer.from(program.result, "base64"));
       return new esm_default.LogicSigAccount(program);
     }
     async resolveName(name) {
       if (name.length === 0 || name.length > 64) {
-        throw new InvalidNameError();
+        throw new import_errors.InvalidNameError();
       } else {
         name = name.split(".algo")[0];
         name = name.toLowerCase();
@@ -37190,7 +36883,7 @@
           let socials = [], metadata = [];
           for (let i = 0; i < length; i++) {
             const app = accountInfo[i];
-            if (app.id === APP_ID) {
+            if (app.id === import_constants.APP_ID) {
               const kv = app["key-value"];
               const decodedKvPairs = this.decodeKvPairs(kv);
               socials = this.filterKvPairs(decodedKvPairs, "socials");
@@ -37216,7 +36909,7 @@
     async getNamesOwnedByAddress(address, socials, metadata, limit) {
       const isValidAddress2 = await esm_default.isValidAddress(address);
       if (!isValidAddress2) {
-        throw new AddressValidationError();
+        throw new import_errors.AddressValidationError();
       } else {
         const indexer = await this.indexerClient;
         let nextToken = "";
@@ -37224,7 +36917,7 @@
         let txns = [];
         while (txnLength > 0) {
           try {
-            const info = await indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(APP_ID).nextToken(nextToken).do();
+            const info = await indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(import_constants.APP_ID).nextToken(nextToken).do();
             txnLength = info.transactions.length;
             if (txnLength > 0) {
               nextToken = info["next-token"];
@@ -37277,15 +36970,16 @@
           key,
           value
         };
-        if (ALLOWED_SOCIALS.includes(key))
+        if (import_constants.ALLOWED_SOCIALS.includes(key))
           socials.push(kvObj);
         else
           metadata.push(kvObj);
       }
-      if (type === "socials")
+      if (type === "socials") {
         return socials;
-      else if (type === "metadata")
+      } else if (type === "metadata") {
         return metadata;
+      }
     }
     decodeKvPairs(kvPairs) {
       return kvPairs.map((kvPair) => {
@@ -37314,7 +37008,7 @@
         for (let i = 0; i < txns.length; i++) {
           const txn = txns[i];
           if (txn["tx-type"] === "appl") {
-            if (txn["application-transaction"]["application-id"] === APP_ID) {
+            if (txn["application-transaction"]["application-id"] === import_constants.APP_ID) {
               const appArgs = txn["application-transaction"]["application-args"];
               if (Buffer.from(appArgs[0], "base64").toString() === "register_name") {
                 if (!names.includes(Buffer.from(appArgs[1], "base64").toString()))
@@ -37325,11 +37019,12 @@
                 accountInfo = accountInfo.account["apps-local-state"];
                 const length = accountInfo.length;
                 for (let i2 = 0; i2 < length; i2++) {
-                  if (accountInfo[i2].id === APP_ID) {
+                  if (accountInfo[i2].id === import_constants.APP_ID) {
                     const kvPairs = accountInfo[i2]["key-value"];
                     const domainInfo = this.decodeKvPairs(kvPairs).filter((domain) => domain.key === "name");
-                    if (!names.includes(domainInfo[0].value))
+                    if (!names.includes(domainInfo[0].value)) {
                       names.push(domainInfo[0].value);
+                    }
                   }
                 }
               }
@@ -37352,12 +37047,14 @@
       const domainInformation = await this.resolveName(name);
       if (domainInformation.found === true) {
         const textRecords = domainInformation.socials.filter((social) => social.key === key);
-        if (textRecords.length > 0)
+        if (textRecords.length > 0) {
           return domainInformation.socials.filter((social) => social.key === key)[0].value;
-        else
+        } else {
           return "Property Not Set";
-      } else
+        }
+      } else {
         return "Not Registered";
+      }
     }
     async expiry(name) {
       const domainInformation = await this.resolveName(name.split(".algo")[0]);
@@ -37366,7 +37063,7 @@
       } else
         return "Not Registered";
     }
-    async content() {
+    async content(name) {
     }
   };
 })();

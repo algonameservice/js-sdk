@@ -63,77 +63,6 @@
   var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target, mod));
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-  // src/errors.js
-  var require_errors = __commonJS({
-    "src/errors.js"(exports2) {
-      "use strict";
-      var __extends = exports2 && exports2.__extends || function() {
-        var extendStatics = function(d, b) {
-          extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
-            d2.__proto__ = b2;
-          } || function(d2, b2) {
-            for (var p in b2)
-              if (b2.hasOwnProperty(p))
-                d2[p] = b2[p];
-          };
-          return extendStatics(d, b);
-        };
-        return function(d, b) {
-          extendStatics(d, b);
-          function __() {
-            this.constructor = d;
-          }
-          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-        };
-      }();
-      exports2.__esModule = true;
-      var AddressValidationError2 = function(_super) {
-        __extends(AddressValidationError3, _super);
-        function AddressValidationError3() {
-          var _this = _super.call(this, "This is not a valid Algorand address") || this;
-          _this.name = "InvalidAddressError";
-          _this.type = "InvalidAddressError";
-          return _this;
-        }
-        return AddressValidationError3;
-      }(Error);
-      exports2.AddressValidationError = AddressValidationError2;
-      var InvalidNameError2 = function(_super) {
-        __extends(InvalidNameError3, _super);
-        function InvalidNameError3() {
-          var _this = _super.call(this, "The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters") || this;
-          _this.name = "InvalidNameError";
-          _this.type = "InvalidNameError";
-          return _this;
-        }
-        return InvalidNameError3;
-      }(Error);
-      exports2.InvalidNameError = InvalidNameError2;
-      var NameNotRegisteredError = function(_super) {
-        __extends(NameNotRegisteredError2, _super);
-        function NameNotRegisteredError2(name) {
-          var _this = _super.call(this, "Name " + name + " is not registered") || this;
-          _this.name = "NameNotRegisteredError";
-          _this.type = "NameNotRegisteredError";
-          return _this;
-        }
-        return NameNotRegisteredError2;
-      }(Error);
-      exports2.NameNotRegisteredError = NameNotRegisteredError;
-      var IncorrectOwnerError = function(_super) {
-        __extends(IncorrectOwnerError2, _super);
-        function IncorrectOwnerError2(name, address) {
-          var _this = _super.call(this, "Name " + name + ".algo is not owned by " + address) || this;
-          _this.name = "IncorrectOwnerError";
-          _this.type = "IncorrectOwnerError";
-          return _this;
-        }
-        return IncorrectOwnerError2;
-      }(Error);
-      exports2.IncorrectOwnerError = IncorrectOwnerError;
-    }
-  });
-
   // node_modules/tweetnacl/nacl-fast.js
   var require_nacl_fast = __commonJS({
     "node_modules/tweetnacl/nacl-fast.js"(exports2, module2) {
@@ -12881,82 +12810,6 @@
         PeriodicPayment: periodicPayTemplate.PeriodicPayment,
         getPeriodicPaymentWithdrawalTransaction: periodicPayTemplate.getPeriodicPaymentWithdrawalTransaction
       };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/bid.js
-  var Bid;
-  var init_bid = __esm({
-    "node_modules/algosdk/dist/esm/src/bid.js"() {
-      init_address();
-      init_encoding();
-      init_naclWrappers();
-      init_utils();
-      Bid = class {
-        constructor({ bidderKey, bidAmount, bidID, auctionKey, auctionID, maxPrice }) {
-          this.name = "Bid";
-          this.tag = Buffer.from([97, 66]);
-          const decodedBidderKey = decodeAddress(bidderKey);
-          const decodedAuctionKey = decodeAddress(auctionKey);
-          if (!Number.isSafeInteger(bidAmount) || bidAmount < 0)
-            throw Error("Bid amount must be positive and 2^53-1");
-          if (!Number.isSafeInteger(bidID) || bidID < 0)
-            throw Error("BidID must be positive and 2^53-1");
-          if (!Number.isSafeInteger(auctionID) || auctionID < 0)
-            throw Error("auctionID must be positive");
-          Object.assign(this, {
-            bidderKey: decodedBidderKey,
-            bidAmount,
-            bidID,
-            auctionKey: decodedAuctionKey,
-            auctionID,
-            maxPrice
-          });
-        }
-        get_obj_for_encoding() {
-          return {
-            bidder: Buffer.from(this.bidderKey.publicKey),
-            cur: this.bidAmount,
-            price: this.maxPrice,
-            id: this.bidID,
-            auc: Buffer.from(this.auctionKey.publicKey),
-            aid: this.auctionID
-          };
-        }
-        signBid(sk) {
-          const encodedMsg = encode2(this.get_obj_for_encoding());
-          const toBeSigned = Buffer.from(concatArrays(this.tag, encodedMsg));
-          const sig = sign(toBeSigned, sk);
-          const sBid = {
-            sig: Buffer.from(sig),
-            bid: this.get_obj_for_encoding()
-          };
-          const note = {
-            t: "b",
-            b: sBid
-          };
-          return new Uint8Array(encode2(note));
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/convert.js
-  function microalgosToAlgos(microalgos) {
-    if (microalgos < 0 || !Number.isSafeInteger(microalgos)) {
-      throw new Error(INVALID_MICROALGOS_ERROR_MSG);
-    }
-    return microalgos / MICROALGOS_TO_ALGOS_RATIO;
-  }
-  function algosToMicroalgos(algos) {
-    const microalgos = algos * MICROALGOS_TO_ALGOS_RATIO;
-    return Math.round(microalgos);
-  }
-  var MICROALGOS_TO_ALGOS_RATIO, INVALID_MICROALGOS_ERROR_MSG;
-  var init_convert = __esm({
-    "node_modules/algosdk/dist/esm/src/convert.js"() {
-      MICROALGOS_TO_ALGOS_RATIO = 1e6;
-      INVALID_MICROALGOS_ERROR_MSG = "Microalgos should be positive and less than 2^53 - 1.";
     }
   });
 
@@ -31296,5720 +31149,116 @@
     }
   });
 
-  // node_modules/algosdk/dist/esm/src/client/v2/serviceClient.js
-  function convertTokenStringToTokenHeader(token = "", headerIdentifier) {
-    const tokenHeader = {};
-    tokenHeader[headerIdentifier] = token;
-    return tokenHeader;
-  }
-  function isBaseHTTPClient(tbc) {
-    return typeof tbc.get === "function";
-  }
-  var ServiceClient;
-  var init_serviceClient = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/serviceClient.js"() {
-      init_client();
-      init_intDecoding();
-      ServiceClient = class {
-        constructor(tokenHeaderIdentifier, tokenHeaderOrStrOrBaseClient, baseServer, port, defaultHeaders = {}) {
-          if (isBaseHTTPClient(tokenHeaderOrStrOrBaseClient)) {
-            this.c = new HTTPClient(tokenHeaderOrStrOrBaseClient);
-          } else {
-            let tokenHeader;
-            if (typeof tokenHeaderOrStrOrBaseClient === "string") {
-              tokenHeader = convertTokenStringToTokenHeader(tokenHeaderOrStrOrBaseClient, tokenHeaderIdentifier);
-            } else {
-              tokenHeader = tokenHeaderOrStrOrBaseClient;
-            }
-            this.c = new HTTPClient(tokenHeader, baseServer, port, defaultHeaders);
-          }
-          this.intDecoding = intDecoding_default.DEFAULT;
-        }
-        setIntEncoding(method2) {
-          this.intDecoding = method2;
-        }
-        getIntEncoding() {
-          return this.intDecoding;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/accountInformation.js
-  var AccountInformation;
-  var init_accountInformation = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/accountInformation.js"() {
-      init_jsonrequest();
-      AccountInformation = class extends JSONRequest {
-        constructor(c, intDecoding, account) {
-          super(c, intDecoding);
-          this.account = account;
-          this.account = account;
-        }
-        path() {
-          return `/v2/accounts/${this.account}`;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/block.js
-  var Block;
-  var init_block = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/block.js"() {
-      init_encoding();
-      init_jsonrequest();
-      Block = class extends JSONRequest {
-        constructor(c, roundNumber) {
-          super(c);
-          if (!Number.isInteger(roundNumber))
-            throw Error("roundNumber should be an integer");
-          this.round = roundNumber;
-          this.query = { format: "msgpack" };
-        }
-        path() {
-          return `/v2/blocks/${this.round}`;
-        }
-        prepare(body) {
-          if (body && body.byteLength > 0) {
-            return decode2(body);
-          }
-          return void 0;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/compile.js
-  function setHeaders(headers = {}) {
-    let hdrs = headers;
-    if (Object.keys(hdrs).every((key) => key.toLowerCase() !== "content-type")) {
-      hdrs = __spreadValues({}, headers);
-      hdrs["Content-Type"] = "text/plain";
-    }
-    return hdrs;
-  }
-  var Compile;
-  var init_compile = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/compile.js"() {
-      init_jsonrequest();
-      Compile = class extends JSONRequest {
-        constructor(c, source) {
-          super(c);
-          this.source = source;
-          this.source = source;
-        }
-        path() {
-          return `/v2/teal/compile`;
-        }
-        async do(headers = {}) {
-          const txHeaders = setHeaders(headers);
-          const res = await this.c.post(this.path(), Buffer.from(this.source), txHeaders);
-          return res.body;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/dryrun.js
-  var Dryrun;
-  var init_dryrun = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/dryrun.js"() {
-      init_jsonrequest();
-      init_encoding();
-      init_compile();
-      Dryrun = class extends JSONRequest {
-        constructor(c, dr) {
-          super(c);
-          this.blob = encode2(dr.get_obj_for_encoding(true));
-        }
-        path() {
-          return "/v2/teal/dryrun";
-        }
-        async do(headers = {}) {
-          const txHeaders = setHeaders(headers);
-          const res = await this.c.post(this.path(), Buffer.from(this.blob), txHeaders);
-          return res.body;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/getAssetByID.js
-  var GetAssetByID;
-  var init_getAssetByID = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/getAssetByID.js"() {
-      init_jsonrequest();
-      GetAssetByID = class extends JSONRequest {
-        constructor(c, intDecoding, index) {
-          super(c, intDecoding);
-          this.index = index;
-          this.index = index;
-        }
-        path() {
-          return `/v2/assets/${this.index}`;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/getApplicationByID.js
-  var GetApplicationByID;
-  var init_getApplicationByID = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/getApplicationByID.js"() {
-      init_jsonrequest();
-      GetApplicationByID = class extends JSONRequest {
-        constructor(c, intDecoding, index) {
-          super(c, intDecoding);
-          this.index = index;
-          this.index = index;
-        }
-        path() {
-          return `/v2/applications/${this.index}`;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/healthCheck.js
-  var HealthCheck;
-  var init_healthCheck = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/healthCheck.js"() {
-      init_jsonrequest();
-      HealthCheck = class extends JSONRequest {
-        path() {
-          return "/health";
-        }
-        async do(headers = {}) {
-          const res = await this.c.get(this.path(), {}, headers);
-          if (!res.ok) {
-            throw new Error(`Health response: ${res.status}`);
-          }
-          return {};
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactionInformation.js
-  var PendingTransactionInformation;
-  var init_pendingTransactionInformation = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactionInformation.js"() {
-      init_jsonrequest();
-      init_encoding();
-      PendingTransactionInformation = class extends JSONRequest {
-        constructor(c, txid) {
-          super(c);
-          this.txid = txid;
-          this.txid = txid;
-          this.query.format = "msgpack";
-        }
-        prepare(body) {
-          if (body && body.byteLength > 0) {
-            return decode2(body);
-          }
-          return void 0;
-        }
-        path() {
-          return `/v2/transactions/pending/${this.txid}`;
-        }
-        max(max) {
-          this.query.max = max;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactions.js
-  var PendingTransactions;
-  var init_pendingTransactions = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactions.js"() {
-      init_jsonrequest();
-      init_encoding();
-      PendingTransactions = class extends JSONRequest {
-        constructor(c) {
-          super(c);
-          this.query.format = "msgpack";
-        }
-        path() {
-          return "/v2/transactions/pending";
-        }
-        prepare(body) {
-          if (body && body.byteLength > 0) {
-            return decode2(body);
-          }
-          return void 0;
-        }
-        max(max) {
-          this.query.max = max;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactionsByAddress.js
-  var PendingTransactionsByAddress;
-  var init_pendingTransactionsByAddress = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactionsByAddress.js"() {
-      init_jsonrequest();
-      init_encoding();
-      PendingTransactionsByAddress = class extends JSONRequest {
-        constructor(c, address) {
-          super(c);
-          this.address = address;
-          this.address = address;
-          this.query.format = "msgpack";
-        }
-        prepare(body) {
-          if (body && body.byteLength > 0) {
-            return decode2(body);
-          }
-          return void 0;
-        }
-        path() {
-          return `/v2/accounts/${this.address}/transactions/pending`;
-        }
-        max(max) {
-          this.query.max = max;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/status.js
-  var Status;
-  var init_status = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/status.js"() {
-      init_jsonrequest();
-      Status = class extends JSONRequest {
-        path() {
-          return "/v2/status";
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/statusAfterBlock.js
-  var StatusAfterBlock;
-  var init_statusAfterBlock = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/statusAfterBlock.js"() {
-      init_jsonrequest();
-      StatusAfterBlock = class extends JSONRequest {
-        constructor(c, intDecoding, round) {
-          super(c, intDecoding);
-          this.round = round;
-          if (!Number.isInteger(round))
-            throw Error("round should be an integer");
-          this.round = round;
-        }
-        path() {
-          return `/v2/status/wait-for-block-after/${this.round}`;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/suggestedParams.js
-  var SuggestedParamsRequest;
-  var init_suggestedParams = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/suggestedParams.js"() {
-      init_jsonrequest();
-      SuggestedParamsRequest = class extends JSONRequest {
-        path() {
-          return "/v2/transactions/params";
-        }
-        prepare(body) {
-          return {
-            flatFee: false,
-            fee: body.fee,
-            firstRound: body["last-round"],
-            lastRound: body["last-round"] + 1e3,
-            genesisID: body["genesis-id"],
-            genesisHash: body["genesis-hash"]
-          };
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/supply.js
-  var Supply;
-  var init_supply = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/supply.js"() {
-      init_jsonrequest();
-      Supply = class extends JSONRequest {
-        path() {
-          return "/v2/ledger/supply";
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/versions.js
-  var Versions;
-  var init_versions = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/versions.js"() {
-      init_jsonrequest();
-      Versions = class extends JSONRequest {
-        path() {
-          return "/versions";
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/genesis.js
-  var Genesis;
-  var init_genesis = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/genesis.js"() {
-      init_jsonrequest();
-      Genesis = class extends JSONRequest {
-        path() {
-          return "/genesis";
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/proof.js
-  var Proof;
-  var init_proof = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/proof.js"() {
-      init_jsonrequest();
-      Proof = class extends JSONRequest {
-        constructor(c, intDecoding, round, txID) {
-          super(c, intDecoding);
-          this.round = round;
-          this.txID = txID;
-          this.round = round;
-          this.txID = txID;
-        }
-        path() {
-          return `/v2/blocks/${this.round}/transactions/${this.txID}/proof`;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/algod.js
-  var AlgodClient;
-  var init_algod = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/algod.js"() {
-      init_serviceClient();
-      init_accountInformation();
-      init_block();
-      init_compile();
-      init_dryrun();
-      init_getAssetByID();
-      init_getApplicationByID();
-      init_healthCheck();
-      init_pendingTransactionInformation();
-      init_pendingTransactions();
-      init_pendingTransactionsByAddress();
-      init_sendRawTransaction();
-      init_status();
-      init_statusAfterBlock();
-      init_suggestedParams();
-      init_supply();
-      init_versions();
-      init_genesis();
-      init_proof();
-      AlgodClient = class extends ServiceClient {
-        constructor(tokenOrBaseClient, baseServer = "http://r2.algorand.network", port = 4180, headers = {}) {
-          super("X-Algo-API-Token", tokenOrBaseClient, baseServer, port, headers);
-        }
-        healthCheck() {
-          return new HealthCheck(this.c);
-        }
-        versionsCheck() {
-          return new Versions(this.c);
-        }
-        sendRawTransaction(stxOrStxs) {
-          return new SendRawTransaction(this.c, stxOrStxs);
-        }
-        accountInformation(account) {
-          return new AccountInformation(this.c, this.intDecoding, account);
-        }
-        block(roundNumber) {
-          return new Block(this.c, roundNumber);
-        }
-        pendingTransactionInformation(txid) {
-          return new PendingTransactionInformation(this.c, txid);
-        }
-        pendingTransactionsInformation() {
-          return new PendingTransactions(this.c);
-        }
-        pendingTransactionByAddress(address) {
-          return new PendingTransactionsByAddress(this.c, address);
-        }
-        status() {
-          return new Status(this.c, this.intDecoding);
-        }
-        statusAfterBlock(round) {
-          return new StatusAfterBlock(this.c, this.intDecoding, round);
-        }
-        getTransactionParams() {
-          return new SuggestedParamsRequest(this.c);
-        }
-        supply() {
-          return new Supply(this.c, this.intDecoding);
-        }
-        compile(source) {
-          return new Compile(this.c, source);
-        }
-        dryrun(dr) {
-          return new Dryrun(this.c, dr);
-        }
-        getAssetByID(index) {
-          return new GetAssetByID(this.c, this.intDecoding, index);
-        }
-        getApplicationByID(index) {
-          return new GetApplicationByID(this.c, this.intDecoding, index);
-        }
-        genesis() {
-          return new Genesis(this.c, this.intDecoding);
-        }
-        getProof(round, txID) {
-          return new Proof(this.c, this.intDecoding, round, txID);
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/kmd.js
-  var Kmd;
-  var init_kmd = __esm({
-    "node_modules/algosdk/dist/esm/src/client/kmd.js"() {
-      init_serviceClient();
-      init_transaction();
-      Kmd = class extends ServiceClient {
-        constructor(token, baseServer = "http://127.0.0.1", port = 7833, headers = {}) {
-          super("X-KMD-API-Token", token, baseServer, port, headers);
-        }
-        async versions() {
-          const res = await this.c.get("/versions");
-          return res.body;
-        }
-        async listWallets() {
-          const res = await this.c.get("/v1/wallets");
-          return res.body;
-        }
-        async createWallet(walletName, walletPassword, walletMDK = "", walletDriverName = "sqlite") {
-          const req = {
-            wallet_name: walletName,
-            wallet_driver_name: walletDriverName,
-            wallet_password: walletPassword,
-            master_derivation_key: Buffer.from(walletMDK).toString("base64")
-          };
-          const res = await this.c.post("/v1/wallet", req);
-          return res.body;
-        }
-        async initWalletHandle(walletID, walletPassword) {
-          const req = {
-            wallet_id: walletID,
-            wallet_password: walletPassword
-          };
-          const res = await this.c.post("/v1/wallet/init", req);
-          return res.body;
-        }
-        async releaseWalletHandle(walletHandle) {
-          const req = {
-            wallet_handle_token: walletHandle
-          };
-          const res = await this.c.post("/v1/wallet/release", req);
-          return res.body;
-        }
-        async renewWalletHandle(walletHandle) {
-          const req = {
-            wallet_handle_token: walletHandle
-          };
-          const res = await this.c.post("/v1/wallet/renew", req);
-          return res.body;
-        }
-        async renameWallet(walletID, walletPassword, newWalletName) {
-          const req = {
-            wallet_id: walletID,
-            wallet_password: walletPassword,
-            wallet_name: newWalletName
-          };
-          const res = await this.c.post("/v1/wallet/rename", req);
-          return res.body;
-        }
-        async getWallet(walletHandle) {
-          const req = {
-            wallet_handle_token: walletHandle
-          };
-          const res = await this.c.post("/v1/wallet/info", req);
-          return res.body;
-        }
-        async exportMasterDerivationKey(walletHandle, walletPassword) {
-          const req = {
-            wallet_handle_token: walletHandle,
-            wallet_password: walletPassword
-          };
-          const res = await this.c.post("/v1/master-key/export", req);
-          return {
-            master_derivation_key: Buffer.from(res.body.master_derivation_key, "base64")
-          };
-        }
-        async importKey(walletHandle, secretKey) {
-          const req = {
-            wallet_handle_token: walletHandle,
-            private_key: Buffer.from(secretKey).toString("base64")
-          };
-          const res = await this.c.post("/v1/key/import", req);
-          return res.body;
-        }
-        async exportKey(walletHandle, walletPassword, addr) {
-          const req = {
-            wallet_handle_token: walletHandle,
-            address: addr,
-            wallet_password: walletPassword
-          };
-          const res = await this.c.post("/v1/key/export", req);
-          return { private_key: Buffer.from(res.body.private_key, "base64") };
-        }
-        async generateKey(walletHandle) {
-          const req = {
-            wallet_handle_token: walletHandle,
-            display_mnemonic: false
-          };
-          const res = await this.c.post("/v1/key", req);
-          return res.body;
-        }
-        async deleteKey(walletHandle, walletPassword, addr) {
-          const req = {
-            wallet_handle_token: walletHandle,
-            address: addr,
-            wallet_password: walletPassword
-          };
-          const res = await this.c.delete("/v1/key", req);
-          return res.body;
-        }
-        async listKeys(walletHandle) {
-          const req = {
-            wallet_handle_token: walletHandle
-          };
-          const res = await this.c.post("/v1/key/list", req);
-          return res.body;
-        }
-        async signTransaction(walletHandle, walletPassword, transaction) {
-          const tx = instantiateTxnIfNeeded(transaction);
-          const req = {
-            wallet_handle_token: walletHandle,
-            wallet_password: walletPassword,
-            transaction: Buffer.from(tx.toByte()).toString("base64")
-          };
-          const res = await this.c.post("/v1/transaction/sign", req);
-          if (res.status === 200) {
-            return Buffer.from(res.body.signed_transaction, "base64");
-          }
-          return res.body;
-        }
-        async signTransactionWithSpecificPublicKey(walletHandle, walletPassword, transaction, publicKey) {
-          const tx = instantiateTxnIfNeeded(transaction);
-          const req = {
-            wallet_handle_token: walletHandle,
-            wallet_password: walletPassword,
-            transaction: Buffer.from(tx.toByte()).toString("base64"),
-            public_key: Buffer.from(publicKey).toString("base64")
-          };
-          const res = await this.c.post("/v1/transaction/sign", req);
-          if (res.status === 200) {
-            return Buffer.from(res.body.signed_transaction, "base64");
-          }
-          return res.body;
-        }
-        async listMultisig(walletHandle) {
-          const req = {
-            wallet_handle_token: walletHandle
-          };
-          const res = await this.c.post("/v1/multisig/list", req);
-          return res.body;
-        }
-        async importMultisig(walletHandle, version, threshold, pks) {
-          const req = {
-            wallet_handle_token: walletHandle,
-            multisig_version: version,
-            threshold,
-            pks
-          };
-          const res = await this.c.post("/v1/multisig/import", req);
-          return res.body;
-        }
-        async exportMultisig(walletHandle, addr) {
-          const req = {
-            wallet_handle_token: walletHandle,
-            address: addr
-          };
-          const res = await this.c.post("/v1/multisig/export", req);
-          return res.body;
-        }
-        async signMultisigTransaction(walletHandle, pw, transaction, pk, partial) {
-          const tx = instantiateTxnIfNeeded(transaction);
-          const req = {
-            wallet_handle_token: walletHandle,
-            transaction: Buffer.from(tx.toByte()).toString("base64"),
-            public_key: Buffer.from(pk).toString("base64"),
-            partial_multisig: partial,
-            wallet_password: pw
-          };
-          const res = await this.c.post("/v1/multisig/sign", req);
-          return res.body;
-        }
-        async deleteMultisig(walletHandle, walletPassword, addr) {
-          const req = {
-            wallet_handle_token: walletHandle,
-            address: addr,
-            wallet_password: walletPassword
-          };
-          const res = await this.c.delete("/v1/multisig", req);
-          return res.body;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/makeHealthCheck.js
-  var MakeHealthCheck;
-  var init_makeHealthCheck = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/makeHealthCheck.js"() {
-      init_jsonrequest();
-      MakeHealthCheck = class extends JSONRequest {
-        path() {
-          return "/health";
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetBalances.js
-  var LookupAssetBalances;
-  var init_lookupAssetBalances = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetBalances.js"() {
-      init_jsonrequest();
-      LookupAssetBalances = class extends JSONRequest {
-        constructor(c, intDecoding, index) {
-          super(c, intDecoding);
-          this.index = index;
-          this.index = index;
-        }
-        path() {
-          return `/v2/assets/${this.index}/balances`;
-        }
-        limit(limit) {
-          this.query.limit = limit;
-          return this;
-        }
-        round(round) {
-          this.query.round = round;
-          return this;
-        }
-        currencyGreaterThan(greater) {
-          this.query["currency-greater-than"] = greater;
-          return this;
-        }
-        currencyLessThan(lesser) {
-          this.query["currency-less-than"] = lesser;
-          return this;
-        }
-        nextToken(nextToken) {
-          this.query.next = nextToken;
-          return this;
-        }
-        includeAll(value = true) {
-          this.query["include-all"] = value;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAccountTransactions.js
-  function base64StringFunnel(data) {
-    if (typeof data === "string") {
-      return data;
-    }
-    return Buffer.from(data).toString("base64");
-  }
-  var LookupAccountTransactions;
-  var init_lookupAccountTransactions = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAccountTransactions.js"() {
-      init_jsonrequest();
-      LookupAccountTransactions = class extends JSONRequest {
-        constructor(c, intDecoding, account) {
-          super(c, intDecoding);
-          this.account = account;
-          this.account = account;
-        }
-        path() {
-          return `/v2/accounts/${this.account}/transactions`;
-        }
-        notePrefix(prefix) {
-          this.query["note-prefix"] = base64StringFunnel(prefix);
-          return this;
-        }
-        txType(type) {
-          this.query["tx-type"] = type;
-          return this;
-        }
-        sigType(type) {
-          this.query["sig-type"] = type;
-          return this;
-        }
-        txid(txid) {
-          this.query.txid = txid;
-          return this;
-        }
-        round(round) {
-          this.query.round = round;
-          return this;
-        }
-        minRound(round) {
-          this.query["min-round"] = round;
-          return this;
-        }
-        maxRound(round) {
-          this.query["max-round"] = round;
-          return this;
-        }
-        assetID(id) {
-          this.query["asset-id"] = id;
-          return this;
-        }
-        limit(limit) {
-          this.query.limit = limit;
-          return this;
-        }
-        beforeTime(before) {
-          this.query["before-time"] = before;
-          return this;
-        }
-        afterTime(after) {
-          this.query["after-time"] = after;
-          return this;
-        }
-        currencyGreaterThan(greater) {
-          this.query["currency-greater-than"] = greater;
-          return this;
-        }
-        currencyLessThan(lesser) {
-          this.query["currency-less-than"] = lesser;
-          return this;
-        }
-        nextToken(nextToken) {
-          this.query.next = nextToken;
-          return this;
-        }
-        rekeyTo(rekeyTo) {
-          this.query["rekey-to"] = rekeyTo;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetTransactions.js
-  var LookupAssetTransactions;
-  var init_lookupAssetTransactions = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetTransactions.js"() {
-      init_jsonrequest();
-      init_lookupAccountTransactions();
-      LookupAssetTransactions = class extends JSONRequest {
-        constructor(c, intDecoding, index) {
-          super(c, intDecoding);
-          this.index = index;
-          this.index = index;
-        }
-        path() {
-          return `/v2/assets/${this.index}/transactions`;
-        }
-        notePrefix(prefix) {
-          this.query["note-prefix"] = base64StringFunnel(prefix);
-          return this;
-        }
-        txType(type) {
-          this.query["tx-type"] = type;
-          return this;
-        }
-        sigType(type) {
-          this.query["sig-type"] = type;
-          return this;
-        }
-        txid(txid) {
-          this.query.txid = txid;
-          return this;
-        }
-        round(round) {
-          this.query.round = round;
-          return this;
-        }
-        minRound(round) {
-          this.query["min-round"] = round;
-          return this;
-        }
-        maxRound(round) {
-          this.query["max-round"] = round;
-          return this;
-        }
-        assetID(id) {
-          this.query["asset-id"] = id;
-          return this;
-        }
-        limit(limit) {
-          this.query.limit = limit;
-          return this;
-        }
-        beforeTime(before) {
-          this.query["before-time"] = before;
-          return this;
-        }
-        afterTime(after) {
-          this.query["after-time"] = after;
-          return this;
-        }
-        currencyGreaterThan(greater) {
-          this.query["currency-greater-than"] = greater;
-          return this;
-        }
-        currencyLessThan(lesser) {
-          this.query["currency-less-than"] = lesser;
-          return this;
-        }
-        addressRole(role) {
-          this.query["address-role"] = role;
-          return this;
-        }
-        address(address) {
-          this.query.address = address;
-          return this;
-        }
-        excludeCloseTo(exclude) {
-          this.query["exclude-close-to"] = exclude;
-          return this;
-        }
-        nextToken(nextToken) {
-          this.query.next = nextToken;
-          return this;
-        }
-        rekeyTo(rekeyTo) {
-          this.query["rekey-to"] = rekeyTo;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupBlock.js
-  var LookupBlock;
-  var init_lookupBlock = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupBlock.js"() {
-      init_jsonrequest();
-      LookupBlock = class extends JSONRequest {
-        constructor(c, intDecoding, round) {
-          super(c, intDecoding);
-          this.round = round;
-          this.round = round;
-        }
-        path() {
-          return `/v2/blocks/${this.round}`;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupTransactionByID.js
-  var LookupTransactionByID;
-  var init_lookupTransactionByID = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupTransactionByID.js"() {
-      init_jsonrequest();
-      LookupTransactionByID = class extends JSONRequest {
-        constructor(c, intDecoding, txID) {
-          super(c, intDecoding);
-          this.txID = txID;
-          this.txID = txID;
-        }
-        path() {
-          return `/v2/transactions/${this.txID}`;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAccountByID.js
-  var LookupAccountByID;
-  var init_lookupAccountByID = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAccountByID.js"() {
-      init_jsonrequest();
-      LookupAccountByID = class extends JSONRequest {
-        constructor(c, intDecoding, account) {
-          super(c, intDecoding);
-          this.account = account;
-          this.account = account;
-        }
-        path() {
-          return `/v2/accounts/${this.account}`;
-        }
-        round(round) {
-          this.query.round = round;
-          return this;
-        }
-        includeAll(value = true) {
-          this.query["include-all"] = value;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetByID.js
-  var LookupAssetByID;
-  var init_lookupAssetByID = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetByID.js"() {
-      init_jsonrequest();
-      LookupAssetByID = class extends JSONRequest {
-        constructor(c, intDecoding, index) {
-          super(c, intDecoding);
-          this.index = index;
-          this.index = index;
-        }
-        path() {
-          return `/v2/assets/${this.index}`;
-        }
-        includeAll(value = true) {
-          this.query["include-all"] = value;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupApplications.js
-  var LookupApplications;
-  var init_lookupApplications = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupApplications.js"() {
-      init_jsonrequest();
-      LookupApplications = class extends JSONRequest {
-        constructor(c, intDecoding, index) {
-          super(c, intDecoding);
-          this.index = index;
-          this.index = index;
-        }
-        path() {
-          return `/v2/applications/${this.index}`;
-        }
-        includeAll(value = true) {
-          this.query["include-all"] = value;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupApplicationLogs.js
-  var LookupApplicationLogs;
-  var init_lookupApplicationLogs = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupApplicationLogs.js"() {
-      init_jsonrequest();
-      LookupApplicationLogs = class extends JSONRequest {
-        constructor(c, intDecoding, appID) {
-          super(c, intDecoding);
-          this.appID = appID;
-          this.appID = appID;
-        }
-        path() {
-          return `/v2/applications/${this.appID}/logs`;
-        }
-        limit(limit) {
-          this.query.limit = limit;
-          return this;
-        }
-        minRound(round) {
-          this.query["min-round"] = round;
-          return this;
-        }
-        maxRound(round) {
-          this.query["max-round"] = round;
-          return this;
-        }
-        nextToken(nextToken) {
-          this.query.next = nextToken;
-          return this;
-        }
-        sender(senderAddress) {
-          this.query["sender-address"] = senderAddress;
-          return this;
-        }
-        txid(txid) {
-          this.query.txid = txid;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/searchAccounts.js
-  var SearchAccounts;
-  var init_searchAccounts = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/searchAccounts.js"() {
-      init_jsonrequest();
-      SearchAccounts = class extends JSONRequest {
-        path() {
-          return "/v2/accounts";
-        }
-        currencyGreaterThan(greater) {
-          this.query["currency-greater-than"] = greater;
-          return this;
-        }
-        currencyLessThan(lesser) {
-          this.query["currency-less-than"] = lesser;
-          return this;
-        }
-        limit(limit) {
-          this.query.limit = limit;
-          return this;
-        }
-        assetID(id) {
-          this.query["asset-id"] = id;
-          return this;
-        }
-        nextToken(nextToken) {
-          this.query.next = nextToken;
-          return this;
-        }
-        round(round) {
-          this.query.round = round;
-          return this;
-        }
-        authAddr(authAddr) {
-          this.query["auth-addr"] = authAddr;
-          return this;
-        }
-        applicationID(applicationID) {
-          this.query["application-id"] = applicationID;
-          return this;
-        }
-        includeAll(value = true) {
-          this.query["include-all"] = value;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForTransactions.js
-  var SearchForTransactions;
-  var init_searchForTransactions = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForTransactions.js"() {
-      init_jsonrequest();
-      init_lookupAccountTransactions();
-      SearchForTransactions = class extends JSONRequest {
-        path() {
-          return "/v2/transactions";
-        }
-        notePrefix(prefix) {
-          this.query["note-prefix"] = base64StringFunnel(prefix);
-          return this;
-        }
-        txType(type) {
-          this.query["tx-type"] = type;
-          return this;
-        }
-        sigType(type) {
-          this.query["sig-type"] = type;
-          return this;
-        }
-        txid(txid) {
-          this.query.txid = txid;
-          return this;
-        }
-        round(round) {
-          this.query.round = round;
-          return this;
-        }
-        minRound(round) {
-          this.query["min-round"] = round;
-          return this;
-        }
-        maxRound(round) {
-          this.query["max-round"] = round;
-          return this;
-        }
-        assetID(id) {
-          this.query["asset-id"] = id;
-          return this;
-        }
-        limit(limit) {
-          this.query.limit = limit;
-          return this;
-        }
-        beforeTime(before) {
-          this.query["before-time"] = before;
-          return this;
-        }
-        afterTime(after) {
-          this.query["after-time"] = after;
-          return this;
-        }
-        currencyGreaterThan(greater) {
-          this.query["currency-greater-than"] = greater;
-          return this;
-        }
-        currencyLessThan(lesser) {
-          this.query["currency-less-than"] = lesser;
-          return this;
-        }
-        addressRole(role) {
-          this.query["address-role"] = role;
-          return this;
-        }
-        address(address) {
-          this.query.address = address;
-          return this;
-        }
-        excludeCloseTo(exclude) {
-          this.query["exclude-close-to"] = exclude;
-          return this;
-        }
-        nextToken(nextToken) {
-          this.query.next = nextToken;
-          return this;
-        }
-        rekeyTo(rekeyTo) {
-          this.query["rekey-to"] = rekeyTo;
-          return this;
-        }
-        applicationID(applicationID) {
-          this.query["application-id"] = applicationID;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForAssets.js
-  var SearchForAssets;
-  var init_searchForAssets = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForAssets.js"() {
-      init_jsonrequest();
-      SearchForAssets = class extends JSONRequest {
-        path() {
-          return "/v2/assets";
-        }
-        limit(limit) {
-          this.query.limit = limit;
-          return this;
-        }
-        creator(creator) {
-          this.query.creator = creator;
-          return this;
-        }
-        name(name) {
-          this.query.name = name;
-          return this;
-        }
-        unit(unit) {
-          this.query.unit = unit;
-          return this;
-        }
-        index(index) {
-          this.query["asset-id"] = index;
-          return this;
-        }
-        nextToken(nextToken) {
-          this.query.next = nextToken;
-          return this;
-        }
-        includeAll(value = true) {
-          this.query["include-all"] = value;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForApplications.js
-  var SearchForApplications;
-  var init_searchForApplications = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForApplications.js"() {
-      init_jsonrequest();
-      SearchForApplications = class extends JSONRequest {
-        path() {
-          return "/v2/applications";
-        }
-        index(index) {
-          this.query["application-id"] = index;
-          return this;
-        }
-        nextToken(next) {
-          this.query.next = next;
-          return this;
-        }
-        limit(limit) {
-          this.query.limit = limit;
-          return this;
-        }
-        includeAll(value = true) {
-          this.query["include-all"] = value;
-          return this;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/indexer/indexer.js
-  var IndexerClient;
-  var init_indexer = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/indexer/indexer.js"() {
-      init_serviceClient();
-      init_makeHealthCheck();
-      init_lookupAssetBalances();
-      init_lookupAssetTransactions();
-      init_lookupAccountTransactions();
-      init_lookupBlock();
-      init_lookupTransactionByID();
-      init_lookupAccountByID();
-      init_lookupAssetByID();
-      init_lookupApplications();
-      init_lookupApplicationLogs();
-      init_searchAccounts();
-      init_searchForTransactions();
-      init_searchForAssets();
-      init_searchForApplications();
-      IndexerClient = class extends ServiceClient {
-        constructor(tokenOrBaseClient, baseServer = "http://127.0.0.1", port = 8080, headers = {}) {
-          super("X-Indexer-API-Token", tokenOrBaseClient, baseServer, port, headers);
-        }
-        makeHealthCheck() {
-          return new MakeHealthCheck(this.c, this.intDecoding);
-        }
-        lookupAssetBalances(index) {
-          return new LookupAssetBalances(this.c, this.intDecoding, index);
-        }
-        lookupAssetTransactions(index) {
-          return new LookupAssetTransactions(this.c, this.intDecoding, index);
-        }
-        lookupAccountTransactions(account) {
-          return new LookupAccountTransactions(this.c, this.intDecoding, account);
-        }
-        lookupBlock(round) {
-          return new LookupBlock(this.c, this.intDecoding, round);
-        }
-        lookupTransactionByID(txID) {
-          return new LookupTransactionByID(this.c, this.intDecoding, txID);
-        }
-        lookupAccountByID(account) {
-          return new LookupAccountByID(this.c, this.intDecoding, account);
-        }
-        lookupAssetByID(index) {
-          return new LookupAssetByID(this.c, this.intDecoding, index);
-        }
-        lookupApplications(index) {
-          return new LookupApplications(this.c, this.intDecoding, index);
-        }
-        lookupApplicationLogs(appID) {
-          return new LookupApplicationLogs(this.c, this.intDecoding, appID);
-        }
-        searchAccounts() {
-          return new SearchAccounts(this.c, this.intDecoding);
-        }
-        searchForTransactions() {
-          return new SearchForTransactions(this.c, this.intDecoding);
-        }
-        searchForAssets() {
-          return new SearchForAssets(this.c, this.intDecoding);
-        }
-        searchForApplications() {
-          return new SearchForApplications(this.c, this.intDecoding);
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/wait.js
-  async function waitForConfirmation(client, txid, waitRounds) {
-    const status = await client.status().do();
-    if (typeof status === "undefined") {
-      throw new Error("Unable to get node status");
-    }
-    const startRound = status["last-round"] + 1;
-    let currentRound = startRound;
-    while (currentRound < startRound + waitRounds) {
-      let poolError = false;
-      try {
-        const pendingInfo = await client.pendingTransactionInformation(txid).do();
-        if (pendingInfo["confirmed-round"]) {
-          return pendingInfo;
-        }
-        if (pendingInfo["pool-error"]) {
-          poolError = true;
-          throw new Error(`Transaction Rejected: ${pendingInfo["pool-error"]}`);
-        }
-      } catch (err) {
-        if (poolError) {
-          throw err;
-        }
-      }
-      await client.statusAfterBlock(currentRound).do();
-      currentRound += 1;
-    }
-    throw new Error(`Transaction not confirmed after ${waitRounds} rounds`);
-  }
-  var init_wait = __esm({
-    "node_modules/algosdk/dist/esm/src/wait.js"() {
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/account.js
-  function generateAccount() {
-    const keys = keyPair();
-    const encodedPk = encodeAddress(keys.publicKey);
-    return { addr: encodedPk, sk: keys.secretKey };
-  }
-  var init_account = __esm({
-    "node_modules/algosdk/dist/esm/src/account.js"() {
-      init_naclWrappers();
-      init_address();
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/models/base.js
-  function _is_primitive(val) {
-    return val === void 0 || val == null || typeof val !== "object" && typeof val !== "function";
-  }
-  function _get_obj_for_encoding(val, binary) {
-    let targetPropValue;
-    if (val instanceof Uint8Array) {
-      targetPropValue = binary ? val : Buffer.from(val).toString("base64");
-    } else if (typeof val.get_obj_for_encoding === "function") {
-      targetPropValue = val.get_obj_for_encoding(binary);
-    } else if (Array.isArray(val)) {
-      targetPropValue = [];
-      for (const elem of val) {
-        targetPropValue.push(_get_obj_for_encoding(elem, binary));
-      }
-    } else if (typeof val === "object") {
-      const obj = {};
-      for (const prop of Object.keys(val)) {
-        obj[prop] = _get_obj_for_encoding(val[prop], binary);
-      }
-      targetPropValue = obj;
-    } else if (_is_primitive(val)) {
-      targetPropValue = val;
-    } else {
-      throw new Error(`Unsupported value: ${String(val)}`);
-    }
-    return targetPropValue;
-  }
-  var BaseModel;
-  var init_base2 = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/models/base.js"() {
-      BaseModel = class {
-        get_obj_for_encoding(binary = false) {
-          const obj = {};
-          for (const prop of Object.keys(this.attribute_map)) {
-            const name = this.attribute_map[prop];
-            const value = this[prop];
-            if (typeof value !== "undefined") {
-              obj[name] = value === null ? null : _get_obj_for_encoding(value, binary);
-            }
-          }
-          return obj;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/client/v2/algod/models/types.js
-  var types_exports = {};
-  __export(types_exports, {
-    Account: () => Account,
-    AccountParticipation: () => AccountParticipation,
-    AccountStateDelta: () => AccountStateDelta,
-    Application: () => Application,
-    ApplicationLocalState: () => ApplicationLocalState,
-    ApplicationParams: () => ApplicationParams,
-    ApplicationStateSchema: () => ApplicationStateSchema,
-    Asset: () => Asset,
-    AssetHolding: () => AssetHolding,
-    AssetParams: () => AssetParams,
-    BlockResponse: () => BlockResponse,
-    BuildVersion: () => BuildVersion,
-    CatchpointAbortResponse: () => CatchpointAbortResponse,
-    CatchpointStartResponse: () => CatchpointStartResponse,
-    CompileResponse: () => CompileResponse,
-    DryrunRequest: () => DryrunRequest,
-    DryrunResponse: () => DryrunResponse,
-    DryrunSource: () => DryrunSource,
-    DryrunState: () => DryrunState,
-    DryrunTxnResult: () => DryrunTxnResult,
-    ErrorResponse: () => ErrorResponse,
-    EvalDelta: () => EvalDelta,
-    EvalDeltaKeyValue: () => EvalDeltaKeyValue,
-    NodeStatusResponse: () => NodeStatusResponse,
-    PendingTransactionResponse: () => PendingTransactionResponse,
-    PendingTransactionsResponse: () => PendingTransactionsResponse,
-    PostTransactionsResponse: () => PostTransactionsResponse,
-    ProofResponse: () => ProofResponse,
-    SupplyResponse: () => SupplyResponse,
-    TealKeyValue: () => TealKeyValue,
-    TealValue: () => TealValue,
-    TransactionParametersResponse: () => TransactionParametersResponse,
-    Version: () => Version
-  });
-  var Account, AccountParticipation, AccountStateDelta, Application, ApplicationLocalState, ApplicationParams, ApplicationStateSchema, Asset, AssetHolding, AssetParams, BlockResponse, BuildVersion, CatchpointAbortResponse, CatchpointStartResponse, CompileResponse, DryrunRequest, DryrunResponse, DryrunSource, DryrunState, DryrunTxnResult, ErrorResponse, EvalDelta, EvalDeltaKeyValue, NodeStatusResponse, PendingTransactionResponse, PendingTransactionsResponse, PostTransactionsResponse, ProofResponse, SupplyResponse, TealKeyValue, TealValue, TransactionParametersResponse, Version;
-  var init_types = __esm({
-    "node_modules/algosdk/dist/esm/src/client/v2/algod/models/types.js"() {
-      init_base2();
-      Account = class extends BaseModel {
-        constructor({ address, amount, amountWithoutPendingRewards, pendingRewards, rewards, round, status, appsLocalState, appsTotalExtraPages, appsTotalSchema, assets, authAddr, createdApps, createdAssets, participation, rewardBase, sigType }) {
-          super();
-          this.address = address;
-          this.amount = amount;
-          this.amountWithoutPendingRewards = amountWithoutPendingRewards;
-          this.pendingRewards = pendingRewards;
-          this.rewards = rewards;
-          this.round = round;
-          this.status = status;
-          this.appsLocalState = appsLocalState;
-          this.appsTotalExtraPages = appsTotalExtraPages;
-          this.appsTotalSchema = appsTotalSchema;
-          this.assets = assets;
-          this.authAddr = authAddr;
-          this.createdApps = createdApps;
-          this.createdAssets = createdAssets;
-          this.participation = participation;
-          this.rewardBase = rewardBase;
-          this.sigType = sigType;
-          this.attribute_map = {
-            address: "address",
-            amount: "amount",
-            amountWithoutPendingRewards: "amount-without-pending-rewards",
-            pendingRewards: "pending-rewards",
-            rewards: "rewards",
-            round: "round",
-            status: "status",
-            appsLocalState: "apps-local-state",
-            appsTotalExtraPages: "apps-total-extra-pages",
-            appsTotalSchema: "apps-total-schema",
-            assets: "assets",
-            authAddr: "auth-addr",
-            createdApps: "created-apps",
-            createdAssets: "created-assets",
-            participation: "participation",
-            rewardBase: "reward-base",
-            sigType: "sig-type"
-          };
-        }
-      };
-      AccountParticipation = class extends BaseModel {
-        constructor({ selectionParticipationKey, voteFirstValid, voteKeyDilution, voteLastValid, voteParticipationKey }) {
-          super();
-          this.selectionParticipationKey = typeof selectionParticipationKey === "string" ? new Uint8Array(Buffer.from(selectionParticipationKey, "base64")) : selectionParticipationKey;
-          this.voteFirstValid = voteFirstValid;
-          this.voteKeyDilution = voteKeyDilution;
-          this.voteLastValid = voteLastValid;
-          this.voteParticipationKey = typeof voteParticipationKey === "string" ? new Uint8Array(Buffer.from(voteParticipationKey, "base64")) : voteParticipationKey;
-          this.attribute_map = {
-            selectionParticipationKey: "selection-participation-key",
-            voteFirstValid: "vote-first-valid",
-            voteKeyDilution: "vote-key-dilution",
-            voteLastValid: "vote-last-valid",
-            voteParticipationKey: "vote-participation-key"
-          };
-        }
-      };
-      AccountStateDelta = class extends BaseModel {
-        constructor(address, delta) {
-          super();
-          this.address = address;
-          this.delta = delta;
-          this.attribute_map = {
-            address: "address",
-            delta: "delta"
-          };
-        }
-      };
-      Application = class extends BaseModel {
-        constructor(id, params) {
-          super();
-          this.id = id;
-          this.params = params;
-          this.attribute_map = {
-            id: "id",
-            params: "params"
-          };
-        }
-      };
-      ApplicationLocalState = class extends BaseModel {
-        constructor(id, schema, keyValue) {
-          super();
-          this.id = id;
-          this.schema = schema;
-          this.keyValue = keyValue;
-          this.attribute_map = {
-            id: "id",
-            schema: "schema",
-            keyValue: "key-value"
-          };
-        }
-      };
-      ApplicationParams = class extends BaseModel {
-        constructor({ approvalProgram, clearStateProgram, creator, extraProgramPages, globalState, globalStateSchema, localStateSchema }) {
-          super();
-          this.approvalProgram = typeof approvalProgram === "string" ? new Uint8Array(Buffer.from(approvalProgram, "base64")) : approvalProgram;
-          this.clearStateProgram = typeof clearStateProgram === "string" ? new Uint8Array(Buffer.from(clearStateProgram, "base64")) : clearStateProgram;
-          this.creator = creator;
-          this.extraProgramPages = extraProgramPages;
-          this.globalState = globalState;
-          this.globalStateSchema = globalStateSchema;
-          this.localStateSchema = localStateSchema;
-          this.attribute_map = {
-            approvalProgram: "approval-program",
-            clearStateProgram: "clear-state-program",
-            creator: "creator",
-            extraProgramPages: "extra-program-pages",
-            globalState: "global-state",
-            globalStateSchema: "global-state-schema",
-            localStateSchema: "local-state-schema"
-          };
-        }
-      };
-      ApplicationStateSchema = class extends BaseModel {
-        constructor(numUint, numByteSlice) {
-          super();
-          this.numUint = numUint;
-          this.numByteSlice = numByteSlice;
-          this.attribute_map = {
-            numUint: "num-uint",
-            numByteSlice: "num-byte-slice"
-          };
-        }
-      };
-      Asset = class extends BaseModel {
-        constructor(index, params) {
-          super();
-          this.index = index;
-          this.params = params;
-          this.attribute_map = {
-            index: "index",
-            params: "params"
-          };
-        }
-      };
-      AssetHolding = class extends BaseModel {
-        constructor(amount, assetId, creator, isFrozen) {
-          super();
-          this.amount = amount;
-          this.assetId = assetId;
-          this.creator = creator;
-          this.isFrozen = isFrozen;
-          this.attribute_map = {
-            amount: "amount",
-            assetId: "asset-id",
-            creator: "creator",
-            isFrozen: "is-frozen"
-          };
-        }
-      };
-      AssetParams = class extends BaseModel {
-        constructor({ creator, decimals, total, clawback, defaultFrozen, freeze, manager, metadataHash, name, nameB64, reserve, unitName, unitNameB64, url, urlB64 }) {
-          super();
-          this.creator = creator;
-          this.decimals = decimals;
-          this.total = total;
-          this.clawback = clawback;
-          this.defaultFrozen = defaultFrozen;
-          this.freeze = freeze;
-          this.manager = manager;
-          this.metadataHash = typeof metadataHash === "string" ? new Uint8Array(Buffer.from(metadataHash, "base64")) : metadataHash;
-          this.name = name;
-          this.nameB64 = typeof nameB64 === "string" ? new Uint8Array(Buffer.from(nameB64, "base64")) : nameB64;
-          this.reserve = reserve;
-          this.unitName = unitName;
-          this.unitNameB64 = typeof unitNameB64 === "string" ? new Uint8Array(Buffer.from(unitNameB64, "base64")) : unitNameB64;
-          this.url = url;
-          this.urlB64 = typeof urlB64 === "string" ? new Uint8Array(Buffer.from(urlB64, "base64")) : urlB64;
-          this.attribute_map = {
-            creator: "creator",
-            decimals: "decimals",
-            total: "total",
-            clawback: "clawback",
-            defaultFrozen: "default-frozen",
-            freeze: "freeze",
-            manager: "manager",
-            metadataHash: "metadata-hash",
-            name: "name",
-            nameB64: "name-b64",
-            reserve: "reserve",
-            unitName: "unit-name",
-            unitNameB64: "unit-name-b64",
-            url: "url",
-            urlB64: "url-b64"
-          };
-        }
-      };
-      BlockResponse = class extends BaseModel {
-        constructor(block, cert) {
-          super();
-          this.block = block;
-          this.cert = cert;
-          this.attribute_map = {
-            block: "block",
-            cert: "cert"
-          };
-        }
-      };
-      BuildVersion = class extends BaseModel {
-        constructor({ branch, buildNumber, channel, commitHash, major, minor }) {
-          super();
-          this.branch = branch;
-          this.buildNumber = buildNumber;
-          this.channel = channel;
-          this.commitHash = commitHash;
-          this.major = major;
-          this.minor = minor;
-          this.attribute_map = {
-            branch: "branch",
-            buildNumber: "build_number",
-            channel: "channel",
-            commitHash: "commit_hash",
-            major: "major",
-            minor: "minor"
-          };
-        }
-      };
-      CatchpointAbortResponse = class extends BaseModel {
-        constructor(catchupMessage) {
-          super();
-          this.catchupMessage = catchupMessage;
-          this.attribute_map = {
-            catchupMessage: "catchup-message"
-          };
-        }
-      };
-      CatchpointStartResponse = class extends BaseModel {
-        constructor(catchupMessage) {
-          super();
-          this.catchupMessage = catchupMessage;
-          this.attribute_map = {
-            catchupMessage: "catchup-message"
-          };
-        }
-      };
-      CompileResponse = class extends BaseModel {
-        constructor(hash, result) {
-          super();
-          this.hash = hash;
-          this.result = result;
-          this.attribute_map = {
-            hash: "hash",
-            result: "result"
-          };
-        }
-      };
-      DryrunRequest = class extends BaseModel {
-        constructor({ accounts, apps, latestTimestamp, protocolVersion, round, sources, txns }) {
-          super();
-          this.accounts = accounts;
-          this.apps = apps;
-          this.latestTimestamp = latestTimestamp;
-          this.protocolVersion = protocolVersion;
-          this.round = round;
-          this.sources = sources;
-          this.txns = txns;
-          this.attribute_map = {
-            accounts: "accounts",
-            apps: "apps",
-            latestTimestamp: "latest-timestamp",
-            protocolVersion: "protocol-version",
-            round: "round",
-            sources: "sources",
-            txns: "txns"
-          };
-        }
-      };
-      DryrunResponse = class extends BaseModel {
-        constructor(error, protocolVersion, txns) {
-          super();
-          this.error = error;
-          this.protocolVersion = protocolVersion;
-          this.txns = txns;
-          this.attribute_map = {
-            error: "error",
-            protocolVersion: "protocol-version",
-            txns: "txns"
-          };
-        }
-      };
-      DryrunSource = class extends BaseModel {
-        constructor(fieldName, source, txnIndex, appIndex) {
-          super();
-          this.fieldName = fieldName;
-          this.source = source;
-          this.txnIndex = txnIndex;
-          this.appIndex = appIndex;
-          this.attribute_map = {
-            fieldName: "field-name",
-            source: "source",
-            txnIndex: "txn-index",
-            appIndex: "app-index"
-          };
-        }
-      };
-      DryrunState = class extends BaseModel {
-        constructor({ line, pc, stack, error, scratch }) {
-          super();
-          this.line = line;
-          this.pc = pc;
-          this.stack = stack;
-          this.error = error;
-          this.scratch = scratch;
-          this.attribute_map = {
-            line: "line",
-            pc: "pc",
-            stack: "stack",
-            error: "error",
-            scratch: "scratch"
-          };
-        }
-      };
-      DryrunTxnResult = class extends BaseModel {
-        constructor({ disassembly, appCallMessages, appCallTrace, cost, globalDelta, localDeltas, logicSigMessages, logicSigTrace, logs }) {
-          super();
-          this.disassembly = disassembly;
-          this.appCallMessages = appCallMessages;
-          this.appCallTrace = appCallTrace;
-          this.cost = cost;
-          this.globalDelta = globalDelta;
-          this.localDeltas = localDeltas;
-          this.logicSigMessages = logicSigMessages;
-          this.logicSigTrace = logicSigTrace;
-          this.logs = logs;
-          this.attribute_map = {
-            disassembly: "disassembly",
-            appCallMessages: "app-call-messages",
-            appCallTrace: "app-call-trace",
-            cost: "cost",
-            globalDelta: "global-delta",
-            localDeltas: "local-deltas",
-            logicSigMessages: "logic-sig-messages",
-            logicSigTrace: "logic-sig-trace",
-            logs: "logs"
-          };
-        }
-      };
-      ErrorResponse = class extends BaseModel {
-        constructor(message, data) {
-          super();
-          this.message = message;
-          this.data = data;
-          this.attribute_map = {
-            message: "message",
-            data: "data"
-          };
-        }
-      };
-      EvalDelta = class extends BaseModel {
-        constructor(action, bytes, uint) {
-          super();
-          this.action = action;
-          this.bytes = bytes;
-          this.uint = uint;
-          this.attribute_map = {
-            action: "action",
-            bytes: "bytes",
-            uint: "uint"
-          };
-        }
-      };
-      EvalDeltaKeyValue = class extends BaseModel {
-        constructor(key, value) {
-          super();
-          this.key = key;
-          this.value = value;
-          this.attribute_map = {
-            key: "key",
-            value: "value"
-          };
-        }
-      };
-      NodeStatusResponse = class extends BaseModel {
-        constructor({ catchupTime, lastRound, lastVersion, nextVersion, nextVersionRound, nextVersionSupported, stoppedAtUnsupportedRound, timeSinceLastRound, catchpoint, catchpointAcquiredBlocks, catchpointProcessedAccounts, catchpointTotalAccounts, catchpointTotalBlocks, catchpointVerifiedAccounts, lastCatchpoint }) {
-          super();
-          this.catchupTime = catchupTime;
-          this.lastRound = lastRound;
-          this.lastVersion = lastVersion;
-          this.nextVersion = nextVersion;
-          this.nextVersionRound = nextVersionRound;
-          this.nextVersionSupported = nextVersionSupported;
-          this.stoppedAtUnsupportedRound = stoppedAtUnsupportedRound;
-          this.timeSinceLastRound = timeSinceLastRound;
-          this.catchpoint = catchpoint;
-          this.catchpointAcquiredBlocks = catchpointAcquiredBlocks;
-          this.catchpointProcessedAccounts = catchpointProcessedAccounts;
-          this.catchpointTotalAccounts = catchpointTotalAccounts;
-          this.catchpointTotalBlocks = catchpointTotalBlocks;
-          this.catchpointVerifiedAccounts = catchpointVerifiedAccounts;
-          this.lastCatchpoint = lastCatchpoint;
-          this.attribute_map = {
-            catchupTime: "catchup-time",
-            lastRound: "last-round",
-            lastVersion: "last-version",
-            nextVersion: "next-version",
-            nextVersionRound: "next-version-round",
-            nextVersionSupported: "next-version-supported",
-            stoppedAtUnsupportedRound: "stopped-at-unsupported-round",
-            timeSinceLastRound: "time-since-last-round",
-            catchpoint: "catchpoint",
-            catchpointAcquiredBlocks: "catchpoint-acquired-blocks",
-            catchpointProcessedAccounts: "catchpoint-processed-accounts",
-            catchpointTotalAccounts: "catchpoint-total-accounts",
-            catchpointTotalBlocks: "catchpoint-total-blocks",
-            catchpointVerifiedAccounts: "catchpoint-verified-accounts",
-            lastCatchpoint: "last-catchpoint"
-          };
-        }
-      };
-      PendingTransactionResponse = class extends BaseModel {
-        constructor({ poolError, txn, applicationIndex, assetClosingAmount, assetIndex, closeRewards, closingAmount, confirmedRound, globalStateDelta, innerTxns, localStateDelta, logs, receiverRewards, senderRewards }) {
-          super();
-          this.poolError = poolError;
-          this.txn = txn;
-          this.applicationIndex = applicationIndex;
-          this.assetClosingAmount = assetClosingAmount;
-          this.assetIndex = assetIndex;
-          this.closeRewards = closeRewards;
-          this.closingAmount = closingAmount;
-          this.confirmedRound = confirmedRound;
-          this.globalStateDelta = globalStateDelta;
-          this.innerTxns = innerTxns;
-          this.localStateDelta = localStateDelta;
-          this.logs = logs;
-          this.receiverRewards = receiverRewards;
-          this.senderRewards = senderRewards;
-          this.attribute_map = {
-            poolError: "pool-error",
-            txn: "txn",
-            applicationIndex: "application-index",
-            assetClosingAmount: "asset-closing-amount",
-            assetIndex: "asset-index",
-            closeRewards: "close-rewards",
-            closingAmount: "closing-amount",
-            confirmedRound: "confirmed-round",
-            globalStateDelta: "global-state-delta",
-            innerTxns: "inner-txns",
-            localStateDelta: "local-state-delta",
-            logs: "logs",
-            receiverRewards: "receiver-rewards",
-            senderRewards: "sender-rewards"
-          };
-        }
-      };
-      PendingTransactionsResponse = class extends BaseModel {
-        constructor(topTransactions, totalTransactions) {
-          super();
-          this.topTransactions = topTransactions;
-          this.totalTransactions = totalTransactions;
-          this.attribute_map = {
-            topTransactions: "top-transactions",
-            totalTransactions: "total-transactions"
-          };
-        }
-      };
-      PostTransactionsResponse = class extends BaseModel {
-        constructor(txid) {
-          super();
-          this.txid = txid;
-          this.attribute_map = {
-            txid: "txId"
-          };
-        }
-      };
-      ProofResponse = class extends BaseModel {
-        constructor(idx, proof, stibhash) {
-          super();
-          this.idx = idx;
-          this.proof = typeof proof === "string" ? new Uint8Array(Buffer.from(proof, "base64")) : proof;
-          this.stibhash = typeof stibhash === "string" ? new Uint8Array(Buffer.from(stibhash, "base64")) : stibhash;
-          this.attribute_map = {
-            idx: "idx",
-            proof: "proof",
-            stibhash: "stibhash"
-          };
-        }
-      };
-      SupplyResponse = class extends BaseModel {
-        constructor(currentRound, onlineMoney, totalMoney) {
-          super();
-          this.currentRound = currentRound;
-          this.onlineMoney = onlineMoney;
-          this.totalMoney = totalMoney;
-          this.attribute_map = {
-            currentRound: "current_round",
-            onlineMoney: "online-money",
-            totalMoney: "total-money"
-          };
-        }
-      };
-      TealKeyValue = class extends BaseModel {
-        constructor(key, value) {
-          super();
-          this.key = key;
-          this.value = value;
-          this.attribute_map = {
-            key: "key",
-            value: "value"
-          };
-        }
-      };
-      TealValue = class extends BaseModel {
-        constructor(type, bytes, uint) {
-          super();
-          this.type = type;
-          this.bytes = bytes;
-          this.uint = uint;
-          this.attribute_map = {
-            type: "type",
-            bytes: "bytes",
-            uint: "uint"
-          };
-        }
-      };
-      TransactionParametersResponse = class extends BaseModel {
-        constructor({ consensusVersion, fee, genesisHash, genesisId, lastRound, minFee }) {
-          super();
-          this.consensusVersion = consensusVersion;
-          this.fee = fee;
-          this.genesisHash = typeof genesisHash === "string" ? new Uint8Array(Buffer.from(genesisHash, "base64")) : genesisHash;
-          this.genesisId = genesisId;
-          this.lastRound = lastRound;
-          this.minFee = minFee;
-          this.attribute_map = {
-            consensusVersion: "consensus-version",
-            fee: "fee",
-            genesisHash: "genesis-hash",
-            genesisId: "genesis-id",
-            lastRound: "last-round",
-            minFee: "min-fee"
-          };
-        }
-      };
-      Version = class extends BaseModel {
-        constructor(build, genesisHashB64, genesisId, versions) {
-          super();
-          this.build = build;
-          this.genesisHashB64 = typeof genesisHashB64 === "string" ? new Uint8Array(Buffer.from(genesisHashB64, "base64")) : genesisHashB64;
-          this.genesisId = genesisId;
-          this.versions = versions;
-          this.attribute_map = {
-            build: "build",
-            genesisHashB64: "genesis_hash_b64",
-            genesisId: "genesis_id",
-            versions: "versions"
-          };
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/mnemonic/wordlists/english.js
-  var english, english_default;
-  var init_english = __esm({
-    "node_modules/algosdk/dist/esm/src/mnemonic/wordlists/english.js"() {
-      english = [
-        "abandon",
-        "ability",
-        "able",
-        "about",
-        "above",
-        "absent",
-        "absorb",
-        "abstract",
-        "absurd",
-        "abuse",
-        "access",
-        "accident",
-        "account",
-        "accuse",
-        "achieve",
-        "acid",
-        "acoustic",
-        "acquire",
-        "across",
-        "act",
-        "action",
-        "actor",
-        "actress",
-        "actual",
-        "adapt",
-        "add",
-        "addict",
-        "address",
-        "adjust",
-        "admit",
-        "adult",
-        "advance",
-        "advice",
-        "aerobic",
-        "affair",
-        "afford",
-        "afraid",
-        "again",
-        "age",
-        "agent",
-        "agree",
-        "ahead",
-        "aim",
-        "air",
-        "airport",
-        "aisle",
-        "alarm",
-        "album",
-        "alcohol",
-        "alert",
-        "alien",
-        "all",
-        "alley",
-        "allow",
-        "almost",
-        "alone",
-        "alpha",
-        "already",
-        "also",
-        "alter",
-        "always",
-        "amateur",
-        "amazing",
-        "among",
-        "amount",
-        "amused",
-        "analyst",
-        "anchor",
-        "ancient",
-        "anger",
-        "angle",
-        "angry",
-        "animal",
-        "ankle",
-        "announce",
-        "annual",
-        "another",
-        "answer",
-        "antenna",
-        "antique",
-        "anxiety",
-        "any",
-        "apart",
-        "apology",
-        "appear",
-        "apple",
-        "approve",
-        "april",
-        "arch",
-        "arctic",
-        "area",
-        "arena",
-        "argue",
-        "arm",
-        "armed",
-        "armor",
-        "army",
-        "around",
-        "arrange",
-        "arrest",
-        "arrive",
-        "arrow",
-        "art",
-        "artefact",
-        "artist",
-        "artwork",
-        "ask",
-        "aspect",
-        "assault",
-        "asset",
-        "assist",
-        "assume",
-        "asthma",
-        "athlete",
-        "atom",
-        "attack",
-        "attend",
-        "attitude",
-        "attract",
-        "auction",
-        "audit",
-        "august",
-        "aunt",
-        "author",
-        "auto",
-        "autumn",
-        "average",
-        "avocado",
-        "avoid",
-        "awake",
-        "aware",
-        "away",
-        "awesome",
-        "awful",
-        "awkward",
-        "axis",
-        "baby",
-        "bachelor",
-        "bacon",
-        "badge",
-        "bag",
-        "balance",
-        "balcony",
-        "ball",
-        "bamboo",
-        "banana",
-        "banner",
-        "bar",
-        "barely",
-        "bargain",
-        "barrel",
-        "base",
-        "basic",
-        "basket",
-        "battle",
-        "beach",
-        "bean",
-        "beauty",
-        "because",
-        "become",
-        "beef",
-        "before",
-        "begin",
-        "behave",
-        "behind",
-        "believe",
-        "below",
-        "belt",
-        "bench",
-        "benefit",
-        "best",
-        "betray",
-        "better",
-        "between",
-        "beyond",
-        "bicycle",
-        "bid",
-        "bike",
-        "bind",
-        "biology",
-        "bird",
-        "birth",
-        "bitter",
-        "black",
-        "blade",
-        "blame",
-        "blanket",
-        "blast",
-        "bleak",
-        "bless",
-        "blind",
-        "blood",
-        "blossom",
-        "blouse",
-        "blue",
-        "blur",
-        "blush",
-        "board",
-        "boat",
-        "body",
-        "boil",
-        "bomb",
-        "bone",
-        "bonus",
-        "book",
-        "boost",
-        "border",
-        "boring",
-        "borrow",
-        "boss",
-        "bottom",
-        "bounce",
-        "box",
-        "boy",
-        "bracket",
-        "brain",
-        "brand",
-        "brass",
-        "brave",
-        "bread",
-        "breeze",
-        "brick",
-        "bridge",
-        "brief",
-        "bright",
-        "bring",
-        "brisk",
-        "broccoli",
-        "broken",
-        "bronze",
-        "broom",
-        "brother",
-        "brown",
-        "brush",
-        "bubble",
-        "buddy",
-        "budget",
-        "buffalo",
-        "build",
-        "bulb",
-        "bulk",
-        "bullet",
-        "bundle",
-        "bunker",
-        "burden",
-        "burger",
-        "burst",
-        "bus",
-        "business",
-        "busy",
-        "butter",
-        "buyer",
-        "buzz",
-        "cabbage",
-        "cabin",
-        "cable",
-        "cactus",
-        "cage",
-        "cake",
-        "call",
-        "calm",
-        "camera",
-        "camp",
-        "can",
-        "canal",
-        "cancel",
-        "candy",
-        "cannon",
-        "canoe",
-        "canvas",
-        "canyon",
-        "capable",
-        "capital",
-        "captain",
-        "car",
-        "carbon",
-        "card",
-        "cargo",
-        "carpet",
-        "carry",
-        "cart",
-        "case",
-        "cash",
-        "casino",
-        "castle",
-        "casual",
-        "cat",
-        "catalog",
-        "catch",
-        "category",
-        "cattle",
-        "caught",
-        "cause",
-        "caution",
-        "cave",
-        "ceiling",
-        "celery",
-        "cement",
-        "census",
-        "century",
-        "cereal",
-        "certain",
-        "chair",
-        "chalk",
-        "champion",
-        "change",
-        "chaos",
-        "chapter",
-        "charge",
-        "chase",
-        "chat",
-        "cheap",
-        "check",
-        "cheese",
-        "chef",
-        "cherry",
-        "chest",
-        "chicken",
-        "chief",
-        "child",
-        "chimney",
-        "choice",
-        "choose",
-        "chronic",
-        "chuckle",
-        "chunk",
-        "churn",
-        "cigar",
-        "cinnamon",
-        "circle",
-        "citizen",
-        "city",
-        "civil",
-        "claim",
-        "clap",
-        "clarify",
-        "claw",
-        "clay",
-        "clean",
-        "clerk",
-        "clever",
-        "click",
-        "client",
-        "cliff",
-        "climb",
-        "clinic",
-        "clip",
-        "clock",
-        "clog",
-        "close",
-        "cloth",
-        "cloud",
-        "clown",
-        "club",
-        "clump",
-        "cluster",
-        "clutch",
-        "coach",
-        "coast",
-        "coconut",
-        "code",
-        "coffee",
-        "coil",
-        "coin",
-        "collect",
-        "color",
-        "column",
-        "combine",
-        "come",
-        "comfort",
-        "comic",
-        "common",
-        "company",
-        "concert",
-        "conduct",
-        "confirm",
-        "congress",
-        "connect",
-        "consider",
-        "control",
-        "convince",
-        "cook",
-        "cool",
-        "copper",
-        "copy",
-        "coral",
-        "core",
-        "corn",
-        "correct",
-        "cost",
-        "cotton",
-        "couch",
-        "country",
-        "couple",
-        "course",
-        "cousin",
-        "cover",
-        "coyote",
-        "crack",
-        "cradle",
-        "craft",
-        "cram",
-        "crane",
-        "crash",
-        "crater",
-        "crawl",
-        "crazy",
-        "cream",
-        "credit",
-        "creek",
-        "crew",
-        "cricket",
-        "crime",
-        "crisp",
-        "critic",
-        "crop",
-        "cross",
-        "crouch",
-        "crowd",
-        "crucial",
-        "cruel",
-        "cruise",
-        "crumble",
-        "crunch",
-        "crush",
-        "cry",
-        "crystal",
-        "cube",
-        "culture",
-        "cup",
-        "cupboard",
-        "curious",
-        "current",
-        "curtain",
-        "curve",
-        "cushion",
-        "custom",
-        "cute",
-        "cycle",
-        "dad",
-        "damage",
-        "damp",
-        "dance",
-        "danger",
-        "daring",
-        "dash",
-        "daughter",
-        "dawn",
-        "day",
-        "deal",
-        "debate",
-        "debris",
-        "decade",
-        "december",
-        "decide",
-        "decline",
-        "decorate",
-        "decrease",
-        "deer",
-        "defense",
-        "define",
-        "defy",
-        "degree",
-        "delay",
-        "deliver",
-        "demand",
-        "demise",
-        "denial",
-        "dentist",
-        "deny",
-        "depart",
-        "depend",
-        "deposit",
-        "depth",
-        "deputy",
-        "derive",
-        "describe",
-        "desert",
-        "design",
-        "desk",
-        "despair",
-        "destroy",
-        "detail",
-        "detect",
-        "develop",
-        "device",
-        "devote",
-        "diagram",
-        "dial",
-        "diamond",
-        "diary",
-        "dice",
-        "diesel",
-        "diet",
-        "differ",
-        "digital",
-        "dignity",
-        "dilemma",
-        "dinner",
-        "dinosaur",
-        "direct",
-        "dirt",
-        "disagree",
-        "discover",
-        "disease",
-        "dish",
-        "dismiss",
-        "disorder",
-        "display",
-        "distance",
-        "divert",
-        "divide",
-        "divorce",
-        "dizzy",
-        "doctor",
-        "document",
-        "dog",
-        "doll",
-        "dolphin",
-        "domain",
-        "donate",
-        "donkey",
-        "donor",
-        "door",
-        "dose",
-        "double",
-        "dove",
-        "draft",
-        "dragon",
-        "drama",
-        "drastic",
-        "draw",
-        "dream",
-        "dress",
-        "drift",
-        "drill",
-        "drink",
-        "drip",
-        "drive",
-        "drop",
-        "drum",
-        "dry",
-        "duck",
-        "dumb",
-        "dune",
-        "during",
-        "dust",
-        "dutch",
-        "duty",
-        "dwarf",
-        "dynamic",
-        "eager",
-        "eagle",
-        "early",
-        "earn",
-        "earth",
-        "easily",
-        "east",
-        "easy",
-        "echo",
-        "ecology",
-        "economy",
-        "edge",
-        "edit",
-        "educate",
-        "effort",
-        "egg",
-        "eight",
-        "either",
-        "elbow",
-        "elder",
-        "electric",
-        "elegant",
-        "element",
-        "elephant",
-        "elevator",
-        "elite",
-        "else",
-        "embark",
-        "embody",
-        "embrace",
-        "emerge",
-        "emotion",
-        "employ",
-        "empower",
-        "empty",
-        "enable",
-        "enact",
-        "end",
-        "endless",
-        "endorse",
-        "enemy",
-        "energy",
-        "enforce",
-        "engage",
-        "engine",
-        "enhance",
-        "enjoy",
-        "enlist",
-        "enough",
-        "enrich",
-        "enroll",
-        "ensure",
-        "enter",
-        "entire",
-        "entry",
-        "envelope",
-        "episode",
-        "equal",
-        "equip",
-        "era",
-        "erase",
-        "erode",
-        "erosion",
-        "error",
-        "erupt",
-        "escape",
-        "essay",
-        "essence",
-        "estate",
-        "eternal",
-        "ethics",
-        "evidence",
-        "evil",
-        "evoke",
-        "evolve",
-        "exact",
-        "example",
-        "excess",
-        "exchange",
-        "excite",
-        "exclude",
-        "excuse",
-        "execute",
-        "exercise",
-        "exhaust",
-        "exhibit",
-        "exile",
-        "exist",
-        "exit",
-        "exotic",
-        "expand",
-        "expect",
-        "expire",
-        "explain",
-        "expose",
-        "express",
-        "extend",
-        "extra",
-        "eye",
-        "eyebrow",
-        "fabric",
-        "face",
-        "faculty",
-        "fade",
-        "faint",
-        "faith",
-        "fall",
-        "false",
-        "fame",
-        "family",
-        "famous",
-        "fan",
-        "fancy",
-        "fantasy",
-        "farm",
-        "fashion",
-        "fat",
-        "fatal",
-        "father",
-        "fatigue",
-        "fault",
-        "favorite",
-        "feature",
-        "february",
-        "federal",
-        "fee",
-        "feed",
-        "feel",
-        "female",
-        "fence",
-        "festival",
-        "fetch",
-        "fever",
-        "few",
-        "fiber",
-        "fiction",
-        "field",
-        "figure",
-        "file",
-        "film",
-        "filter",
-        "final",
-        "find",
-        "fine",
-        "finger",
-        "finish",
-        "fire",
-        "firm",
-        "first",
-        "fiscal",
-        "fish",
-        "fit",
-        "fitness",
-        "fix",
-        "flag",
-        "flame",
-        "flash",
-        "flat",
-        "flavor",
-        "flee",
-        "flight",
-        "flip",
-        "float",
-        "flock",
-        "floor",
-        "flower",
-        "fluid",
-        "flush",
-        "fly",
-        "foam",
-        "focus",
-        "fog",
-        "foil",
-        "fold",
-        "follow",
-        "food",
-        "foot",
-        "force",
-        "forest",
-        "forget",
-        "fork",
-        "fortune",
-        "forum",
-        "forward",
-        "fossil",
-        "foster",
-        "found",
-        "fox",
-        "fragile",
-        "frame",
-        "frequent",
-        "fresh",
-        "friend",
-        "fringe",
-        "frog",
-        "front",
-        "frost",
-        "frown",
-        "frozen",
-        "fruit",
-        "fuel",
-        "fun",
-        "funny",
-        "furnace",
-        "fury",
-        "future",
-        "gadget",
-        "gain",
-        "galaxy",
-        "gallery",
-        "game",
-        "gap",
-        "garage",
-        "garbage",
-        "garden",
-        "garlic",
-        "garment",
-        "gas",
-        "gasp",
-        "gate",
-        "gather",
-        "gauge",
-        "gaze",
-        "general",
-        "genius",
-        "genre",
-        "gentle",
-        "genuine",
-        "gesture",
-        "ghost",
-        "giant",
-        "gift",
-        "giggle",
-        "ginger",
-        "giraffe",
-        "girl",
-        "give",
-        "glad",
-        "glance",
-        "glare",
-        "glass",
-        "glide",
-        "glimpse",
-        "globe",
-        "gloom",
-        "glory",
-        "glove",
-        "glow",
-        "glue",
-        "goat",
-        "goddess",
-        "gold",
-        "good",
-        "goose",
-        "gorilla",
-        "gospel",
-        "gossip",
-        "govern",
-        "gown",
-        "grab",
-        "grace",
-        "grain",
-        "grant",
-        "grape",
-        "grass",
-        "gravity",
-        "great",
-        "green",
-        "grid",
-        "grief",
-        "grit",
-        "grocery",
-        "group",
-        "grow",
-        "grunt",
-        "guard",
-        "guess",
-        "guide",
-        "guilt",
-        "guitar",
-        "gun",
-        "gym",
-        "habit",
-        "hair",
-        "half",
-        "hammer",
-        "hamster",
-        "hand",
-        "happy",
-        "harbor",
-        "hard",
-        "harsh",
-        "harvest",
-        "hat",
-        "have",
-        "hawk",
-        "hazard",
-        "head",
-        "health",
-        "heart",
-        "heavy",
-        "hedgehog",
-        "height",
-        "hello",
-        "helmet",
-        "help",
-        "hen",
-        "hero",
-        "hidden",
-        "high",
-        "hill",
-        "hint",
-        "hip",
-        "hire",
-        "history",
-        "hobby",
-        "hockey",
-        "hold",
-        "hole",
-        "holiday",
-        "hollow",
-        "home",
-        "honey",
-        "hood",
-        "hope",
-        "horn",
-        "horror",
-        "horse",
-        "hospital",
-        "host",
-        "hotel",
-        "hour",
-        "hover",
-        "hub",
-        "huge",
-        "human",
-        "humble",
-        "humor",
-        "hundred",
-        "hungry",
-        "hunt",
-        "hurdle",
-        "hurry",
-        "hurt",
-        "husband",
-        "hybrid",
-        "ice",
-        "icon",
-        "idea",
-        "identify",
-        "idle",
-        "ignore",
-        "ill",
-        "illegal",
-        "illness",
-        "image",
-        "imitate",
-        "immense",
-        "immune",
-        "impact",
-        "impose",
-        "improve",
-        "impulse",
-        "inch",
-        "include",
-        "income",
-        "increase",
-        "index",
-        "indicate",
-        "indoor",
-        "industry",
-        "infant",
-        "inflict",
-        "inform",
-        "inhale",
-        "inherit",
-        "initial",
-        "inject",
-        "injury",
-        "inmate",
-        "inner",
-        "innocent",
-        "input",
-        "inquiry",
-        "insane",
-        "insect",
-        "inside",
-        "inspire",
-        "install",
-        "intact",
-        "interest",
-        "into",
-        "invest",
-        "invite",
-        "involve",
-        "iron",
-        "island",
-        "isolate",
-        "issue",
-        "item",
-        "ivory",
-        "jacket",
-        "jaguar",
-        "jar",
-        "jazz",
-        "jealous",
-        "jeans",
-        "jelly",
-        "jewel",
-        "job",
-        "join",
-        "joke",
-        "journey",
-        "joy",
-        "judge",
-        "juice",
-        "jump",
-        "jungle",
-        "junior",
-        "junk",
-        "just",
-        "kangaroo",
-        "keen",
-        "keep",
-        "ketchup",
-        "key",
-        "kick",
-        "kid",
-        "kidney",
-        "kind",
-        "kingdom",
-        "kiss",
-        "kit",
-        "kitchen",
-        "kite",
-        "kitten",
-        "kiwi",
-        "knee",
-        "knife",
-        "knock",
-        "know",
-        "lab",
-        "label",
-        "labor",
-        "ladder",
-        "lady",
-        "lake",
-        "lamp",
-        "language",
-        "laptop",
-        "large",
-        "later",
-        "latin",
-        "laugh",
-        "laundry",
-        "lava",
-        "law",
-        "lawn",
-        "lawsuit",
-        "layer",
-        "lazy",
-        "leader",
-        "leaf",
-        "learn",
-        "leave",
-        "lecture",
-        "left",
-        "leg",
-        "legal",
-        "legend",
-        "leisure",
-        "lemon",
-        "lend",
-        "length",
-        "lens",
-        "leopard",
-        "lesson",
-        "letter",
-        "level",
-        "liar",
-        "liberty",
-        "library",
-        "license",
-        "life",
-        "lift",
-        "light",
-        "like",
-        "limb",
-        "limit",
-        "link",
-        "lion",
-        "liquid",
-        "list",
-        "little",
-        "live",
-        "lizard",
-        "load",
-        "loan",
-        "lobster",
-        "local",
-        "lock",
-        "logic",
-        "lonely",
-        "long",
-        "loop",
-        "lottery",
-        "loud",
-        "lounge",
-        "love",
-        "loyal",
-        "lucky",
-        "luggage",
-        "lumber",
-        "lunar",
-        "lunch",
-        "luxury",
-        "lyrics",
-        "machine",
-        "mad",
-        "magic",
-        "magnet",
-        "maid",
-        "mail",
-        "main",
-        "major",
-        "make",
-        "mammal",
-        "man",
-        "manage",
-        "mandate",
-        "mango",
-        "mansion",
-        "manual",
-        "maple",
-        "marble",
-        "march",
-        "margin",
-        "marine",
-        "market",
-        "marriage",
-        "mask",
-        "mass",
-        "master",
-        "match",
-        "material",
-        "math",
-        "matrix",
-        "matter",
-        "maximum",
-        "maze",
-        "meadow",
-        "mean",
-        "measure",
-        "meat",
-        "mechanic",
-        "medal",
-        "media",
-        "melody",
-        "melt",
-        "member",
-        "memory",
-        "mention",
-        "menu",
-        "mercy",
-        "merge",
-        "merit",
-        "merry",
-        "mesh",
-        "message",
-        "metal",
-        "method",
-        "middle",
-        "midnight",
-        "milk",
-        "million",
-        "mimic",
-        "mind",
-        "minimum",
-        "minor",
-        "minute",
-        "miracle",
-        "mirror",
-        "misery",
-        "miss",
-        "mistake",
-        "mix",
-        "mixed",
-        "mixture",
-        "mobile",
-        "model",
-        "modify",
-        "mom",
-        "moment",
-        "monitor",
-        "monkey",
-        "monster",
-        "month",
-        "moon",
-        "moral",
-        "more",
-        "morning",
-        "mosquito",
-        "mother",
-        "motion",
-        "motor",
-        "mountain",
-        "mouse",
-        "move",
-        "movie",
-        "much",
-        "muffin",
-        "mule",
-        "multiply",
-        "muscle",
-        "museum",
-        "mushroom",
-        "music",
-        "must",
-        "mutual",
-        "myself",
-        "mystery",
-        "myth",
-        "naive",
-        "name",
-        "napkin",
-        "narrow",
-        "nasty",
-        "nation",
-        "nature",
-        "near",
-        "neck",
-        "need",
-        "negative",
-        "neglect",
-        "neither",
-        "nephew",
-        "nerve",
-        "nest",
-        "net",
-        "network",
-        "neutral",
-        "never",
-        "news",
-        "next",
-        "nice",
-        "night",
-        "noble",
-        "noise",
-        "nominee",
-        "noodle",
-        "normal",
-        "north",
-        "nose",
-        "notable",
-        "note",
-        "nothing",
-        "notice",
-        "novel",
-        "now",
-        "nuclear",
-        "number",
-        "nurse",
-        "nut",
-        "oak",
-        "obey",
-        "object",
-        "oblige",
-        "obscure",
-        "observe",
-        "obtain",
-        "obvious",
-        "occur",
-        "ocean",
-        "october",
-        "odor",
-        "off",
-        "offer",
-        "office",
-        "often",
-        "oil",
-        "okay",
-        "old",
-        "olive",
-        "olympic",
-        "omit",
-        "once",
-        "one",
-        "onion",
-        "online",
-        "only",
-        "open",
-        "opera",
-        "opinion",
-        "oppose",
-        "option",
-        "orange",
-        "orbit",
-        "orchard",
-        "order",
-        "ordinary",
-        "organ",
-        "orient",
-        "original",
-        "orphan",
-        "ostrich",
-        "other",
-        "outdoor",
-        "outer",
-        "output",
-        "outside",
-        "oval",
-        "oven",
-        "over",
-        "own",
-        "owner",
-        "oxygen",
-        "oyster",
-        "ozone",
-        "pact",
-        "paddle",
-        "page",
-        "pair",
-        "palace",
-        "palm",
-        "panda",
-        "panel",
-        "panic",
-        "panther",
-        "paper",
-        "parade",
-        "parent",
-        "park",
-        "parrot",
-        "party",
-        "pass",
-        "patch",
-        "path",
-        "patient",
-        "patrol",
-        "pattern",
-        "pause",
-        "pave",
-        "payment",
-        "peace",
-        "peanut",
-        "pear",
-        "peasant",
-        "pelican",
-        "pen",
-        "penalty",
-        "pencil",
-        "people",
-        "pepper",
-        "perfect",
-        "permit",
-        "person",
-        "pet",
-        "phone",
-        "photo",
-        "phrase",
-        "physical",
-        "piano",
-        "picnic",
-        "picture",
-        "piece",
-        "pig",
-        "pigeon",
-        "pill",
-        "pilot",
-        "pink",
-        "pioneer",
-        "pipe",
-        "pistol",
-        "pitch",
-        "pizza",
-        "place",
-        "planet",
-        "plastic",
-        "plate",
-        "play",
-        "please",
-        "pledge",
-        "pluck",
-        "plug",
-        "plunge",
-        "poem",
-        "poet",
-        "point",
-        "polar",
-        "pole",
-        "police",
-        "pond",
-        "pony",
-        "pool",
-        "popular",
-        "portion",
-        "position",
-        "possible",
-        "post",
-        "potato",
-        "pottery",
-        "poverty",
-        "powder",
-        "power",
-        "practice",
-        "praise",
-        "predict",
-        "prefer",
-        "prepare",
-        "present",
-        "pretty",
-        "prevent",
-        "price",
-        "pride",
-        "primary",
-        "print",
-        "priority",
-        "prison",
-        "private",
-        "prize",
-        "problem",
-        "process",
-        "produce",
-        "profit",
-        "program",
-        "project",
-        "promote",
-        "proof",
-        "property",
-        "prosper",
-        "protect",
-        "proud",
-        "provide",
-        "public",
-        "pudding",
-        "pull",
-        "pulp",
-        "pulse",
-        "pumpkin",
-        "punch",
-        "pupil",
-        "puppy",
-        "purchase",
-        "purity",
-        "purpose",
-        "purse",
-        "push",
-        "put",
-        "puzzle",
-        "pyramid",
-        "quality",
-        "quantum",
-        "quarter",
-        "question",
-        "quick",
-        "quit",
-        "quiz",
-        "quote",
-        "rabbit",
-        "raccoon",
-        "race",
-        "rack",
-        "radar",
-        "radio",
-        "rail",
-        "rain",
-        "raise",
-        "rally",
-        "ramp",
-        "ranch",
-        "random",
-        "range",
-        "rapid",
-        "rare",
-        "rate",
-        "rather",
-        "raven",
-        "raw",
-        "razor",
-        "ready",
-        "real",
-        "reason",
-        "rebel",
-        "rebuild",
-        "recall",
-        "receive",
-        "recipe",
-        "record",
-        "recycle",
-        "reduce",
-        "reflect",
-        "reform",
-        "refuse",
-        "region",
-        "regret",
-        "regular",
-        "reject",
-        "relax",
-        "release",
-        "relief",
-        "rely",
-        "remain",
-        "remember",
-        "remind",
-        "remove",
-        "render",
-        "renew",
-        "rent",
-        "reopen",
-        "repair",
-        "repeat",
-        "replace",
-        "report",
-        "require",
-        "rescue",
-        "resemble",
-        "resist",
-        "resource",
-        "response",
-        "result",
-        "retire",
-        "retreat",
-        "return",
-        "reunion",
-        "reveal",
-        "review",
-        "reward",
-        "rhythm",
-        "rib",
-        "ribbon",
-        "rice",
-        "rich",
-        "ride",
-        "ridge",
-        "rifle",
-        "right",
-        "rigid",
-        "ring",
-        "riot",
-        "ripple",
-        "risk",
-        "ritual",
-        "rival",
-        "river",
-        "road",
-        "roast",
-        "robot",
-        "robust",
-        "rocket",
-        "romance",
-        "roof",
-        "rookie",
-        "room",
-        "rose",
-        "rotate",
-        "rough",
-        "round",
-        "route",
-        "royal",
-        "rubber",
-        "rude",
-        "rug",
-        "rule",
-        "run",
-        "runway",
-        "rural",
-        "sad",
-        "saddle",
-        "sadness",
-        "safe",
-        "sail",
-        "salad",
-        "salmon",
-        "salon",
-        "salt",
-        "salute",
-        "same",
-        "sample",
-        "sand",
-        "satisfy",
-        "satoshi",
-        "sauce",
-        "sausage",
-        "save",
-        "say",
-        "scale",
-        "scan",
-        "scare",
-        "scatter",
-        "scene",
-        "scheme",
-        "school",
-        "science",
-        "scissors",
-        "scorpion",
-        "scout",
-        "scrap",
-        "screen",
-        "script",
-        "scrub",
-        "sea",
-        "search",
-        "season",
-        "seat",
-        "second",
-        "secret",
-        "section",
-        "security",
-        "seed",
-        "seek",
-        "segment",
-        "select",
-        "sell",
-        "seminar",
-        "senior",
-        "sense",
-        "sentence",
-        "series",
-        "service",
-        "session",
-        "settle",
-        "setup",
-        "seven",
-        "shadow",
-        "shaft",
-        "shallow",
-        "share",
-        "shed",
-        "shell",
-        "sheriff",
-        "shield",
-        "shift",
-        "shine",
-        "ship",
-        "shiver",
-        "shock",
-        "shoe",
-        "shoot",
-        "shop",
-        "short",
-        "shoulder",
-        "shove",
-        "shrimp",
-        "shrug",
-        "shuffle",
-        "shy",
-        "sibling",
-        "sick",
-        "side",
-        "siege",
-        "sight",
-        "sign",
-        "silent",
-        "silk",
-        "silly",
-        "silver",
-        "similar",
-        "simple",
-        "since",
-        "sing",
-        "siren",
-        "sister",
-        "situate",
-        "six",
-        "size",
-        "skate",
-        "sketch",
-        "ski",
-        "skill",
-        "skin",
-        "skirt",
-        "skull",
-        "slab",
-        "slam",
-        "sleep",
-        "slender",
-        "slice",
-        "slide",
-        "slight",
-        "slim",
-        "slogan",
-        "slot",
-        "slow",
-        "slush",
-        "small",
-        "smart",
-        "smile",
-        "smoke",
-        "smooth",
-        "snack",
-        "snake",
-        "snap",
-        "sniff",
-        "snow",
-        "soap",
-        "soccer",
-        "social",
-        "sock",
-        "soda",
-        "soft",
-        "solar",
-        "soldier",
-        "solid",
-        "solution",
-        "solve",
-        "someone",
-        "song",
-        "soon",
-        "sorry",
-        "sort",
-        "soul",
-        "sound",
-        "soup",
-        "source",
-        "south",
-        "space",
-        "spare",
-        "spatial",
-        "spawn",
-        "speak",
-        "special",
-        "speed",
-        "spell",
-        "spend",
-        "sphere",
-        "spice",
-        "spider",
-        "spike",
-        "spin",
-        "spirit",
-        "split",
-        "spoil",
-        "sponsor",
-        "spoon",
-        "sport",
-        "spot",
-        "spray",
-        "spread",
-        "spring",
-        "spy",
-        "square",
-        "squeeze",
-        "squirrel",
-        "stable",
-        "stadium",
-        "staff",
-        "stage",
-        "stairs",
-        "stamp",
-        "stand",
-        "start",
-        "state",
-        "stay",
-        "steak",
-        "steel",
-        "stem",
-        "step",
-        "stereo",
-        "stick",
-        "still",
-        "sting",
-        "stock",
-        "stomach",
-        "stone",
-        "stool",
-        "story",
-        "stove",
-        "strategy",
-        "street",
-        "strike",
-        "strong",
-        "struggle",
-        "student",
-        "stuff",
-        "stumble",
-        "style",
-        "subject",
-        "submit",
-        "subway",
-        "success",
-        "such",
-        "sudden",
-        "suffer",
-        "sugar",
-        "suggest",
-        "suit",
-        "summer",
-        "sun",
-        "sunny",
-        "sunset",
-        "super",
-        "supply",
-        "supreme",
-        "sure",
-        "surface",
-        "surge",
-        "surprise",
-        "surround",
-        "survey",
-        "suspect",
-        "sustain",
-        "swallow",
-        "swamp",
-        "swap",
-        "swarm",
-        "swear",
-        "sweet",
-        "swift",
-        "swim",
-        "swing",
-        "switch",
-        "sword",
-        "symbol",
-        "symptom",
-        "syrup",
-        "system",
-        "table",
-        "tackle",
-        "tag",
-        "tail",
-        "talent",
-        "talk",
-        "tank",
-        "tape",
-        "target",
-        "task",
-        "taste",
-        "tattoo",
-        "taxi",
-        "teach",
-        "team",
-        "tell",
-        "ten",
-        "tenant",
-        "tennis",
-        "tent",
-        "term",
-        "test",
-        "text",
-        "thank",
-        "that",
-        "theme",
-        "then",
-        "theory",
-        "there",
-        "they",
-        "thing",
-        "this",
-        "thought",
-        "three",
-        "thrive",
-        "throw",
-        "thumb",
-        "thunder",
-        "ticket",
-        "tide",
-        "tiger",
-        "tilt",
-        "timber",
-        "time",
-        "tiny",
-        "tip",
-        "tired",
-        "tissue",
-        "title",
-        "toast",
-        "tobacco",
-        "today",
-        "toddler",
-        "toe",
-        "together",
-        "toilet",
-        "token",
-        "tomato",
-        "tomorrow",
-        "tone",
-        "tongue",
-        "tonight",
-        "tool",
-        "tooth",
-        "top",
-        "topic",
-        "topple",
-        "torch",
-        "tornado",
-        "tortoise",
-        "toss",
-        "total",
-        "tourist",
-        "toward",
-        "tower",
-        "town",
-        "toy",
-        "track",
-        "trade",
-        "traffic",
-        "tragic",
-        "train",
-        "transfer",
-        "trap",
-        "trash",
-        "travel",
-        "tray",
-        "treat",
-        "tree",
-        "trend",
-        "trial",
-        "tribe",
-        "trick",
-        "trigger",
-        "trim",
-        "trip",
-        "trophy",
-        "trouble",
-        "truck",
-        "true",
-        "truly",
-        "trumpet",
-        "trust",
-        "truth",
-        "try",
-        "tube",
-        "tuition",
-        "tumble",
-        "tuna",
-        "tunnel",
-        "turkey",
-        "turn",
-        "turtle",
-        "twelve",
-        "twenty",
-        "twice",
-        "twin",
-        "twist",
-        "two",
-        "type",
-        "typical",
-        "ugly",
-        "umbrella",
-        "unable",
-        "unaware",
-        "uncle",
-        "uncover",
-        "under",
-        "undo",
-        "unfair",
-        "unfold",
-        "unhappy",
-        "uniform",
-        "unique",
-        "unit",
-        "universe",
-        "unknown",
-        "unlock",
-        "until",
-        "unusual",
-        "unveil",
-        "update",
-        "upgrade",
-        "uphold",
-        "upon",
-        "upper",
-        "upset",
-        "urban",
-        "urge",
-        "usage",
-        "use",
-        "used",
-        "useful",
-        "useless",
-        "usual",
-        "utility",
-        "vacant",
-        "vacuum",
-        "vague",
-        "valid",
-        "valley",
-        "valve",
-        "van",
-        "vanish",
-        "vapor",
-        "various",
-        "vast",
-        "vault",
-        "vehicle",
-        "velvet",
-        "vendor",
-        "venture",
-        "venue",
-        "verb",
-        "verify",
-        "version",
-        "very",
-        "vessel",
-        "veteran",
-        "viable",
-        "vibrant",
-        "vicious",
-        "victory",
-        "video",
-        "view",
-        "village",
-        "vintage",
-        "violin",
-        "virtual",
-        "virus",
-        "visa",
-        "visit",
-        "visual",
-        "vital",
-        "vivid",
-        "vocal",
-        "voice",
-        "void",
-        "volcano",
-        "volume",
-        "vote",
-        "voyage",
-        "wage",
-        "wagon",
-        "wait",
-        "walk",
-        "wall",
-        "walnut",
-        "want",
-        "warfare",
-        "warm",
-        "warrior",
-        "wash",
-        "wasp",
-        "waste",
-        "water",
-        "wave",
-        "way",
-        "wealth",
-        "weapon",
-        "wear",
-        "weasel",
-        "weather",
-        "web",
-        "wedding",
-        "weekend",
-        "weird",
-        "welcome",
-        "west",
-        "wet",
-        "whale",
-        "what",
-        "wheat",
-        "wheel",
-        "when",
-        "where",
-        "whip",
-        "whisper",
-        "wide",
-        "width",
-        "wife",
-        "wild",
-        "will",
-        "win",
-        "window",
-        "wine",
-        "wing",
-        "wink",
-        "winner",
-        "winter",
-        "wire",
-        "wisdom",
-        "wise",
-        "wish",
-        "witness",
-        "wolf",
-        "woman",
-        "wonder",
-        "wood",
-        "wool",
-        "word",
-        "work",
-        "world",
-        "worry",
-        "worth",
-        "wrap",
-        "wreck",
-        "wrestle",
-        "wrist",
-        "write",
-        "wrong",
-        "yard",
-        "year",
-        "yellow",
-        "you",
-        "young",
-        "youth",
-        "zebra",
-        "zero",
-        "zone",
-        "zoo"
+  // src/constants.js
+  var require_constants2 = __commonJS({
+    "src/constants.js"(exports2) {
+      "use strict";
+      exports2.__esModule = true;
+      exports2.APP_ID = 628095415;
+      exports2.REGISTRATION_PRICE = {
+        CHAR_3_AMOUNT: 15e7,
+        CHAR_4_AMOUNT: 5e7,
+        CHAR_5_AMOUNT: 5e6
+      };
+      exports2.TRANSFER_FEE = 2e6;
+      exports2.IPFS_LINK = "https://ipfs.infura.io/ipfs/";
+      exports2.ASCII_CODES = {
+        ASCII_A: 97,
+        ASCII_Z: 122,
+        ASCII_0: 48,
+        ASCII_9: 57
+      };
+      exports2.ALLOWED_SOCIALS = [
+        "github",
+        "twitter",
+        "telegram",
+        "youtube",
+        "reddit",
+        "discord"
       ];
-      english_default = english;
     }
   });
 
-  // node_modules/algosdk/dist/esm/src/mnemonic/mnemonic.js
-  function toUint11Array(buffer8) {
-    const buffer11 = [];
-    let acc = 0;
-    let accBits = 0;
-    function add(octet) {
-      acc |= octet << accBits;
-      accBits += 8;
-      if (accBits >= 11) {
-        buffer11.push(acc & 2047);
-        acc >>= 11;
-        accBits -= 11;
-      }
-    }
-    function flush() {
-      if (accBits) {
-        buffer11.push(acc);
-      }
-    }
-    buffer8.forEach(add);
-    flush();
-    return buffer11;
-  }
-  function applyWords(nums) {
-    return nums.map((n) => english_default[n]);
-  }
-  function computeChecksum(seed) {
-    const hashBuffer = genericHash(seed);
-    const uint11Hash = toUint11Array(hashBuffer);
-    const words = applyWords(uint11Hash);
-    return words[0];
-  }
-  function mnemonicFromSeed(seed) {
-    if (seed.length !== SEED_BTYES_LENGTH) {
-      throw new RangeError(`Seed length must be ${SEED_BTYES_LENGTH}`);
-    }
-    const uint11Array = toUint11Array(seed);
-    const words = applyWords(uint11Array);
-    const checksumWord = computeChecksum(seed);
-    return `${words.join(" ")} ${checksumWord}`;
-  }
-  function toUint8Array(buffer11) {
-    const buffer8 = [];
-    let acc = 0;
-    let accBits = 0;
-    function add(ui11) {
-      acc |= ui11 << accBits;
-      accBits += 11;
-      while (accBits >= 8) {
-        buffer8.push(acc & 255);
-        acc >>= 8;
-        accBits -= 8;
-      }
-    }
-    function flush() {
-      if (accBits) {
-        buffer8.push(acc);
-      }
-    }
-    buffer11.forEach(add);
-    flush();
-    return new Uint8Array(buffer8);
-  }
-  function seedFromMnemonic(mnemonic) {
-    const words = mnemonic.split(" ");
-    const key = words.slice(0, 24);
-    for (const w of key) {
-      if (english_default.indexOf(w) === -1)
-        throw new Error(NOT_IN_WORDS_LIST_ERROR_MSG);
-    }
-    const checksum = words[words.length - 1];
-    const uint11Array = key.map((word) => english_default.indexOf(word));
-    let uint8Array = toUint8Array(uint11Array);
-    if (uint8Array.length !== 33)
-      throw new Error(FAIL_TO_DECODE_MNEMONIC_ERROR_MSG);
-    if (uint8Array[uint8Array.length - 1] !== 0)
-      throw new Error(FAIL_TO_DECODE_MNEMONIC_ERROR_MSG);
-    uint8Array = uint8Array.slice(0, uint8Array.length - 1);
-    const cs = computeChecksum(uint8Array);
-    if (cs === checksum)
-      return uint8Array;
-    throw new Error(FAIL_TO_DECODE_MNEMONIC_ERROR_MSG);
-  }
-  function mnemonicToSecretKey(mn) {
-    const seed = seedFromMnemonic(mn);
-    const keys = keyPairFromSeed(seed);
-    const encodedPk = encodeAddress(keys.publicKey);
-    return { addr: encodedPk, sk: keys.secretKey };
-  }
-  function secretKeyToMnemonic(sk) {
-    const seed = sk.slice(0, SEED_BTYES_LENGTH);
-    return mnemonicFromSeed(seed);
-  }
-  function mnemonicToMasterDerivationKey(mn) {
-    return seedFromMnemonic(mn);
-  }
-  function masterDerivationKeyToMnemonic(mdk) {
-    return mnemonicFromSeed(mdk);
-  }
-  var FAIL_TO_DECODE_MNEMONIC_ERROR_MSG, NOT_IN_WORDS_LIST_ERROR_MSG;
-  var init_mnemonic = __esm({
-    "node_modules/algosdk/dist/esm/src/mnemonic/mnemonic.js"() {
-      init_english();
-      init_naclWrappers();
-      init_address();
-      FAIL_TO_DECODE_MNEMONIC_ERROR_MSG = "failed to decode mnemonic";
-      NOT_IN_WORDS_LIST_ERROR_MSG = "the mnemonic contains a word that is not in the wordlist";
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/dryrun.js
-  function decodePrograms(ap) {
-    ap.params["approval-program"] = Buffer.from(ap.params["approval-program"].toString(), "base64");
-    ap.params["clear-state-program"] = Buffer.from(ap.params["clear-state-program"].toString(), "base64");
-    return ap;
-  }
-  async function createDryrun({ client, txns, protocolVersion, latestTimestamp, round, sources }) {
-    const appInfos = [];
-    const acctInfos = [];
-    const apps = [];
-    const assets = [];
-    const accts = [];
-    for (const t of txns) {
-      if (t.txn.type === TransactionType.appl) {
-        accts.push(encodeAddress(t.txn.from.publicKey));
-        if (t.txn.appAccounts)
-          accts.push(...t.txn.appAccounts.map((a) => encodeAddress(a.publicKey)));
-        if (t.txn.appForeignApps)
-          apps.push(...t.txn.appForeignApps);
-        if (t.txn.appForeignAssets)
-          assets.push(...t.txn.appForeignAssets);
-        if (t.txn.appIndex === 0) {
-          appInfos.push(new Application(defaultAppId, new ApplicationParams({
-            creator: encodeAddress(t.txn.from.publicKey),
-            approvalProgram: t.txn.appApprovalProgram,
-            clearStateProgram: t.txn.appClearProgram,
-            localStateSchema: new ApplicationStateSchema(t.txn.appLocalInts, t.txn.appLocalByteSlices),
-            globalStateSchema: new ApplicationStateSchema(t.txn.appGlobalInts, t.txn.appGlobalByteSlices)
-          })));
-        } else {
-          apps.push(t.txn.appIndex);
-          accts.push(getApplicationAddress(t.txn.appIndex));
-        }
-      }
-    }
-    const assetPromises = [];
-    for (const assetId of [...new Set(assets)]) {
-      assetPromises.push(client.getAssetByID(assetId).do().then((assetInfo) => {
-        accts.push(assetInfo.params.creator);
-      }));
-    }
-    await Promise.all(assetPromises);
-    const appPromises = [];
-    for (const appId of [...new Set(apps)]) {
-      appPromises.push(client.getApplicationByID(appId).do().then((appInfo) => {
-        const ai = decodePrograms(appInfo);
-        appInfos.push(ai);
-        accts.push(ai.params.creator);
-      }));
-    }
-    await Promise.all(appPromises);
-    const acctPromises = [];
-    for (const acct of [...new Set(accts)]) {
-      acctPromises.push(client.accountInformation(acct).do().then((acctInfo) => {
-        if ("created-apps" in acctInfo) {
-          acctInfo["created-apps"] = acctInfo["created-apps"].map((app) => decodePrograms(app));
-        }
-        acctInfos.push(acctInfo);
-      }));
-    }
-    await Promise.all(acctPromises);
-    return new DryrunRequest({
-      txns: txns.map((st) => __spreadProps(__spreadValues({}, st), { txn: st.txn.get_obj_for_encoding() })),
-      accounts: acctInfos,
-      apps: appInfos,
-      latestTimestamp,
-      round,
-      protocolVersion,
-      sources
-    });
-  }
-  var defaultAppId;
-  var init_dryrun2 = __esm({
-    "node_modules/algosdk/dist/esm/src/dryrun.js"() {
-      init_types();
-      init_transactions();
-      init_address();
-      defaultAppId = 1380011588;
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/signer.js
-  function makeBasicAccountTransactionSigner(account) {
-    return (txnGroup, indexesToSign) => {
-      const signed = [];
-      for (const index of indexesToSign) {
-        signed.push(txnGroup[index].signTxn(account.sk));
-      }
-      return Promise.resolve(signed);
-    };
-  }
-  function makeLogicSigAccountTransactionSigner(account) {
-    return (txnGroup, indexesToSign) => {
-      const signed = [];
-      for (const index of indexesToSign) {
-        const { blob } = signLogicSigTransactionObject(txnGroup[index], account);
-        signed.push(blob);
-      }
-      return Promise.resolve(signed);
-    };
-  }
-  function makeMultiSigAccountTransactionSigner(msig, sks) {
-    return (txnGroup, indexesToSign) => {
-      const signed = [];
-      for (const index of indexesToSign) {
-        const txn = txnGroup[index];
-        const partialSigs = [];
-        for (const sk of sks) {
-          const { blob } = signMultisigTransaction(txn, msig, sk);
-          partialSigs.push(blob);
-        }
-        signed.push(mergeMultisigTransactions(partialSigs));
-      }
-      return Promise.resolve(signed);
-    };
-  }
-  function isTransactionWithSigner(value) {
-    return typeof value === "object" && Object.keys(value).length === 2 && typeof value.txn === "object" && typeof value.signer === "function";
-  }
-  var init_signer = __esm({
-    "node_modules/algosdk/dist/esm/src/signer.js"() {
-      init_logicsig();
-      init_multisig();
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/encoding/bigint.js
-  function bigIntToBytes(bi, size) {
-    let hex = bi.toString(16);
-    if (hex.length !== size * 2) {
-      hex = hex.padStart(size * 2, "0");
-    }
-    const byteArray = new Uint8Array(hex.length / 2);
-    for (let i = 0, j = 0; i < hex.length / 2; i++, j += 2) {
-      byteArray[i] = parseInt(hex.slice(j, j + 2), 16);
-    }
-    return byteArray;
-  }
-  function bytesToBigInt(bytes) {
-    let res = BigInt(0);
-    const buf = Buffer.from(bytes);
-    for (let i = 0; i < bytes.length; i++) {
-      res = BigInt(Number(buf.readUIntBE(i, 1))) + res * BigInt(256);
-    }
-    return res;
-  }
-  var init_bigint = __esm({
-    "node_modules/algosdk/dist/esm/src/encoding/bigint.js"() {
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/abi/abi_type.js
-  function compressMultipleBool(valueList) {
-    let res = 0;
-    if (valueList.length > 8) {
-      throw new Error("value list passed in should be no greater than length 8");
-    }
-    for (let i = 0; i < valueList.length; i++) {
-      const boolVal = valueList[i];
-      if (typeof boolVal !== "boolean") {
-        throw new Error("non-boolean values cannot be compressed into a byte");
-      }
-      if (boolVal) {
-        res |= 1 << 7 - i;
-      }
-    }
-    return res;
-  }
-  function findBoolLR(typeList, index, delta) {
-    let until = 0;
-    while (true) {
-      const curr = index + delta * until;
-      if (typeList[curr].constructor === ABIBoolType) {
-        if (curr !== typeList.length - 1 && delta === 1) {
-          until += 1;
-        } else if (curr > 0 && delta === -1) {
-          until += 1;
-        } else {
-          break;
-        }
-      } else {
-        until -= 1;
-        break;
-      }
-    }
-    return until;
-  }
-  var MAX_LEN, ADDR_BYTE_SIZE, SINGLE_BYTE_SIZE, SINGLE_BOOL_SIZE, LENGTH_ENCODE_BYTE_SIZE, staticArrayRegexp, ufixedRegexp, ABIType, ABIUintType, ABIUfixedType, ABIAddressType, ABIBoolType, ABIByteType, ABIStringType, ABIArrayStaticType, ABIArrayDynamicType, ABITupleType;
-  var init_abi_type = __esm({
-    "node_modules/algosdk/dist/esm/src/abi/abi_type.js"() {
-      init_address();
-      init_bigint();
-      init_utils();
-      MAX_LEN = 2 ** 16 - 1;
-      ADDR_BYTE_SIZE = 32;
-      SINGLE_BYTE_SIZE = 1;
-      SINGLE_BOOL_SIZE = 1;
-      LENGTH_ENCODE_BYTE_SIZE = 2;
-      staticArrayRegexp = /^([a-z\d[\](),]+)\[([1-9][\d]*)]$/;
-      ufixedRegexp = /^ufixed([1-9][\d]*)x([1-9][\d]*)$/;
-      ABIType = class {
-        static from(str) {
-          if (str.endsWith("[]")) {
-            const arrayArgType = ABIType.from(str.slice(0, str.length - 2));
-            return new ABIArrayDynamicType(arrayArgType);
-          }
-          if (str.endsWith("]")) {
-            const stringMatches = str.match(staticArrayRegexp);
-            if (stringMatches.length !== 3) {
-              throw new Error(`malformed static array string: ${str}`);
-            }
-            const arrayLengthStr = stringMatches[2];
-            const arrayLength = parseInt(arrayLengthStr, 10);
-            if (arrayLength > MAX_LEN) {
-              throw new Error(`array length exceeds limit ${MAX_LEN}`);
-            }
-            const arrayType = ABIType.from(stringMatches[1]);
-            return new ABIArrayStaticType(arrayType, arrayLength);
-          }
-          if (str.startsWith("uint")) {
-            const digitsOnly = (string) => [...string].every((c) => "0123456789".includes(c));
-            const typeSizeStr = str.slice(4, str.length);
-            if (!digitsOnly(typeSizeStr)) {
-              throw new Error(`malformed uint string: ${typeSizeStr}`);
-            }
-            const typeSize = parseInt(typeSizeStr, 10);
-            if (typeSize > MAX_LEN) {
-              throw new Error(`malformed uint string: ${typeSize}`);
-            }
-            return new ABIUintType(typeSize);
-          }
-          if (str === "byte") {
-            return new ABIByteType();
-          }
-          if (str.startsWith("ufixed")) {
-            const stringMatches = str.match(ufixedRegexp);
-            if (stringMatches.length !== 3) {
-              throw new Error(`malformed ufixed type: ${str}`);
-            }
-            const ufixedSize = parseInt(stringMatches[1], 10);
-            const ufixedPrecision = parseInt(stringMatches[2], 10);
-            return new ABIUfixedType(ufixedSize, ufixedPrecision);
-          }
-          if (str === "bool") {
-            return new ABIBoolType();
-          }
-          if (str === "address") {
-            return new ABIAddressType();
-          }
-          if (str === "string") {
-            return new ABIStringType();
-          }
-          if (str.length >= 2 && str[0] === "(" && str[str.length - 1] === ")") {
-            const tupleContent = ABITupleType.parseTupleContent(str.slice(1, str.length - 1));
-            const tupleTypes = [];
-            for (let i = 0; i < tupleContent.length; i++) {
-              const ti = ABIType.from(tupleContent[i]);
-              tupleTypes.push(ti);
-            }
-            return new ABITupleType(tupleTypes);
-          }
-          throw new Error(`cannot convert a string ${str} to an ABI type`);
-        }
-      };
-      ABIUintType = class extends ABIType {
-        constructor(size) {
-          super();
-          if (size % 8 !== 0 || size < 8 || size > 512) {
-            throw new Error(`unsupported uint type bitSize: ${size}`);
-          }
-          this.bitSize = size;
-        }
-        toString() {
-          return `uint${this.bitSize}`;
-        }
-        equals(other) {
-          return other instanceof ABIUintType && this.bitSize === other.bitSize;
-        }
-        isDynamic() {
-          return false;
-        }
-        byteLen() {
-          return this.bitSize / 8;
-        }
-        encode(value) {
-          if (typeof value !== "bigint" && typeof value !== "number") {
-            throw new Error(`Cannot encode value as uint${this.bitSize}: ${value}`);
-          }
-          if (value >= BigInt(2 ** this.bitSize) || value < BigInt(0)) {
-            throw new Error(`${value} is not a non-negative int or too big to fit in size uint${this.bitSize}`);
-          }
-          if (typeof value === "number" && !Number.isSafeInteger(value)) {
-            throw new Error(`${value} should be converted into a BigInt before it is encoded`);
-          }
-          return bigIntToBytes(value, this.bitSize / 8);
-        }
-        decode(byteString) {
-          if (byteString.length !== this.bitSize / 8) {
-            throw new Error(`byte string must correspond to a uint${this.bitSize}`);
-          }
-          return bytesToBigInt(byteString);
-        }
-      };
-      ABIUfixedType = class extends ABIType {
-        constructor(size, denominator) {
-          super();
-          if (size % 8 !== 0 || size < 8 || size > 512) {
-            throw new Error(`unsupported ufixed type bitSize: ${size}`);
-          }
-          if (denominator > 160 || denominator < 1) {
-            throw new Error(`unsupported ufixed type precision: ${denominator}`);
-          }
-          this.bitSize = size;
-          this.precision = denominator;
-        }
-        toString() {
-          return `ufixed${this.bitSize}x${this.precision}`;
-        }
-        equals(other) {
-          return other instanceof ABIUfixedType && this.bitSize === other.bitSize && this.precision === other.precision;
-        }
-        isDynamic() {
-          return false;
-        }
-        byteLen() {
-          return this.bitSize / 8;
-        }
-        encode(value) {
-          if (typeof value !== "bigint" && typeof value !== "number") {
-            throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
-          }
-          if (value >= BigInt(2 ** this.bitSize) || value < BigInt(0)) {
-            throw new Error(`${value} is not a non-negative int or too big to fit in size ${this.toString()}`);
-          }
-          if (typeof value === "number" && !Number.isSafeInteger(value)) {
-            throw new Error(`${value} should be converted into a BigInt before it is encoded`);
-          }
-          return bigIntToBytes(value, this.bitSize / 8);
-        }
-        decode(byteString) {
-          if (byteString.length !== this.bitSize / 8) {
-            throw new Error(`byte string must correspond to a ${this.toString()}`);
-          }
-          return bytesToBigInt(byteString);
-        }
-      };
-      ABIAddressType = class extends ABIType {
-        toString() {
-          return "address";
-        }
-        equals(other) {
-          return other instanceof ABIAddressType;
-        }
-        isDynamic() {
-          return false;
-        }
-        byteLen() {
-          return ADDR_BYTE_SIZE;
-        }
-        encode(value) {
-          if (typeof value !== "string" && !(value instanceof Uint8Array)) {
-            throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
-          }
-          if (typeof value === "string") {
-            const decodedAddress = decodeAddress(value);
-            return decodedAddress.publicKey;
-          }
-          if (value.byteLength !== 32) {
-            throw new Error(`byte string must be 32 bytes long for an address`);
-          }
-          return value;
-        }
-        decode(byteString) {
-          if (byteString.byteLength !== 32) {
-            throw new Error(`byte string must be 32 bytes long for an address`);
-          }
-          return encodeAddress(byteString);
-        }
-      };
-      ABIBoolType = class extends ABIType {
-        toString() {
-          return "bool";
-        }
-        equals(other) {
-          return other instanceof ABIBoolType;
-        }
-        isDynamic() {
-          return false;
-        }
-        byteLen() {
-          return SINGLE_BOOL_SIZE;
-        }
-        encode(value) {
-          if (typeof value !== "boolean") {
-            throw new Error(`Cannot encode value as bool: ${value}`);
-          }
-          if (value) {
-            return new Uint8Array([128]);
-          }
-          return new Uint8Array([0]);
-        }
-        decode(byteString) {
-          if (byteString.byteLength !== 1) {
-            throw new Error(`bool string must be 1 byte long`);
-          }
-          const value = byteString[0];
-          if (value === 128) {
-            return true;
-          }
-          if (value === 0) {
-            return false;
-          }
-          throw new Error(`boolean could not be decoded from the byte string`);
-        }
-      };
-      ABIByteType = class extends ABIType {
-        toString() {
-          return "byte";
-        }
-        equals(other) {
-          return other instanceof ABIByteType;
-        }
-        isDynamic() {
-          return false;
-        }
-        byteLen() {
-          return SINGLE_BYTE_SIZE;
-        }
-        encode(value) {
-          if (typeof value !== "number" && typeof value !== "bigint") {
-            throw new Error(`Cannot encode value as byte: ${value}`);
-          }
-          if (typeof value === "bigint") {
-            value = Number(value);
-          }
-          if (value < 0 || value > 255) {
-            throw new Error(`${value} cannot be encoded into a byte`);
-          }
-          return new Uint8Array([value]);
-        }
-        decode(byteString) {
-          if (byteString.byteLength !== 1) {
-            throw new Error(`byte string must be 1 byte long`);
-          }
-          return byteString[0];
-        }
-      };
-      ABIStringType = class extends ABIType {
-        toString() {
-          return "string";
-        }
-        equals(other) {
-          return other instanceof ABIStringType;
-        }
-        isDynamic() {
-          return true;
-        }
-        byteLen() {
-          throw new Error(`${this.toString()} is a dynamic type`);
-        }
-        encode(value) {
-          if (typeof value !== "string" && !(value instanceof Uint8Array)) {
-            throw new Error(`Cannot encode value as string: ${value}`);
-          }
-          const encodedBytes = Buffer.from(value);
-          const encodedLength = bigIntToBytes(value.length, LENGTH_ENCODE_BYTE_SIZE);
-          const mergedBytes = new Uint8Array(value.length + LENGTH_ENCODE_BYTE_SIZE);
-          mergedBytes.set(encodedLength);
-          mergedBytes.set(encodedBytes, LENGTH_ENCODE_BYTE_SIZE);
-          return mergedBytes;
-        }
-        decode(byteString) {
-          if (byteString.length < LENGTH_ENCODE_BYTE_SIZE) {
-            throw new Error(`byte string is too short to be decoded. Actual length is ${byteString.length}, but expected at least ${LENGTH_ENCODE_BYTE_SIZE}`);
-          }
-          const buf = Buffer.from(byteString);
-          const byteLength = buf.readUIntBE(0, LENGTH_ENCODE_BYTE_SIZE);
-          const byteValue = byteString.slice(LENGTH_ENCODE_BYTE_SIZE, byteString.length);
-          if (byteLength !== byteValue.length) {
-            throw new Error(`string length bytes do not match the actual length of string. Expected ${byteLength}, got ${byteValue.length}`);
-          }
-          return Buffer.from(byteValue).toString("utf-8");
-        }
-      };
-      ABIArrayStaticType = class extends ABIType {
-        constructor(argType, arrayLength) {
-          super();
-          if (arrayLength < 1) {
-            throw new Error(`static array must have a length greater than 0: ${arrayLength}`);
-          }
-          this.childType = argType;
-          this.staticLength = arrayLength;
-        }
-        toString() {
-          return `${this.childType.toString()}[${this.staticLength}]`;
-        }
-        equals(other) {
-          return other instanceof ABIArrayStaticType && this.staticLength === other.staticLength && this.childType.equals(other.childType);
-        }
-        isDynamic() {
-          return this.childType.isDynamic();
-        }
-        byteLen() {
-          if (this.childType.constructor === ABIBoolType) {
-            return Math.ceil(this.staticLength / 8);
-          }
-          return this.staticLength * this.childType.byteLen();
-        }
-        encode(value) {
-          if (!Array.isArray(value) && !(value instanceof Uint8Array)) {
-            throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
-          }
-          if (value.length !== this.staticLength) {
-            throw new Error(`Value array does not match static array length. Expected ${this.staticLength}, got ${value.length}`);
-          }
-          const convertedTuple = this.toABITupleType();
-          return convertedTuple.encode(value);
-        }
-        decode(byteString) {
-          const convertedTuple = this.toABITupleType();
-          return convertedTuple.decode(byteString);
-        }
-        toABITupleType() {
-          return new ABITupleType(Array(this.staticLength).fill(this.childType));
-        }
-      };
-      ABIArrayDynamicType = class extends ABIType {
-        constructor(argType) {
-          super();
-          this.childType = argType;
-        }
-        toString() {
-          return `${this.childType.toString()}[]`;
-        }
-        equals(other) {
-          return other instanceof ABIArrayDynamicType && this.childType.equals(other.childType);
-        }
-        isDynamic() {
-          return true;
-        }
-        byteLen() {
-          throw new Error(`${this.toString()} is a dynamic type`);
-        }
-        encode(value) {
-          if (!Array.isArray(value) && !(value instanceof Uint8Array)) {
-            throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
-          }
-          const convertedTuple = this.toABITupleType(value.length);
-          const encodedTuple = convertedTuple.encode(value);
-          const encodedLength = bigIntToBytes(convertedTuple.childTypes.length, LENGTH_ENCODE_BYTE_SIZE);
-          const mergedBytes = concatArrays(encodedLength, encodedTuple);
-          return mergedBytes;
-        }
-        decode(byteString) {
-          const buf = Buffer.from(byteString);
-          const byteLength = buf.readUIntBE(0, LENGTH_ENCODE_BYTE_SIZE);
-          const convertedTuple = this.toABITupleType(byteLength);
-          return convertedTuple.decode(byteString.slice(LENGTH_ENCODE_BYTE_SIZE, byteString.length));
-        }
-        toABITupleType(length) {
-          return new ABITupleType(Array(length).fill(this.childType));
-        }
-      };
-      ABITupleType = class extends ABIType {
-        constructor(argTypes) {
-          super();
-          if (argTypes.length >= MAX_LEN) {
-            throw new Error("tuple type child type number larger than maximum uint16 error");
-          }
-          this.childTypes = argTypes;
-        }
-        toString() {
-          const typeStrings = [];
-          for (let i = 0; i < this.childTypes.length; i++) {
-            typeStrings[i] = this.childTypes[i].toString();
-          }
-          return `(${typeStrings.join(",")})`;
-        }
-        equals(other) {
-          return other instanceof ABITupleType && this.childTypes.length === other.childTypes.length && this.childTypes.every((child, index) => child.equals(other.childTypes[index]));
-        }
-        isDynamic() {
-          const isDynamic = (child) => child.isDynamic();
-          return this.childTypes.some(isDynamic);
-        }
-        byteLen() {
-          let size = 0;
-          for (let i = 0; i < this.childTypes.length; i++) {
-            if (this.childTypes[i].constructor === ABIBoolType) {
-              const after = findBoolLR(this.childTypes, i, 1);
-              const boolNum = after + 1;
-              i += after;
-              size += Math.trunc((boolNum + 7) / 8);
-            } else {
-              const childByteSize = this.childTypes[i].byteLen();
-              size += childByteSize;
-            }
-          }
-          return size;
-        }
-        encode(value) {
-          if (!Array.isArray(value) && !(value instanceof Uint8Array)) {
-            throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
-          }
-          const values = Array.from(value);
-          if (value.length > MAX_LEN) {
-            throw new Error("length of tuple array should not exceed a uint16");
-          }
-          const tupleTypes = this.childTypes;
-          const heads = [];
-          const tails = [];
-          const isDynamicIndex = /* @__PURE__ */ new Map();
-          let i = 0;
-          while (i < tupleTypes.length) {
-            const tupleType = tupleTypes[i];
-            if (tupleType.isDynamic()) {
-              isDynamicIndex.set(heads.length, true);
-              heads.push(new Uint8Array([0, 0]));
-              tails.push(tupleType.encode(values[i]));
-            } else {
-              if (tupleType.constructor === ABIBoolType) {
-                const before = findBoolLR(tupleTypes, i, -1);
-                let after = findBoolLR(tupleTypes, i, 1);
-                if (before % 8 !== 0) {
-                  throw new Error("expected before index should have number of bool mod 8 equal 0");
-                }
-                after = Math.min(7, after);
-                const compressedInt = compressMultipleBool(values.slice(i, i + after + 1));
-                heads.push(bigIntToBytes(compressedInt, 1));
-                i += after;
-              } else {
-                const encodedTupleValue = tupleType.encode(values[i]);
-                heads.push(encodedTupleValue);
-              }
-              isDynamicIndex.set(i, false);
-              tails.push(new Uint8Array());
-            }
-            i += 1;
-          }
-          let headLength = 0;
-          for (const headElement of heads) {
-            headLength += headElement.length;
-          }
-          let tailLength = 0;
-          for (let j = 0; j < heads.length; j++) {
-            if (isDynamicIndex.get(j)) {
-              const headValue = headLength + tailLength;
-              if (headValue > MAX_LEN) {
-                throw new Error(`byte length of ${headValue} should not exceed a uint16`);
-              }
-              heads[j] = bigIntToBytes(headValue, LENGTH_ENCODE_BYTE_SIZE);
-            }
-            tailLength += tails[j].length;
-          }
-          return concatArrays(...heads, ...tails);
-        }
-        decode(byteString) {
-          const tupleTypes = this.childTypes;
-          const dynamicSegments = [];
-          const valuePartition = [];
-          let i = 0;
-          let iterIndex = 0;
-          const buf = Buffer.from(byteString);
-          while (i < tupleTypes.length) {
-            const tupleType = tupleTypes[i];
-            if (tupleType.isDynamic()) {
-              if (byteString.slice(iterIndex, byteString.length).length < LENGTH_ENCODE_BYTE_SIZE) {
-                throw new Error("dynamic type in tuple is too short to be decoded");
-              }
-              const dynamicIndex = buf.readUIntBE(iterIndex, LENGTH_ENCODE_BYTE_SIZE);
-              if (dynamicSegments.length > 0) {
-                dynamicSegments[dynamicSegments.length - 1].right = dynamicIndex;
-                if (dynamicIndex < dynamicSegments[dynamicSegments.length - 1].left) {
-                  throw new Error("dynamic index segment miscalculation: left is greater than right index");
-                }
-              }
-              const seg = {
-                left: dynamicIndex,
-                right: -1
-              };
-              dynamicSegments.push(seg);
-              valuePartition.push(null);
-              iterIndex += LENGTH_ENCODE_BYTE_SIZE;
-            } else {
-              if (tupleType.constructor === ABIBoolType) {
-                const before = findBoolLR(this.childTypes, i, -1);
-                let after = findBoolLR(this.childTypes, i, 1);
-                if (before % 8 !== 0) {
-                  throw new Error("expected before bool number mod 8 === 0");
-                }
-                after = Math.min(7, after);
-                for (let boolIndex = 0; boolIndex <= after; boolIndex++) {
-                  const boolMask = 128 >> boolIndex;
-                  if ((byteString[iterIndex] & boolMask) > 0) {
-                    valuePartition.push(new Uint8Array([128]));
-                  } else {
-                    valuePartition.push(new Uint8Array([0]));
-                  }
-                }
-                i += after;
-                iterIndex += 1;
-              } else {
-                const currLen = tupleType.byteLen();
-                valuePartition.push(byteString.slice(iterIndex, iterIndex + currLen));
-                iterIndex += currLen;
-              }
-            }
-            if (i !== tupleTypes.length - 1 && iterIndex >= byteString.length) {
-              throw new Error("input byte not enough to decode");
-            }
-            i += 1;
-          }
-          if (dynamicSegments.length > 0) {
-            dynamicSegments[dynamicSegments.length - 1].right = byteString.length;
-            iterIndex = byteString.length;
-          }
-          if (iterIndex < byteString.length) {
-            throw new Error("input byte not fully consumed");
-          }
-          for (let j = 0; j < dynamicSegments.length; j++) {
-            const seg = dynamicSegments[j];
-            if (seg.left > seg.right) {
-              throw new Error("dynamic segment should display a [l, r] space with l <= r");
-            }
-            if (j !== dynamicSegments.length - 1 && seg.right !== dynamicSegments[j + 1].left) {
-              throw new Error("dynamic segment should be consecutive");
-            }
-          }
-          let segIndex = 0;
-          for (let j = 0; j < tupleTypes.length; j++) {
-            if (tupleTypes[j].isDynamic()) {
-              valuePartition[j] = byteString.slice(dynamicSegments[segIndex].left, dynamicSegments[segIndex].right);
-              segIndex += 1;
-            }
-          }
-          const returnValues = [];
-          for (let j = 0; j < tupleTypes.length; j++) {
-            const valueTi = tupleTypes[j].decode(valuePartition[j]);
-            returnValues.push(valueTi);
-          }
-          return returnValues;
-        }
-        static parseTupleContent(str) {
-          if (str.length === 0) {
-            return [];
-          }
-          if (str.endsWith(",") || str.startsWith(",")) {
-            throw new Error("tuple string should not start with comma");
-          }
-          if (str.includes(",,")) {
-            throw new Error("tuple string should not have consecutive commas");
-          }
-          const tupleStrings = [];
-          let depth = 0;
-          let word = "";
-          for (const char of str) {
-            word += char;
-            if (char === "(") {
-              depth += 1;
-            } else if (char === ")") {
-              depth -= 1;
-            } else if (char === ",") {
-              if (depth === 0) {
-                tupleStrings.push(word.slice(0, word.length - 1));
-                word = "";
-              }
-            }
-          }
-          if (word.length !== 0) {
-            tupleStrings.push(word);
-          }
-          if (depth !== 0) {
-            throw new Error("tuple string has mismatched parentheses");
-          }
-          return tupleStrings;
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/abi/transaction.js
-  function abiTypeIsTransaction(type) {
-    return type === ABITransactionType.any || type === ABITransactionType.pay || type === ABITransactionType.keyreg || type === ABITransactionType.acfg || type === ABITransactionType.axfer || type === ABITransactionType.afrz || type === ABITransactionType.appl;
-  }
-  function abiCheckTransactionType(type, txn) {
-    if (type === ABITransactionType.any) {
-      return true;
-    }
-    return txn.type && txn.type.toString() === type.toString();
-  }
-  var ABITransactionType;
-  var init_transaction2 = __esm({
-    "node_modules/algosdk/dist/esm/src/abi/transaction.js"() {
-      (function(ABITransactionType2) {
-        ABITransactionType2["any"] = "txn";
-        ABITransactionType2["pay"] = "pay";
-        ABITransactionType2["keyreg"] = "keyreg";
-        ABITransactionType2["acfg"] = "acfg";
-        ABITransactionType2["axfer"] = "axfer";
-        ABITransactionType2["afrz"] = "afrz";
-        ABITransactionType2["appl"] = "appl";
-      })(ABITransactionType || (ABITransactionType = {}));
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/abi/reference.js
-  function abiTypeIsReference(type) {
-    return type === ABIReferenceType.account || type === ABIReferenceType.application || type === ABIReferenceType.asset;
-  }
-  var ABIReferenceType;
-  var init_reference = __esm({
-    "node_modules/algosdk/dist/esm/src/abi/reference.js"() {
-      (function(ABIReferenceType2) {
-        ABIReferenceType2["account"] = "account";
-        ABIReferenceType2["application"] = "application";
-        ABIReferenceType2["asset"] = "asset";
-      })(ABIReferenceType || (ABIReferenceType = {}));
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/abi/method.js
-  function parseMethodSignature(signature) {
-    const argsStart = signature.indexOf("(");
-    if (argsStart === -1) {
-      throw new Error(`Invalid method signature: ${signature}`);
-    }
-    let argsEnd = -1;
-    let depth = 0;
-    for (let i = argsStart; i < signature.length; i++) {
-      const char = signature[i];
-      if (char === "(") {
-        depth += 1;
-      } else if (char === ")") {
-        if (depth === 0) {
-          break;
-        }
-        depth -= 1;
-        if (depth === 0) {
-          argsEnd = i;
-          break;
-        }
-      }
-    }
-    if (argsEnd === -1) {
-      throw new Error(`Invalid method signature: ${signature}`);
-    }
-    return {
-      name: signature.slice(0, argsStart),
-      args: ABITupleType.parseTupleContent(signature.slice(argsStart + 1, argsEnd)),
-      returns: signature.slice(argsEnd + 1)
-    };
-  }
-  var ABIMethod;
-  var init_method = __esm({
-    "node_modules/algosdk/dist/esm/src/abi/method.js"() {
-      init_naclWrappers();
-      init_abi_type();
-      init_transaction2();
-      init_reference();
-      ABIMethod = class {
-        constructor(params) {
-          if (typeof params.name !== "string" || typeof params.returns !== "object" || !Array.isArray(params.args)) {
-            throw new Error("Invalid ABIMethod parameters");
-          }
-          this.name = params.name;
-          this.description = params.desc;
-          this.args = params.args.map(({ type, name, desc }) => {
-            if (abiTypeIsTransaction(type) || abiTypeIsReference(type)) {
-              return {
-                type,
-                name,
-                description: desc
-              };
-            }
-            return {
-              type: ABIType.from(type),
-              name,
-              description: desc
-            };
-          });
-          this.returns = {
-            type: params.returns.type === "void" ? params.returns.type : ABIType.from(params.returns.type),
-            description: params.returns.desc
+  // src/errors.js
+  var require_errors = __commonJS({
+    "src/errors.js"(exports2) {
+      "use strict";
+      var __extends = exports2 && exports2.__extends || function() {
+        var extendStatics = function(d, b) {
+          extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
+            d2.__proto__ = b2;
+          } || function(d2, b2) {
+            for (var p in b2)
+              if (b2.hasOwnProperty(p))
+                d2[p] = b2[p];
           };
-        }
-        getSignature() {
-          const args = this.args.map((arg) => arg.type.toString()).join(",");
-          const returns = this.returns.type.toString();
-          return `${this.name}(${args})${returns}`;
-        }
-        getSelector() {
-          const hash = genericHash(this.getSignature());
-          return new Uint8Array(hash.slice(0, 4));
-        }
-        txnCount() {
-          let count = 1;
-          for (const arg of this.args) {
-            if (typeof arg.type === "string" && abiTypeIsTransaction(arg.type)) {
-              count += 1;
-            }
+          return extendStatics(d, b);
+        };
+        return function(d, b) {
+          extendStatics(d, b);
+          function __() {
+            this.constructor = d;
           }
-          return count;
+          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+      }();
+      exports2.__esModule = true;
+      var AddressValidationError = function(_super) {
+        __extends(AddressValidationError2, _super);
+        function AddressValidationError2() {
+          var _this = _super.call(this, "This is not a valid Algorand address") || this;
+          _this.name = "InvalidAddressError";
+          _this.type = "InvalidAddressError";
+          return _this;
         }
-        toJSON() {
-          return {
-            name: this.name,
-            desc: this.description,
-            args: this.args.map(({ type, name, description }) => ({
-              type: type.toString(),
-              name,
-              desc: description
-            })),
-            returns: {
-              type: this.returns.type.toString(),
-              desc: this.returns.description
-            }
-          };
+        return AddressValidationError2;
+      }(Error);
+      exports2.AddressValidationError = AddressValidationError;
+      var InvalidNameError2 = function(_super) {
+        __extends(InvalidNameError3, _super);
+        function InvalidNameError3() {
+          var _this = _super.call(this, "The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters") || this;
+          _this.name = "InvalidNameError";
+          _this.type = "InvalidNameError";
+          return _this;
         }
-        static fromSignature(signature) {
-          const { name, args, returns } = parseMethodSignature(signature);
-          return new ABIMethod({
-            name,
-            args: args.map((arg) => ({ type: arg })),
-            returns: { type: returns }
-          });
+        return InvalidNameError3;
+      }(Error);
+      exports2.InvalidNameError = InvalidNameError2;
+      var NameNotRegisteredError = function(_super) {
+        __extends(NameNotRegisteredError2, _super);
+        function NameNotRegisteredError2(name) {
+          var _this = _super.call(this, "Name " + name + " is not registered") || this;
+          _this.name = "NameNotRegisteredError";
+          _this.type = "NameNotRegisteredError";
+          return _this;
         }
-      };
+        return NameNotRegisteredError2;
+      }(Error);
+      exports2.NameNotRegisteredError = NameNotRegisteredError;
+      var IncorrectOwnerError = function(_super) {
+        __extends(IncorrectOwnerError2, _super);
+        function IncorrectOwnerError2(name, address) {
+          var _this = _super.call(this, "Name " + name + ".algo is not owned by " + address) || this;
+          _this.name = "IncorrectOwnerError";
+          _this.type = "IncorrectOwnerError";
+          return _this;
+        }
+        return IncorrectOwnerError2;
+      }(Error);
+      exports2.IncorrectOwnerError = IncorrectOwnerError;
     }
   });
 
-  // node_modules/algosdk/dist/esm/src/abi/contract.js
-  var ABIContract;
-  var init_contract = __esm({
-    "node_modules/algosdk/dist/esm/src/abi/contract.js"() {
-      init_method();
-      ABIContract = class {
-        constructor(params) {
-          if (typeof params.name !== "string" || !Array.isArray(params.methods) || params.networks && typeof params.networks !== "object") {
-            throw new Error("Invalid ABIContract parameters");
-          }
-          this.name = params.name;
-          this.description = params.desc;
-          this.networks = params.networks ? __spreadValues({}, params.networks) : {};
-          this.methods = params.methods.map((method2) => new ABIMethod(method2));
-        }
-        toJSON() {
-          return {
-            name: this.name,
-            desc: this.description,
-            networks: this.networks,
-            methods: this.methods.map((method2) => method2.toJSON())
-          };
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/abi/interface.js
-  var ABIInterface;
-  var init_interface = __esm({
-    "node_modules/algosdk/dist/esm/src/abi/interface.js"() {
-      init_method();
-      ABIInterface = class {
-        constructor(params) {
-          if (typeof params.name !== "string" || !Array.isArray(params.methods)) {
-            throw new Error("Invalid ABIInterface parameters");
-          }
-          this.name = params.name;
-          this.description = params.desc;
-          this.methods = params.methods.map((method2) => new ABIMethod(method2));
-        }
-        toJSON() {
-          return {
-            name: this.name,
-            desc: this.description,
-            methods: this.methods.map((method2) => method2.toJSON())
-          };
-        }
-      };
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/abi/index.js
-  var init_abi = __esm({
-    "node_modules/algosdk/dist/esm/src/abi/index.js"() {
-      init_abi_type();
-      init_contract();
-      init_interface();
-      init_method();
-      init_transaction2();
-      init_reference();
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/composer.js
-  function populateForeignArray(valueToAdd, array, zeroValue) {
-    if (zeroValue != null && valueToAdd === zeroValue) {
-      return 0;
-    }
-    const offset = zeroValue == null ? 0 : 1;
-    for (let i = 0; i < array.length; i++) {
-      if (valueToAdd === array[i]) {
-        return i + offset;
+  // src/generateTeal.js
+  var require_generateTeal = __commonJS({
+    "src/generateTeal.js"(exports2) {
+      "use strict";
+      exports2.__esModule = true;
+      function generateTeal2(name) {
+        return '#pragma version 4\n    byte "' + name + '"\n    len\n    int 3\n    ==\n    bnz main_l22\n    byte "' + name + '"\n    len\n    int 4\n    ==\n    bnz main_l13\n    byte "' + name + '"\n    len\n    int 5\n    >=\n    bnz main_l4\n    err\n    main_l4:\n    gtxn 0 Amount\n    int 5000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l5:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l12\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l11\n    global GroupSize\n    int 4\n    ==\n    bnz main_l10\n    int 0\n    return\n    main_l9:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l10:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l11:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l12:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l5\n    main_l13:\n    gtxn 0 Amount\n    int 50000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l14:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l21\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l20\n    global GroupSize\n    int 4\n    ==\n    bnz main_l19\n    int 0\n    return\n    main_l18:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l19:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l20:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l21:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l14\n    main_l22:\n    gtxn 0 Amount\n    int 150000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l23:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l30\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l29\n    global GroupSize\n    int 4\n    ==\n    bnz main_l28\n    int 0\n    return\n    main_l27:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l28:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l29:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l30:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l23\n    main_l31:\n    return';
       }
-    }
-    array.push(valueToAdd);
-    return array.length - 1 + offset;
-  }
-  var RETURN_PREFIX, MAX_APP_ARGS, AtomicTransactionComposerStatus, AtomicTransactionComposer;
-  var init_composer = __esm({
-    "node_modules/algosdk/dist/esm/src/composer.js"() {
-      init_abi();
-      init_transaction();
-      init_makeTxn();
-      init_group();
-      init_wait();
-      init_signer();
-      init_base();
-      RETURN_PREFIX = Buffer.from([21, 31, 124, 117]);
-      MAX_APP_ARGS = 16;
-      (function(AtomicTransactionComposerStatus2) {
-        AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["BUILDING"] = 0] = "BUILDING";
-        AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["BUILT"] = 1] = "BUILT";
-        AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["SIGNED"] = 2] = "SIGNED";
-        AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["SUBMITTED"] = 3] = "SUBMITTED";
-        AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["COMMITTED"] = 4] = "COMMITTED";
-      })(AtomicTransactionComposerStatus || (AtomicTransactionComposerStatus = {}));
-      AtomicTransactionComposer = class {
-        constructor() {
-          this.status = AtomicTransactionComposerStatus.BUILDING;
-          this.transactions = [];
-          this.methodCalls = /* @__PURE__ */ new Map();
-          this.signedTxns = [];
-          this.txIDs = [];
-        }
-        getStatus() {
-          return this.status;
-        }
-        count() {
-          return this.transactions.length;
-        }
-        clone() {
-          const theClone = new AtomicTransactionComposer();
-          theClone.transactions = this.transactions.map(({ txn, signer }) => ({
-            txn: Transaction.from_obj_for_encoding(__spreadProps(__spreadValues({}, txn.get_obj_for_encoding()), {
-              grp: void 0
-            })),
-            signer
-          }));
-          theClone.methodCalls = new Map(this.methodCalls);
-          return theClone;
-        }
-        addTransaction(txnAndSigner) {
-          if (this.status !== AtomicTransactionComposerStatus.BUILDING) {
-            throw new Error("Cannot add transactions when composer status is not BUILDING");
-          }
-          if (this.transactions.length === AtomicTransactionComposer.MAX_GROUP_SIZE) {
-            throw new Error(`Adding an additional transaction exceeds the maximum atomic group size of ${AtomicTransactionComposer.MAX_GROUP_SIZE}`);
-          }
-          if (txnAndSigner.txn.group && txnAndSigner.txn.group.some((v) => v !== 0)) {
-            throw new Error("Cannot add a transaction with nonzero group ID");
-          }
-          this.transactions.push(txnAndSigner);
-        }
-        addMethodCall({ appID, method: method2, methodArgs, sender, suggestedParams, onComplete, approvalProgram, clearProgram, numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices, extraPages, note, lease, rekeyTo, signer }) {
-          if (this.status !== AtomicTransactionComposerStatus.BUILDING) {
-            throw new Error("Cannot add transactions when composer status is not BUILDING");
-          }
-          if (this.transactions.length + method2.txnCount() > AtomicTransactionComposer.MAX_GROUP_SIZE) {
-            throw new Error(`Adding additional transactions exceeds the maximum atomic group size of ${AtomicTransactionComposer.MAX_GROUP_SIZE}`);
-          }
-          if (appID === 0) {
-            if (approvalProgram == null || clearProgram == null || numGlobalInts == null || numGlobalByteSlices == null || numLocalInts == null || numLocalByteSlices == null) {
-              throw new Error("One of the following required parameters for application creation is missing: approvalProgram, clearProgram, numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices");
-            }
-          } else if (onComplete === OnApplicationComplete.UpdateApplicationOC) {
-            if (approvalProgram == null || clearProgram == null) {
-              throw new Error("One of the following required parameters for OnApplicationComplete.UpdateApplicationOC is missing: approvalProgram, clearProgram");
-            }
-            if (numGlobalInts != null || numGlobalByteSlices != null || numLocalInts != null || numLocalByteSlices != null || extraPages != null) {
-              throw new Error("One of the following application creation parameters were set on a non-creation call: numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices, extraPages");
-            }
-          } else if (approvalProgram != null || clearProgram != null || numGlobalInts != null || numGlobalByteSlices != null || numLocalInts != null || numLocalByteSlices != null || extraPages != null) {
-            throw new Error("One of the following application creation parameters were set on a non-creation call: approvalProgram, clearProgram, numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices, extraPages");
-          }
-          if (methodArgs == null) {
-            methodArgs = [];
-          }
-          if (methodArgs.length !== method2.args.length) {
-            throw new Error(`Incorrect number of method arguments. Expected ${method2.args.length}, got ${methodArgs.length}`);
-          }
-          let basicArgTypes = [];
-          let basicArgValues = [];
-          const txnArgs = [];
-          const refArgTypes = [];
-          const refArgValues = [];
-          const refArgIndexToBasicArgIndex = /* @__PURE__ */ new Map();
-          for (let i = 0; i < methodArgs.length; i++) {
-            let argType = method2.args[i].type;
-            const argValue = methodArgs[i];
-            if (abiTypeIsTransaction(argType)) {
-              if (!isTransactionWithSigner(argValue) || !abiCheckTransactionType(argType, argValue.txn)) {
-                throw new Error(`Expected ${argType} transaction for argument at index ${i}`);
-              }
-              if (argValue.txn.group && argValue.txn.group.some((v) => v !== 0)) {
-                throw new Error("Cannot add a transaction with nonzero group ID");
-              }
-              txnArgs.push(argValue);
-              continue;
-            }
-            if (isTransactionWithSigner(argValue)) {
-              throw new Error(`Expected non-transaction value for argument at index ${i}`);
-            }
-            if (abiTypeIsReference(argType)) {
-              refArgIndexToBasicArgIndex.set(refArgTypes.length, basicArgTypes.length);
-              refArgTypes.push(argType);
-              refArgValues.push(argValue);
-              argType = new ABIUintType(8);
-            }
-            if (typeof argType === "string") {
-              throw new Error(`Unknown ABI type: ${argType}`);
-            }
-            basicArgTypes.push(argType);
-            basicArgValues.push(argValue);
-          }
-          const resolvedRefIndexes = [];
-          const foreignAccounts = [];
-          const foreignApps = [];
-          const foreignAssets = [];
-          for (let i = 0; i < refArgTypes.length; i++) {
-            const refType = refArgTypes[i];
-            const refValue = refArgValues[i];
-            let resolved = 0;
-            switch (refType) {
-              case ABIReferenceType.account: {
-                const addressType = new ABIAddressType();
-                const address = addressType.decode(addressType.encode(refValue));
-                resolved = populateForeignArray(address, foreignAccounts, sender);
-                break;
-              }
-              case ABIReferenceType.application: {
-                const uint64Type = new ABIUintType(64);
-                const refAppID = uint64Type.decode(uint64Type.encode(refValue));
-                if (refAppID > Number.MAX_SAFE_INTEGER) {
-                  throw new Error(`Expected safe integer for application value, got ${refAppID}`);
-                }
-                resolved = populateForeignArray(Number(refAppID), foreignApps, appID);
-                break;
-              }
-              case ABIReferenceType.asset: {
-                const uint64Type = new ABIUintType(64);
-                const refAssetID = uint64Type.decode(uint64Type.encode(refValue));
-                if (refAssetID > Number.MAX_SAFE_INTEGER) {
-                  throw new Error(`Expected safe integer for asset value, got ${refAssetID}`);
-                }
-                resolved = populateForeignArray(Number(refAssetID), foreignAssets);
-                break;
-              }
-              default:
-                throw new Error(`Unknown reference type: ${refType}`);
-            }
-            resolvedRefIndexes.push(resolved);
-          }
-          for (let i = 0; i < resolvedRefIndexes.length; i++) {
-            const basicArgIndex = refArgIndexToBasicArgIndex.get(i);
-            basicArgValues[basicArgIndex] = resolvedRefIndexes[i];
-          }
-          if (basicArgTypes.length > MAX_APP_ARGS - 1) {
-            const lastArgTupleTypes = basicArgTypes.slice(MAX_APP_ARGS - 2);
-            const lastArgTupleValues = basicArgValues.slice(MAX_APP_ARGS - 2);
-            basicArgTypes = basicArgTypes.slice(0, MAX_APP_ARGS - 2);
-            basicArgValues = basicArgValues.slice(0, MAX_APP_ARGS - 2);
-            basicArgTypes.push(new ABITupleType(lastArgTupleTypes));
-            basicArgValues.push(lastArgTupleValues);
-          }
-          const appArgsEncoded = [method2.getSelector()];
-          for (let i = 0; i < basicArgTypes.length; i++) {
-            appArgsEncoded.push(basicArgTypes[i].encode(basicArgValues[i]));
-          }
-          const appCall = {
-            txn: makeApplicationCallTxnFromObject({
-              from: sender,
-              appIndex: appID,
-              appArgs: appArgsEncoded,
-              accounts: foreignAccounts,
-              foreignApps,
-              foreignAssets,
-              onComplete: onComplete == null ? OnApplicationComplete.NoOpOC : onComplete,
-              approvalProgram,
-              clearProgram,
-              numGlobalInts,
-              numGlobalByteSlices,
-              numLocalInts,
-              numLocalByteSlices,
-              extraPages,
-              lease,
-              note,
-              rekeyTo,
-              suggestedParams
-            }),
-            signer
-          };
-          this.transactions.push(...txnArgs, appCall);
-          this.methodCalls.set(this.transactions.length - 1, method2);
-        }
-        buildGroup() {
-          if (this.status === AtomicTransactionComposerStatus.BUILDING) {
-            if (this.transactions.length === 0) {
-              throw new Error("Cannot build a group with 0 transactions");
-            }
-            if (this.transactions.length > 1) {
-              assignGroupID(this.transactions.map((txnWithSigner) => txnWithSigner.txn));
-            }
-            this.status = AtomicTransactionComposerStatus.BUILT;
-          }
-          return this.transactions;
-        }
-        async gatherSignatures() {
-          if (this.status >= AtomicTransactionComposerStatus.SIGNED) {
-            return this.signedTxns;
-          }
-          const txnsWithSigners = this.buildGroup();
-          const txnGroup = txnsWithSigners.map((txnWithSigner) => txnWithSigner.txn);
-          const indexesPerSigner = /* @__PURE__ */ new Map();
-          for (let i = 0; i < txnsWithSigners.length; i++) {
-            const { signer } = txnsWithSigners[i];
-            if (!indexesPerSigner.has(signer)) {
-              indexesPerSigner.set(signer, []);
-            }
-            indexesPerSigner.get(signer).push(i);
-          }
-          const orderedSigners = Array.from(indexesPerSigner);
-          const batchedSigs = await Promise.all(orderedSigners.map(([signer, indexes]) => signer(txnGroup, indexes)));
-          const signedTxns = txnsWithSigners.map(() => null);
-          for (let signerIndex = 0; signerIndex < orderedSigners.length; signerIndex++) {
-            const indexes = orderedSigners[signerIndex][1];
-            const sigs = batchedSigs[signerIndex];
-            for (let i = 0; i < indexes.length; i++) {
-              signedTxns[indexes[i]] = sigs[i];
-            }
-          }
-          if (!signedTxns.every((sig) => sig != null)) {
-            throw new Error(`Missing signatures. Got ${signedTxns}`);
-          }
-          const txIDs = signedTxns.map((stxn, index) => {
-            try {
-              return decodeSignedTransaction(stxn).txn.txID();
-            } catch (err) {
-              throw new Error(`Cannot decode signed transaction at index ${index}. ${err}`);
-            }
-          });
-          this.signedTxns = signedTxns;
-          this.txIDs = txIDs;
-          this.status = AtomicTransactionComposerStatus.SIGNED;
-          return signedTxns;
-        }
-        async submit(client) {
-          if (this.status > AtomicTransactionComposerStatus.SUBMITTED) {
-            throw new Error("Transaction group cannot be resubmitted");
-          }
-          const stxns = await this.gatherSignatures();
-          await client.sendRawTransaction(stxns).do();
-          this.status = AtomicTransactionComposerStatus.SUBMITTED;
-          return this.txIDs;
-        }
-        async execute(client, waitRounds) {
-          if (this.status === AtomicTransactionComposerStatus.COMMITTED) {
-            throw new Error("Transaction group has already been executed successfully");
-          }
-          const txIDs = await this.submit(client);
-          this.status = AtomicTransactionComposerStatus.SUBMITTED;
-          const firstMethodCallIndex = this.transactions.findIndex((_, index) => this.methodCalls.has(index));
-          const indexToWaitFor = firstMethodCallIndex === -1 ? 0 : firstMethodCallIndex;
-          const confirmedTxnInfo = await waitForConfirmation(client, txIDs[indexToWaitFor], waitRounds);
-          this.status = AtomicTransactionComposerStatus.COMMITTED;
-          const confirmedRound = confirmedTxnInfo["confirmed-round"];
-          const methodResults = [];
-          for (const [txnIndex, method2] of this.methodCalls) {
-            const txID = txIDs[txnIndex];
-            const methodResult = {
-              txID,
-              rawReturnValue: new Uint8Array()
-            };
-            try {
-              if (method2.returns.type !== "void") {
-                const pendingInfo = txnIndex === firstMethodCallIndex ? confirmedTxnInfo : await client.pendingTransactionInformation(txID).do();
-                const logs = pendingInfo.logs || [];
-                if (logs.length === 0) {
-                  throw new Error("App call transaction did not log a return value");
-                }
-                const lastLog = Buffer.from(logs[logs.length - 1], "base64");
-                if (lastLog.byteLength < 4 || !lastLog.slice(0, 4).equals(RETURN_PREFIX)) {
-                  throw new Error("App call transaction did not log a return value");
-                }
-                methodResult.rawReturnValue = new Uint8Array(lastLog.slice(4));
-                methodResult.returnValue = method2.returns.type.decode(methodResult.rawReturnValue);
-              }
-            } catch (err) {
-              methodResult.decodeError = err;
-            }
-            methodResults.push(methodResult);
-          }
-          return {
-            confirmedRound,
-            txIDs,
-            methodResults
-          };
-        }
-      };
-      AtomicTransactionComposer.MAX_GROUP_SIZE = 16;
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/types/multisig.js
-  var init_multisig2 = __esm({
-    "node_modules/algosdk/dist/esm/src/types/multisig.js"() {
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/types/address.js
-  var init_address2 = __esm({
-    "node_modules/algosdk/dist/esm/src/types/address.js"() {
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/types/index.js
-  var init_types2 = __esm({
-    "node_modules/algosdk/dist/esm/src/types/index.js"() {
-      init_transactions();
-      init_multisig2();
-      init_address2();
-    }
-  });
-
-  // node_modules/algosdk/dist/esm/src/main.js
-  var main_exports = {};
-  __export(main_exports, {
-    ABIAddressType: () => ABIAddressType,
-    ABIArrayDynamicType: () => ABIArrayDynamicType,
-    ABIArrayStaticType: () => ABIArrayStaticType,
-    ABIBoolType: () => ABIBoolType,
-    ABIByteType: () => ABIByteType,
-    ABIContract: () => ABIContract,
-    ABIInterface: () => ABIInterface,
-    ABIMethod: () => ABIMethod,
-    ABIReferenceType: () => ABIReferenceType,
-    ABIStringType: () => ABIStringType,
-    ABITransactionType: () => ABITransactionType,
-    ABITupleType: () => ABITupleType,
-    ABIType: () => ABIType,
-    ABIUfixedType: () => ABIUfixedType,
-    ABIUintType: () => ABIUintType,
-    ADDR_BYTE_SIZE: () => ADDR_BYTE_SIZE,
-    ALGORAND_MIN_TX_FEE: () => ALGORAND_MIN_TX_FEE,
-    Algodv2: () => AlgodClient,
-    AtomicTransactionComposer: () => AtomicTransactionComposer,
-    AtomicTransactionComposerStatus: () => AtomicTransactionComposerStatus,
-    ERROR_INVALID_MICROALGOS: () => ERROR_INVALID_MICROALGOS,
-    ERROR_MULTISIG_BAD_SENDER: () => ERROR_MULTISIG_BAD_SENDER,
-    INVALID_MICROALGOS_ERROR_MSG: () => INVALID_MICROALGOS_ERROR_MSG,
-    Indexer: () => IndexerClient,
-    IntDecoding: () => intDecoding_default,
-    Kmd: () => Kmd,
-    LENGTH_ENCODE_BYTE_SIZE: () => LENGTH_ENCODE_BYTE_SIZE,
-    LogicSigAccount: () => LogicSigAccount,
-    LogicTemplates: () => LogicTemplates,
-    MAX_LEN: () => MAX_LEN,
-    MULTISIG_BAD_SENDER_ERROR_MSG: () => MULTISIG_BAD_SENDER_ERROR_MSG,
-    OnApplicationComplete: () => OnApplicationComplete,
-    SINGLE_BOOL_SIZE: () => SINGLE_BOOL_SIZE,
-    SINGLE_BYTE_SIZE: () => SINGLE_BYTE_SIZE,
-    Transaction: () => Transaction,
-    TransactionType: () => TransactionType,
-    abiCheckTransactionType: () => abiCheckTransactionType,
-    abiTypeIsReference: () => abiTypeIsReference,
-    abiTypeIsTransaction: () => abiTypeIsTransaction,
-    algosToMicroalgos: () => algosToMicroalgos,
-    appendSignMultisigTransaction: () => appendSignMultisigTransaction,
-    assignGroupID: () => assignGroupID,
-    computeGroupID: () => computeGroupID,
-    createDryrun: () => createDryrun,
-    decodeAddress: () => decodeAddress,
-    decodeObj: () => decodeObj,
-    decodeSignedTransaction: () => decodeSignedTransaction,
-    decodeUint64: () => decodeUint64,
-    decodeUnsignedTransaction: () => decodeUnsignedTransaction,
-    encodeAddress: () => encodeAddress,
-    encodeObj: () => encodeObj,
-    encodeUint64: () => encodeUint64,
-    encodeUnsignedTransaction: () => encodeUnsignedTransaction,
-    generateAccount: () => generateAccount,
-    getApplicationAddress: () => getApplicationAddress,
-    instantiateTxnIfNeeded: () => instantiateTxnIfNeeded,
-    isTransactionWithSigner: () => isTransactionWithSigner,
-    isValidAddress: () => isValidAddress,
-    logicSigFromByte: () => logicSigFromByte,
-    makeApplicationCallTxnFromObject: () => makeApplicationCallTxnFromObject,
-    makeApplicationClearStateTxn: () => makeApplicationClearStateTxn,
-    makeApplicationClearStateTxnFromObject: () => makeApplicationClearStateTxnFromObject,
-    makeApplicationCloseOutTxn: () => makeApplicationCloseOutTxn,
-    makeApplicationCloseOutTxnFromObject: () => makeApplicationCloseOutTxnFromObject,
-    makeApplicationCreateTxn: () => makeApplicationCreateTxn,
-    makeApplicationCreateTxnFromObject: () => makeApplicationCreateTxnFromObject,
-    makeApplicationDeleteTxn: () => makeApplicationDeleteTxn,
-    makeApplicationDeleteTxnFromObject: () => makeApplicationDeleteTxnFromObject,
-    makeApplicationNoOpTxn: () => makeApplicationNoOpTxn,
-    makeApplicationNoOpTxnFromObject: () => makeApplicationNoOpTxnFromObject,
-    makeApplicationOptInTxn: () => makeApplicationOptInTxn,
-    makeApplicationOptInTxnFromObject: () => makeApplicationOptInTxnFromObject,
-    makeApplicationUpdateTxn: () => makeApplicationUpdateTxn,
-    makeApplicationUpdateTxnFromObject: () => makeApplicationUpdateTxnFromObject,
-    makeAssetConfigTxn: () => makeAssetConfigTxn,
-    makeAssetConfigTxnWithSuggestedParams: () => makeAssetConfigTxnWithSuggestedParams,
-    makeAssetConfigTxnWithSuggestedParamsFromObject: () => makeAssetConfigTxnWithSuggestedParamsFromObject,
-    makeAssetCreateTxn: () => makeAssetCreateTxn,
-    makeAssetCreateTxnWithSuggestedParams: () => makeAssetCreateTxnWithSuggestedParams,
-    makeAssetCreateTxnWithSuggestedParamsFromObject: () => makeAssetCreateTxnWithSuggestedParamsFromObject,
-    makeAssetDestroyTxn: () => makeAssetDestroyTxn,
-    makeAssetDestroyTxnWithSuggestedParams: () => makeAssetDestroyTxnWithSuggestedParams,
-    makeAssetDestroyTxnWithSuggestedParamsFromObject: () => makeAssetDestroyTxnWithSuggestedParamsFromObject,
-    makeAssetFreezeTxn: () => makeAssetFreezeTxn,
-    makeAssetFreezeTxnWithSuggestedParams: () => makeAssetFreezeTxnWithSuggestedParams,
-    makeAssetFreezeTxnWithSuggestedParamsFromObject: () => makeAssetFreezeTxnWithSuggestedParamsFromObject,
-    makeAssetTransferTxn: () => makeAssetTransferTxn,
-    makeAssetTransferTxnWithSuggestedParams: () => makeAssetTransferTxnWithSuggestedParams,
-    makeAssetTransferTxnWithSuggestedParamsFromObject: () => makeAssetTransferTxnWithSuggestedParamsFromObject,
-    makeBasicAccountTransactionSigner: () => makeBasicAccountTransactionSigner,
-    makeKeyRegistrationTxn: () => makeKeyRegistrationTxn,
-    makeKeyRegistrationTxnWithSuggestedParams: () => makeKeyRegistrationTxnWithSuggestedParams,
-    makeKeyRegistrationTxnWithSuggestedParamsFromObject: () => makeKeyRegistrationTxnWithSuggestedParamsFromObject,
-    makeLogicSig: () => makeLogicSig,
-    makeLogicSigAccountTransactionSigner: () => makeLogicSigAccountTransactionSigner,
-    makeMultiSigAccountTransactionSigner: () => makeMultiSigAccountTransactionSigner,
-    makePaymentTxn: () => makePaymentTxn,
-    makePaymentTxnWithSuggestedParams: () => makePaymentTxnWithSuggestedParams,
-    makePaymentTxnWithSuggestedParamsFromObject: () => makePaymentTxnWithSuggestedParamsFromObject,
-    masterDerivationKeyToMnemonic: () => masterDerivationKeyToMnemonic,
-    mergeMultisigTransactions: () => mergeMultisigTransactions,
-    microalgosToAlgos: () => microalgosToAlgos,
-    mnemonicFromSeed: () => mnemonicFromSeed,
-    mnemonicToMasterDerivationKey: () => mnemonicToMasterDerivationKey,
-    mnemonicToSecretKey: () => mnemonicToSecretKey,
-    modelsv2: () => types_exports,
-    multisigAddress: () => multisigAddress,
-    secretKeyToMnemonic: () => secretKeyToMnemonic,
-    seedFromMnemonic: () => seedFromMnemonic,
-    signBid: () => signBid,
-    signBytes: () => signBytes,
-    signLogicSigTransaction: () => signLogicSigTransaction,
-    signLogicSigTransactionObject: () => signLogicSigTransactionObject,
-    signMultisigTransaction: () => signMultisigTransaction,
-    signTransaction: () => signTransaction,
-    tealSign: () => tealSign,
-    tealSignFromProgram: () => tealSignFromProgram,
-    verifyBytes: () => verifyBytes,
-    waitForConfirmation: () => waitForConfirmation
-  });
-  function signTransaction(txn, sk) {
-    if (typeof txn.from === "undefined") {
-      const key = keyPairFromSecretKey(sk);
-      txn.from = encodeAddress(key.publicKey);
-    }
-    const algoTxn = instantiateTxnIfNeeded(txn);
-    return {
-      txID: algoTxn.txID().toString(),
-      blob: algoTxn.signTxn(sk)
-    };
-  }
-  function signBid(bid, sk) {
-    const signedBid = new Bid(bid);
-    return signedBid.signBid(sk);
-  }
-  function signBytes(bytes, sk) {
-    const toBeSigned = Buffer.from(concatArrays(SIGN_BYTES_PREFIX, bytes));
-    const sig = sign(toBeSigned, sk);
-    return sig;
-  }
-  function verifyBytes(bytes, signature, addr) {
-    const toBeVerified = Buffer.from(concatArrays(SIGN_BYTES_PREFIX, bytes));
-    const pk = decodeAddress(addr).publicKey;
-    return verify(toBeVerified, signature, pk);
-  }
-  function encodeObj(o) {
-    return new Uint8Array(encode2(o));
-  }
-  function decodeObj(o) {
-    return decode2(o);
-  }
-  var LogicTemplatesCommonJSExport, SIGN_BYTES_PREFIX, MULTISIG_BAD_SENDER_ERROR_MSG, ERROR_MULTISIG_BAD_SENDER, ERROR_INVALID_MICROALGOS, LogicTemplates;
-  var init_main = __esm({
-    "node_modules/algosdk/dist/esm/src/main.js"() {
-      init_naclWrappers();
-      init_address();
-      init_encoding();
-      init_transaction();
-      LogicTemplatesCommonJSExport = __toESM(require_logicTemplates());
-      init_bid();
-      init_convert();
-      init_utils();
-      __reExport(main_exports, __toESM(require_algod()));
-      init_algod();
-      init_kmd();
-      init_intDecoding();
-      init_indexer();
-      init_wait();
-      init_address();
-      init_uint64();
-      init_account();
-      init_types();
-      init_mnemonic();
-      init_convert();
-      init_group();
-      init_logicsig();
-      init_multisig();
-      init_dryrun2();
-      init_makeTxn();
-      init_transaction();
-      init_signer();
-      init_composer();
-      init_types2();
-      init_abi();
-      SIGN_BYTES_PREFIX = Buffer.from([77, 88]);
-      MULTISIG_BAD_SENDER_ERROR_MSG = "The transaction sender address and multisig preimage do not match.";
-      ERROR_MULTISIG_BAD_SENDER = new Error(MULTISIG_BAD_SENDER_ERROR_MSG);
-      ERROR_INVALID_MICROALGOS = new Error(INVALID_MICROALGOS_ERROR_MSG);
-      LogicTemplates = LogicTemplatesCommonJSExport.default;
+      exports2.generateTeal = generateTeal2;
     }
   });
 
@@ -37137,1517 +31386,5629 @@
     verifyBytes: () => verifyBytes,
     waitForConfirmation: () => waitForConfirmation
   });
-  var esm_default;
-  var init_esm = __esm({
-    "node_modules/algosdk/dist/esm/index.js"() {
-      init_main();
-      init_main();
-      __reExport(esm_exports, main_exports);
-      esm_default = main_exports;
-    }
-  });
 
-  // src/constants.js
-  var require_constants2 = __commonJS({
-    "src/constants.js"(exports2) {
-      "use strict";
-      exports2.__esModule = true;
-      exports2.APP_ID = 628095415;
-      exports2.REGISTRATION_PRICE = {
-        CHAR_3_AMOUNT: 15e7,
-        CHAR_4_AMOUNT: 5e7,
-        CHAR_5_AMOUNT: 5e6
-      };
-      exports2.TRANSFER_FEE = 2e6;
-      exports2.IPFS_LINK = "https://ipfs.infura.io/ipfs/";
-      exports2.ASCII_CODES = {
-        ASCII_A: 97,
-        ASCII_Z: 122,
-        ASCII_0: 48,
-        ASCII_9: 57
-      };
-      exports2.ALLOWED_SOCIALS = [
-        "github",
-        "twitter",
-        "telegram",
-        "youtube",
-        "reddit",
-        "discord"
-      ];
-    }
+  // node_modules/algosdk/dist/esm/src/main.js
+  var main_exports = {};
+  __export(main_exports, {
+    ABIAddressType: () => ABIAddressType,
+    ABIArrayDynamicType: () => ABIArrayDynamicType,
+    ABIArrayStaticType: () => ABIArrayStaticType,
+    ABIBoolType: () => ABIBoolType,
+    ABIByteType: () => ABIByteType,
+    ABIContract: () => ABIContract,
+    ABIInterface: () => ABIInterface,
+    ABIMethod: () => ABIMethod,
+    ABIReferenceType: () => ABIReferenceType,
+    ABIStringType: () => ABIStringType,
+    ABITransactionType: () => ABITransactionType,
+    ABITupleType: () => ABITupleType,
+    ABIType: () => ABIType,
+    ABIUfixedType: () => ABIUfixedType,
+    ABIUintType: () => ABIUintType,
+    ADDR_BYTE_SIZE: () => ADDR_BYTE_SIZE,
+    ALGORAND_MIN_TX_FEE: () => ALGORAND_MIN_TX_FEE,
+    Algodv2: () => AlgodClient,
+    AtomicTransactionComposer: () => AtomicTransactionComposer,
+    AtomicTransactionComposerStatus: () => AtomicTransactionComposerStatus,
+    ERROR_INVALID_MICROALGOS: () => ERROR_INVALID_MICROALGOS,
+    ERROR_MULTISIG_BAD_SENDER: () => ERROR_MULTISIG_BAD_SENDER,
+    INVALID_MICROALGOS_ERROR_MSG: () => INVALID_MICROALGOS_ERROR_MSG,
+    Indexer: () => IndexerClient,
+    IntDecoding: () => intDecoding_default,
+    Kmd: () => Kmd,
+    LENGTH_ENCODE_BYTE_SIZE: () => LENGTH_ENCODE_BYTE_SIZE,
+    LogicSigAccount: () => LogicSigAccount,
+    LogicTemplates: () => LogicTemplates,
+    MAX_LEN: () => MAX_LEN,
+    MULTISIG_BAD_SENDER_ERROR_MSG: () => MULTISIG_BAD_SENDER_ERROR_MSG,
+    OnApplicationComplete: () => OnApplicationComplete,
+    SINGLE_BOOL_SIZE: () => SINGLE_BOOL_SIZE,
+    SINGLE_BYTE_SIZE: () => SINGLE_BYTE_SIZE,
+    Transaction: () => Transaction,
+    TransactionType: () => TransactionType,
+    abiCheckTransactionType: () => abiCheckTransactionType,
+    abiTypeIsReference: () => abiTypeIsReference,
+    abiTypeIsTransaction: () => abiTypeIsTransaction,
+    algosToMicroalgos: () => algosToMicroalgos,
+    appendSignMultisigTransaction: () => appendSignMultisigTransaction,
+    assignGroupID: () => assignGroupID,
+    computeGroupID: () => computeGroupID,
+    createDryrun: () => createDryrun,
+    decodeAddress: () => decodeAddress,
+    decodeObj: () => decodeObj,
+    decodeSignedTransaction: () => decodeSignedTransaction,
+    decodeUint64: () => decodeUint64,
+    decodeUnsignedTransaction: () => decodeUnsignedTransaction,
+    encodeAddress: () => encodeAddress,
+    encodeObj: () => encodeObj,
+    encodeUint64: () => encodeUint64,
+    encodeUnsignedTransaction: () => encodeUnsignedTransaction,
+    generateAccount: () => generateAccount,
+    getApplicationAddress: () => getApplicationAddress,
+    instantiateTxnIfNeeded: () => instantiateTxnIfNeeded,
+    isTransactionWithSigner: () => isTransactionWithSigner,
+    isValidAddress: () => isValidAddress,
+    logicSigFromByte: () => logicSigFromByte,
+    makeApplicationCallTxnFromObject: () => makeApplicationCallTxnFromObject,
+    makeApplicationClearStateTxn: () => makeApplicationClearStateTxn,
+    makeApplicationClearStateTxnFromObject: () => makeApplicationClearStateTxnFromObject,
+    makeApplicationCloseOutTxn: () => makeApplicationCloseOutTxn,
+    makeApplicationCloseOutTxnFromObject: () => makeApplicationCloseOutTxnFromObject,
+    makeApplicationCreateTxn: () => makeApplicationCreateTxn,
+    makeApplicationCreateTxnFromObject: () => makeApplicationCreateTxnFromObject,
+    makeApplicationDeleteTxn: () => makeApplicationDeleteTxn,
+    makeApplicationDeleteTxnFromObject: () => makeApplicationDeleteTxnFromObject,
+    makeApplicationNoOpTxn: () => makeApplicationNoOpTxn,
+    makeApplicationNoOpTxnFromObject: () => makeApplicationNoOpTxnFromObject,
+    makeApplicationOptInTxn: () => makeApplicationOptInTxn,
+    makeApplicationOptInTxnFromObject: () => makeApplicationOptInTxnFromObject,
+    makeApplicationUpdateTxn: () => makeApplicationUpdateTxn,
+    makeApplicationUpdateTxnFromObject: () => makeApplicationUpdateTxnFromObject,
+    makeAssetConfigTxn: () => makeAssetConfigTxn,
+    makeAssetConfigTxnWithSuggestedParams: () => makeAssetConfigTxnWithSuggestedParams,
+    makeAssetConfigTxnWithSuggestedParamsFromObject: () => makeAssetConfigTxnWithSuggestedParamsFromObject,
+    makeAssetCreateTxn: () => makeAssetCreateTxn,
+    makeAssetCreateTxnWithSuggestedParams: () => makeAssetCreateTxnWithSuggestedParams,
+    makeAssetCreateTxnWithSuggestedParamsFromObject: () => makeAssetCreateTxnWithSuggestedParamsFromObject,
+    makeAssetDestroyTxn: () => makeAssetDestroyTxn,
+    makeAssetDestroyTxnWithSuggestedParams: () => makeAssetDestroyTxnWithSuggestedParams,
+    makeAssetDestroyTxnWithSuggestedParamsFromObject: () => makeAssetDestroyTxnWithSuggestedParamsFromObject,
+    makeAssetFreezeTxn: () => makeAssetFreezeTxn,
+    makeAssetFreezeTxnWithSuggestedParams: () => makeAssetFreezeTxnWithSuggestedParams,
+    makeAssetFreezeTxnWithSuggestedParamsFromObject: () => makeAssetFreezeTxnWithSuggestedParamsFromObject,
+    makeAssetTransferTxn: () => makeAssetTransferTxn,
+    makeAssetTransferTxnWithSuggestedParams: () => makeAssetTransferTxnWithSuggestedParams,
+    makeAssetTransferTxnWithSuggestedParamsFromObject: () => makeAssetTransferTxnWithSuggestedParamsFromObject,
+    makeBasicAccountTransactionSigner: () => makeBasicAccountTransactionSigner,
+    makeKeyRegistrationTxn: () => makeKeyRegistrationTxn,
+    makeKeyRegistrationTxnWithSuggestedParams: () => makeKeyRegistrationTxnWithSuggestedParams,
+    makeKeyRegistrationTxnWithSuggestedParamsFromObject: () => makeKeyRegistrationTxnWithSuggestedParamsFromObject,
+    makeLogicSig: () => makeLogicSig,
+    makeLogicSigAccountTransactionSigner: () => makeLogicSigAccountTransactionSigner,
+    makeMultiSigAccountTransactionSigner: () => makeMultiSigAccountTransactionSigner,
+    makePaymentTxn: () => makePaymentTxn,
+    makePaymentTxnWithSuggestedParams: () => makePaymentTxnWithSuggestedParams,
+    makePaymentTxnWithSuggestedParamsFromObject: () => makePaymentTxnWithSuggestedParamsFromObject,
+    masterDerivationKeyToMnemonic: () => masterDerivationKeyToMnemonic,
+    mergeMultisigTransactions: () => mergeMultisigTransactions,
+    microalgosToAlgos: () => microalgosToAlgos,
+    mnemonicFromSeed: () => mnemonicFromSeed,
+    mnemonicToMasterDerivationKey: () => mnemonicToMasterDerivationKey,
+    mnemonicToSecretKey: () => mnemonicToSecretKey,
+    modelsv2: () => types_exports,
+    multisigAddress: () => multisigAddress,
+    secretKeyToMnemonic: () => secretKeyToMnemonic,
+    seedFromMnemonic: () => seedFromMnemonic,
+    signBid: () => signBid,
+    signBytes: () => signBytes,
+    signLogicSigTransaction: () => signLogicSigTransaction,
+    signLogicSigTransactionObject: () => signLogicSigTransactionObject,
+    signMultisigTransaction: () => signMultisigTransaction,
+    signTransaction: () => signTransaction,
+    tealSign: () => tealSign,
+    tealSignFromProgram: () => tealSignFromProgram,
+    verifyBytes: () => verifyBytes,
+    waitForConfirmation: () => waitForConfirmation
   });
+  init_naclWrappers();
+  init_address();
+  init_encoding();
+  init_transaction();
+  var LogicTemplatesCommonJSExport = __toESM(require_logicTemplates());
 
-  // src/validation.js
-  var require_validation = __commonJS({
-    "src/validation.js"(exports2) {
-      "use strict";
-      exports2.__esModule = true;
-      var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
-      var constants_js_1 = require_constants2();
-      function isValidAddress3(address) {
-        return algosdk_1["default"].isValidAddress(address);
-      }
-      exports2.isValidAddress = isValidAddress3;
-      function isValidName2(name) {
-        name = name.split(".algo")[0];
-        var lengthOfName = name.length;
-        for (var i = 0; i < lengthOfName; i++) {
-          if (!(name.charCodeAt(i) >= constants_js_1.ASCII_CODES.ASCII_0 && name.charCodeAt(i) <= constants_js_1.ASCII_CODES.ASCII_9)) {
-            if (!(name.charCodeAt(i) >= constants_js_1.ASCII_CODES.ASCII_A && name.charCodeAt(i) <= constants_js_1.ASCII_CODES.ASCII_Z))
-              return false;
-          }
-        }
-        return true;
-      }
-      exports2.isValidName = isValidName2;
-    }
-  });
-
-  // src/generateTeal.js
-  var require_generateTeal = __commonJS({
-    "src/generateTeal.js"(exports2) {
-      "use strict";
-      exports2.__esModule = true;
-      function generateTeal(name) {
-        return '#pragma version 4\n    byte "' + name + '"\n    len\n    int 3\n    ==\n    bnz main_l22\n    byte "' + name + '"\n    len\n    int 4\n    ==\n    bnz main_l13\n    byte "' + name + '"\n    len\n    int 5\n    >=\n    bnz main_l4\n    err\n    main_l4:\n    gtxn 0 Amount\n    int 5000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l5:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l12\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l11\n    global GroupSize\n    int 4\n    ==\n    bnz main_l10\n    int 0\n    return\n    main_l9:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l10:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l11:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l12:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l5\n    main_l13:\n    gtxn 0 Amount\n    int 50000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l14:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l21\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l20\n    global GroupSize\n    int 4\n    ==\n    bnz main_l19\n    int 0\n    return\n    main_l18:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l19:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l20:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l21:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l14\n    main_l22:\n    gtxn 0 Amount\n    int 150000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l23:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l30\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l29\n    global GroupSize\n    int 4\n    ==\n    bnz main_l28\n    int 0\n    return\n    main_l27:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l28:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l29:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l30:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l23\n    main_l31:\n    return';
-      }
-      exports2.generateTeal = generateTeal;
-    }
-  });
-
-  // src/resolver.js
-  var require_resolver = __commonJS({
-    "src/resolver.js"(exports2) {
-      "use strict";
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
-        function adopt(value) {
-          return value instanceof P ? value : new P(function(resolve) {
-            resolve(value);
-          });
-        }
-        return new (P || (P = Promise))(function(resolve, reject) {
-          function fulfilled(value) {
-            try {
-              step(generator.next(value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function rejected(value) {
-            try {
-              step(generator["throw"](value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-          }
-          step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-      };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-          return this;
-        }), g;
-        function verb(n) {
-          return function(v) {
-            return step([n, v]);
-          };
-        }
-        function step(op) {
-          if (f)
-            throw new TypeError("Generator is already executing.");
-          while (_)
-            try {
-              if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
-                return t;
-              if (y = 0, t)
-                op = [op[0] & 2, t.value];
-              switch (op[0]) {
-                case 0:
-                case 1:
-                  t = op;
-                  break;
-                case 4:
-                  _.label++;
-                  return { value: op[1], done: false };
-                case 5:
-                  _.label++;
-                  y = op[1];
-                  op = [0];
-                  continue;
-                case 7:
-                  op = _.ops.pop();
-                  _.trys.pop();
-                  continue;
-                default:
-                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                    _ = 0;
-                    continue;
-                  }
-                  if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                    _.label = op[1];
-                    break;
-                  }
-                  if (op[0] === 6 && _.label < t[1]) {
-                    _.label = t[1];
-                    t = op;
-                    break;
-                  }
-                  if (t && _.label < t[2]) {
-                    _.label = t[2];
-                    _.ops.push(op);
-                    break;
-                  }
-                  if (t[2])
-                    _.ops.pop();
-                  _.trys.pop();
-                  continue;
-              }
-              op = body.call(thisArg, _);
-            } catch (e) {
-              op = [6, e];
-              y = 0;
-            } finally {
-              f = t = 0;
-            }
-          if (op[0] & 5)
-            throw op[1];
-          return { value: op[0] ? op[1] : void 0, done: true };
-        }
-      };
-      exports2.__esModule = true;
-      var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
-      var constants_js_1 = require_constants2();
-      var errors_js_1 = require_errors();
-      var generateTeal_js_1 = require_generateTeal();
-      var Resolver = function() {
-        function Resolver2(client, indexer) {
-          this.algodClient = client;
-          this.indexerClient = indexer;
-        }
-        Resolver2.prototype.generateLsig = function(name) {
-          return __awaiter(this, void 0, void 0, function() {
-            var client, program;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  client = this.algodClient;
-                  return [
-                    4,
-                    client.compile(generateTeal_js_1.generateTeal(name))["do"]()
-                  ];
-                case 1:
-                  program = _a.sent();
-                  program = new Uint8Array(Buffer.from(program.result, "base64"));
-                  return [
-                    2,
-                    new algosdk_1["default"].LogicSigAccount(program)
-                  ];
-              }
-            });
-          });
-        };
-        Resolver2.prototype.resolveName = function(name) {
-          return __awaiter(this, void 0, void 0, function() {
-            var indexer, lsig, accountInfo, length_1, owner, found, socials, metadata, i, app, kv, decodedKvPairs, err_1;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  if (!(name.length === 0 || name.length > 64))
-                    return [3, 1];
-                  throw new errors_js_1.InvalidNameError();
-                case 1:
-                  name = name.split(".algo")[0];
-                  name = name.toLowerCase();
-                  return [4, this.indexerClient];
-                case 2:
-                  indexer = _a.sent();
-                  return [4, this.generateLsig(name)];
-                case 3:
-                  lsig = _a.sent();
-                  _a.label = 4;
-                case 4:
-                  _a.trys.push([4, 6, , 7]);
-                  return [
-                    4,
-                    indexer.lookupAccountByID(lsig.address())["do"]()
-                  ];
-                case 5:
-                  accountInfo = _a.sent();
-                  accountInfo = accountInfo.account["apps-local-state"];
-                  length_1 = accountInfo.length;
-                  owner = void 0;
-                  found = false;
-                  socials = [], metadata = [];
-                  for (i = 0; i < length_1; i++) {
-                    app = accountInfo[i];
-                    if (app.id === constants_js_1.APP_ID) {
-                      kv = app["key-value"];
-                      decodedKvPairs = this.decodeKvPairs(kv);
-                      socials = this.filterKvPairs(decodedKvPairs, "socials");
-                      metadata = this.filterKvPairs(decodedKvPairs, "metadata");
-                      found = true;
-                      owner = metadata.filter(function(kv2) {
-                        return kv2.key === "owner";
-                      })[0].value;
-                    }
-                  }
-                  if (found) {
-                    return [
-                      2,
-                      {
-                        found: true,
-                        address: owner,
-                        socials,
-                        metadata
-                      }
-                    ];
-                  } else
-                    return [2, { found: false }];
-                  return [3, 7];
-                case 6:
-                  err_1 = _a.sent();
-                  return [2, { found: false }];
-                case 7:
-                  return [2];
-              }
-            });
-          });
-        };
-        Resolver2.prototype.getNamesOwnedByAddress = function(address, socials, metadata, limit) {
-          return __awaiter(this, void 0, void 0, function() {
-            var isValidAddress3, indexer, nextToken, txnLength, txns, info, err_2, accountTxns, i, names, details, i, info, domain;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, algosdk_1["default"].isValidAddress(address)];
-                case 1:
-                  isValidAddress3 = _a.sent();
-                  if (!!isValidAddress3)
-                    return [3, 2];
-                  throw new errors_js_1.AddressValidationError();
-                case 2:
-                  return [4, this.indexerClient];
-                case 3:
-                  indexer = _a.sent();
-                  nextToken = "";
-                  txnLength = 1;
-                  txns = [];
-                  _a.label = 4;
-                case 4:
-                  if (!(txnLength > 0))
-                    return [3, 9];
-                  _a.label = 5;
-                case 5:
-                  _a.trys.push([5, 7, , 8]);
-                  return [
-                    4,
-                    indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(constants_js_1.APP_ID).nextToken(nextToken)["do"]()
-                  ];
-                case 6:
-                  info = _a.sent();
-                  txnLength = info.transactions.length;
-                  if (txnLength > 0) {
-                    nextToken = info["next-token"];
-                    txns.push(info.transactions);
-                  }
-                  return [3, 8];
-                case 7:
-                  err_2 = _a.sent();
-                  return [2, false];
-                case 8:
-                  return [3, 4];
-                case 9:
-                  accountTxns = [];
-                  for (i = 0; i < txns.length; i++) {
-                    accountTxns = accountTxns.concat(txns[i]);
-                  }
-                  txns = accountTxns;
-                  return [4, this.filterDomainRegistrationTxns(txns)];
-                case 10:
-                  names = _a.sent();
-                  if (!(names.length > 0))
-                    return [3, 15];
-                  details = [];
-                  i = 0;
-                  _a.label = 11;
-                case 11:
-                  if (!(i < names.length))
-                    return [3, 14];
-                  if (limit !== void 0) {
-                    if (details.length >= limit)
-                      return [3, 14];
-                  }
-                  return [4, this.resolveName(names[i])];
-                case 12:
-                  info = _a.sent();
-                  if (info.found && info.address !== void 0) {
-                    if (info.address === address) {
-                      domain = {
-                        name: ""
-                      };
-                      domain.name = names[i] + ".algo";
-                      if (socials)
-                        domain["socials"] = info.socials;
-                      if (metadata)
-                        domain["metadata"] = info.metadata;
-                      details.push(domain);
-                    }
-                  } else {
-                    i = i - 1;
-                  }
-                  _a.label = 13;
-                case 13:
-                  i++;
-                  return [3, 11];
-                case 14:
-                  return [2, details];
-                case 15:
-                  return [2];
-              }
-            });
-          });
-        };
-        Resolver2.prototype.filterKvPairs = function(kvPairs, type) {
-          var socials = [], metadata = [];
-          for (var i in kvPairs) {
-            var key = kvPairs[i].key;
-            var value = kvPairs[i].value;
-            var kvObj = {
-              key,
-              value
-            };
-            if (constants_js_1.ALLOWED_SOCIALS.includes(key))
-              socials.push(kvObj);
-            else
-              metadata.push(kvObj);
-          }
-          if (type === "socials") {
-            return socials;
-          } else if (type === "metadata") {
-            return metadata;
-          }
-        };
-        Resolver2.prototype.decodeKvPairs = function(kvPairs) {
-          return kvPairs.map(function(kvPair) {
-            var decodedKvPair = {
-              key: "",
-              value: ""
-            };
-            var key = kvPair.key;
-            key = Buffer.from(key, "base64").toString();
-            decodedKvPair.key = key;
-            var value = kvPair.value;
-            if (key === "owner") {
-              decodedKvPair.value = algosdk_1["default"].encodeAddress(new Uint8Array(Buffer.from(value.bytes, "base64")));
-            } else if (value.type === 1) {
-              decodedKvPair.value = Buffer.from(value.bytes, "base64").toString();
-            } else if (value.type === 2) {
-              decodedKvPair.value = value.uint;
-            }
-            return decodedKvPair;
-          });
-        };
-        Resolver2.prototype.filterDomainRegistrationTxns = function(txns) {
-          return __awaiter(this, void 0, void 0, function() {
-            var names, indexer, i, txn, appArgs, lsigAccount, accountInfo, length_2, i_1, kvPairs, domainInfo, err_3;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  names = [];
-                  indexer = this.indexerClient;
-                  _a.label = 1;
-                case 1:
-                  _a.trys.push([1, 7, , 8]);
-                  i = 0;
-                  _a.label = 2;
-                case 2:
-                  if (!(i < txns.length))
-                    return [3, 6];
-                  txn = txns[i];
-                  if (!(txn["tx-type"] === "appl"))
-                    return [3, 5];
-                  if (!(txn["application-transaction"]["application-id"] === constants_js_1.APP_ID))
-                    return [3, 5];
-                  appArgs = txn["application-transaction"]["application-args"];
-                  if (!(Buffer.from(appArgs[0], "base64").toString() === "register_name"))
-                    return [3, 3];
-                  if (!names.includes(Buffer.from(appArgs[1], "base64").toString()))
-                    names.push(Buffer.from(appArgs[1], "base64").toString());
-                  return [3, 5];
-                case 3:
-                  if (!(Buffer.from(appArgs[0], "base64").toString() === "accept_transfer"))
-                    return [3, 5];
-                  lsigAccount = txn["application-transaction"]["accounts"][0];
-                  return [
-                    4,
-                    indexer.lookupAccountByID(lsigAccount)["do"]()
-                  ];
-                case 4:
-                  accountInfo = _a.sent();
-                  accountInfo = accountInfo.account["apps-local-state"];
-                  length_2 = accountInfo.length;
-                  for (i_1 = 0; i_1 < length_2; i_1++) {
-                    if (accountInfo[i_1].id === constants_js_1.APP_ID) {
-                      kvPairs = accountInfo[i_1]["key-value"];
-                      domainInfo = this.decodeKvPairs(kvPairs).filter(function(domain) {
-                        return domain.key === "name";
-                      });
-                      if (!names.includes(domainInfo[0].value)) {
-                        names.push(domainInfo[0].value);
-                      }
-                    }
-                  }
-                  _a.label = 5;
-                case 5:
-                  i++;
-                  return [3, 2];
-                case 6:
-                  return [3, 8];
-                case 7:
-                  err_3 = _a.sent();
-                  return [2, []];
-                case 8:
-                  return [2, names];
-              }
-            });
-          });
-        };
-        Resolver2.prototype.owner = function(name) {
-          return __awaiter(this, void 0, void 0, function() {
-            var domainInformation;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolveName(name.split(".algo")[0])];
-                case 1:
-                  domainInformation = _a.sent();
-                  if (domainInformation.found === true) {
-                    return [2, domainInformation.address];
-                  } else
-                    return [2, "Not Registered"];
-                  return [2];
-              }
-            });
-          });
-        };
-        Resolver2.prototype.text = function(name, key) {
-          return __awaiter(this, void 0, void 0, function() {
-            var domainInformation, textRecords;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolveName(name)];
-                case 1:
-                  domainInformation = _a.sent();
-                  if (domainInformation.found === true) {
-                    textRecords = domainInformation.socials.filter(function(social) {
-                      return social.key === key;
-                    });
-                    if (textRecords.length > 0) {
-                      return [
-                        2,
-                        domainInformation.socials.filter(function(social) {
-                          return social.key === key;
-                        })[0].value
-                      ];
-                    } else {
-                      return [2, "Property Not Set"];
-                    }
-                  } else {
-                    return [2, "Not Registered"];
-                  }
-                  return [2];
-              }
-            });
-          });
-        };
-        Resolver2.prototype.expiry = function(name) {
-          return __awaiter(this, void 0, void 0, function() {
-            var domainInformation;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolveName(name.split(".algo")[0])];
-                case 1:
-                  domainInformation = _a.sent();
-                  if (domainInformation.found === true) {
-                    return [
-                      2,
-                      new Date(domainInformation.metadata.filter(function(data) {
-                        return data.key === "expiry";
-                      })[0].value * 1e3)
-                    ];
-                  } else
-                    return [2, "Not Registered"];
-                  return [2];
-              }
-            });
-          });
-        };
-        Resolver2.prototype.content = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              return [2];
-            });
-          });
-        };
-        return Resolver2;
-      }();
-      exports2.Resolver = Resolver;
-    }
-  });
-
-  // src/transactions.js
-  var require_transactions = __commonJS({
-    "src/transactions.js"(exports2) {
-      "use strict";
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
-        function adopt(value) {
-          return value instanceof P ? value : new P(function(resolve) {
-            resolve(value);
-          });
-        }
-        return new (P || (P = Promise))(function(resolve, reject) {
-          function fulfilled(value) {
-            try {
-              step(generator.next(value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function rejected(value) {
-            try {
-              step(generator["throw"](value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-          }
-          step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-      };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-          return this;
-        }), g;
-        function verb(n) {
-          return function(v) {
-            return step([n, v]);
-          };
-        }
-        function step(op) {
-          if (f)
-            throw new TypeError("Generator is already executing.");
-          while (_)
-            try {
-              if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
-                return t;
-              if (y = 0, t)
-                op = [op[0] & 2, t.value];
-              switch (op[0]) {
-                case 0:
-                case 1:
-                  t = op;
-                  break;
-                case 4:
-                  _.label++;
-                  return { value: op[1], done: false };
-                case 5:
-                  _.label++;
-                  y = op[1];
-                  op = [0];
-                  continue;
-                case 7:
-                  op = _.ops.pop();
-                  _.trys.pop();
-                  continue;
-                default:
-                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                    _ = 0;
-                    continue;
-                  }
-                  if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                    _.label = op[1];
-                    break;
-                  }
-                  if (op[0] === 6 && _.label < t[1]) {
-                    _.label = t[1];
-                    t = op;
-                    break;
-                  }
-                  if (t && _.label < t[2]) {
-                    _.label = t[2];
-                    _.ops.push(op);
-                    break;
-                  }
-                  if (t[2])
-                    _.ops.pop();
-                  _.trys.pop();
-                  continue;
-              }
-              op = body.call(thisArg, _);
-            } catch (e) {
-              op = [6, e];
-              y = 0;
-            } finally {
-              f = t = 0;
-            }
-          if (op[0] & 5)
-            throw op[1];
-          return { value: op[0] ? op[1] : void 0, done: true };
-        }
-      };
-      exports2.__esModule = true;
-      var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
-      var constants_js_1 = require_constants2();
-      var errors_js_1 = require_errors();
-      var generateTeal_js_1 = require_generateTeal();
-      var Transactions = function() {
-        function Transactions2(client) {
-          this.algodClient = client;
-        }
-        Transactions2.prototype.generateLsig = function(name) {
-          return __awaiter(this, void 0, void 0, function() {
-            var client, program;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  name = name.split(".algo")[0];
-                  client = this.algodClient;
-                  return [
-                    4,
-                    client.compile(generateTeal_js_1.generateTeal(name))["do"]()
-                  ];
-                case 1:
-                  program = _a.sent();
-                  program = new Uint8Array(Buffer.from(program.result, "base64"));
-                  return [
-                    2,
-                    new algosdk_1["default"].LogicSigAccount(program)
-                  ];
-              }
-            });
-          });
-        };
-        Transactions2.prototype.calculatePrice = function(name, period) {
-          var amount = 0;
-          name = name.split(".algo")[0];
-          if (name.length === 3) {
-            amount = constants_js_1.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
-          } else if (name.length === 4) {
-            amount = constants_js_1.REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
-          } else if (name.length >= 5) {
-            amount = constants_js_1.REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
-          }
-          return amount;
-        };
-        Transactions2.prototype.prepareNameRegistrationTransactions = function(name, address, period) {
-          return __awaiter(this, void 0, void 0, function() {
-            var algodClient, amount, lsig, params, receiver, sender, closeToRemaninder, note, txn1, groupTxns, txn2, txn3, method2, appArgs, txn4, signedOptinTxn;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  algodClient = this.algodClient;
-                  if (name.split(".algo")[0].length < 3)
-                    throw new errors_js_1.InvalidNameError();
-                  amount = 0;
-                  return [4, this.generateLsig(name)];
-                case 1:
-                  lsig = _a.sent();
-                  return [4, algodClient.getTransactionParams()["do"]()];
-                case 2:
-                  params = _a.sent();
-                  params.fee = 1e3;
-                  params.flatFee = true;
-                  receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
-                  sender = address;
-                  if (period === void 0) {
-                    period = 1;
-                  }
-                  amount = this.calculatePrice(name, period);
-                  closeToRemaninder = void 0;
-                  note = void 0;
-                  txn1 = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
-                  groupTxns = [];
-                  groupTxns.push(txn1);
-                  sender = address;
-                  receiver = lsig.address();
-                  amount = 915e3;
-                  txn2 = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
-                  groupTxns.push(txn2);
-                  return [
-                    4,
-                    algosdk_1["default"].makeApplicationOptInTxnFromObject({
-                      from: lsig.address(),
-                      suggestedParams: params,
-                      appIndex: constants_js_1.APP_ID
-                    })
-                  ];
-                case 3:
-                  txn3 = _a.sent();
-                  groupTxns.push(txn3);
-                  sender = lsig.address();
-                  receiver = address;
-                  amount = 0;
-                  method2 = "register_name";
-                  appArgs = [];
-                  period++;
-                  appArgs.push(new Uint8Array(Buffer.from(method2)));
-                  appArgs.push(new Uint8Array(Buffer.from(name)));
-                  appArgs.push(algosdk_1["default"].encodeUint64(period));
-                  return [
-                    4,
-                    algosdk_1["default"].makeApplicationNoOpTxn(address, params, constants_js_1.APP_ID, appArgs, [lsig.address()])
-                  ];
-                case 4:
-                  txn4 = _a.sent();
-                  groupTxns.push(txn4);
-                  algosdk_1["default"].assignGroupID(groupTxns);
-                  signedOptinTxn = algosdk_1["default"].signLogicSigTransaction(groupTxns[2], lsig);
-                  return [
-                    2,
-                    {
-                      optinTxn: signedOptinTxn,
-                      txns: groupTxns,
-                      unsignedOptinTxn: groupTxns[2]
-                    }
-                  ];
-              }
-            });
-          });
-        };
-        Transactions2.prototype.prepareUpdateNamePropertyTransactions = function(name, address, editedHandles) {
-          return __awaiter(this, void 0, void 0, function() {
-            var algodClient, lsig, params, method2, groupTxns, _a, _b, _i, key, appArgs, network, handle, txn;
-            return __generator(this, function(_c) {
-              switch (_c.label) {
-                case 0:
-                  algodClient = this.algodClient;
-                  return [4, this.generateLsig(name)];
-                case 1:
-                  lsig = _c.sent();
-                  return [4, algodClient.getTransactionParams()["do"]()];
-                case 2:
-                  params = _c.sent();
-                  params.fee = 1e3;
-                  params.flatFee = true;
-                  method2 = "update_name";
-                  groupTxns = [];
-                  _a = [];
-                  for (_b in editedHandles)
-                    _a.push(_b);
-                  _i = 0;
-                  _c.label = 3;
-                case 3:
-                  if (!(_i < _a.length))
-                    return [3, 6];
-                  key = _a[_i];
-                  appArgs = [];
-                  network = key;
-                  handle = editedHandles[key];
-                  appArgs.push(new Uint8Array(Buffer.from(method2)));
-                  appArgs.push(new Uint8Array(Buffer.from(network)));
-                  appArgs.push(new Uint8Array(Buffer.from(handle)));
-                  return [
-                    4,
-                    algosdk_1["default"].makeApplicationNoOpTxn(address, params, constants_js_1.APP_ID, appArgs, [lsig.address()])
-                  ];
-                case 4:
-                  txn = _c.sent();
-                  groupTxns.push(txn);
-                  _c.label = 5;
-                case 5:
-                  _i++;
-                  return [3, 3];
-                case 6:
-                  if (Object.keys(editedHandles).length > 1) {
-                    algosdk_1["default"].assignGroupID(groupTxns);
-                  }
-                  return [2, groupTxns];
-              }
-            });
-          });
-        };
-        Transactions2.prototype.preparePaymentTxn = function(sender, receiver, amt, note) {
-          return __awaiter(this, void 0, void 0, function() {
-            var algodClient, params, enc, closeToRemaninder;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  algodClient = this.algodClient;
-                  return [4, algodClient.getTransactionParams()["do"]()];
-                case 1:
-                  params = _a.sent();
-                  amt = algosdk_1["default"].algosToMicroalgos(amt);
-                  enc = new TextEncoder();
-                  note = enc.encode(note);
-                  closeToRemaninder = void 0;
-                  return [
-                    2,
-                    algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params)
-                  ];
-              }
-            });
-          });
-        };
-        Transactions2.prototype.prepareNameRenewalTxns = function(name, sender, years) {
-          return __awaiter(this, void 0, void 0, function() {
-            var algodClient, params, receiver, closeToRemaninder, note, paymentTxn, lsig, appArgs, applicationTxn;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  name = name.split(".algo")[0];
-                  algodClient = this.algodClient;
-                  return [4, algodClient.getTransactionParams()["do"]()];
-                case 1:
-                  params = _a.sent();
-                  receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
-                  closeToRemaninder = void 0;
-                  note = void 0;
-                  paymentTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(name, years), closeToRemaninder, note, params);
-                  return [4, this.generateLsig(name)];
-                case 2:
-                  lsig = _a.sent();
-                  appArgs = [];
-                  appArgs.push(new Uint8Array(Buffer.from("renew_name")));
-                  appArgs.push(algosdk_1["default"].encodeUint64(years));
-                  applicationTxn = algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [lsig.address()]);
-                  algosdk_1["default"].assignGroupID([paymentTxn, applicationTxn]);
-                  return [2, [paymentTxn, applicationTxn]];
-              }
-            });
-          });
-        };
-        Transactions2.prototype.prepareInitiateNameTransferTransaction = function(name, sender, newOwner, price) {
-          return __awaiter(this, void 0, void 0, function() {
-            var algodClient, params, lsig, appArgs;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  algodClient = this.algodClient;
-                  price = algosdk_1["default"].algosToMicroalgos(price);
-                  return [4, algodClient.getTransactionParams()["do"]()];
-                case 1:
-                  params = _a.sent();
-                  name = name.split(".algo")[0];
-                  return [4, this.generateLsig(name)];
-                case 2:
-                  lsig = _a.sent();
-                  appArgs = [];
-                  appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
-                  appArgs.push(algosdk_1["default"].encodeUint64(price));
-                  return [
-                    2,
-                    algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [lsig.address(), newOwner])
-                  ];
-              }
-            });
-          });
-        };
-        Transactions2.prototype.prepareAcceptNameTransferTransactions = function(name, sender, receiver, amt) {
-          return __awaiter(this, void 0, void 0, function() {
-            var algodClient, params, closeToRemaninder, note, paymentToOwnerTxn, paymentToSmartContractTxn, lsig, appArgs, applicationTxn;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  amt = algosdk_1["default"].algosToMicroalgos(amt);
-                  algodClient = this.algodClient;
-                  return [4, algodClient.getTransactionParams()["do"]()];
-                case 1:
-                  params = _a.sent();
-                  closeToRemaninder = void 0;
-                  note = void 0;
-                  paymentToOwnerTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
-                  receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
-                  paymentToSmartContractTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, constants_js_1.TRANSFER_FEE, closeToRemaninder, note, params);
-                  name = name.split(".algo")[0];
-                  return [4, this.generateLsig(name)];
-                case 2:
-                  lsig = _a.sent();
-                  appArgs = [];
-                  appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
-                  applicationTxn = algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [lsig.address()]);
-                  algosdk_1["default"].assignGroupID([
-                    paymentToOwnerTxn,
-                    paymentToSmartContractTxn,
-                    applicationTxn
-                  ]);
-                  return [
-                    2,
-                    [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn]
-                  ];
-              }
-            });
-          });
-        };
-        return Transactions2;
-      }();
-      exports2.Transactions = Transactions;
-    }
-  });
-
-  // src/name.js
-  var require_name = __commonJS({
-    "src/name.js"(exports2) {
-      "use strict";
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
-        function adopt(value) {
-          return value instanceof P ? value : new P(function(resolve) {
-            resolve(value);
-          });
-        }
-        return new (P || (P = Promise))(function(resolve, reject) {
-          function fulfilled(value) {
-            try {
-              step(generator.next(value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function rejected(value) {
-            try {
-              step(generator["throw"](value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-          }
-          step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-      };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-          return this;
-        }), g;
-        function verb(n) {
-          return function(v) {
-            return step([n, v]);
-          };
-        }
-        function step(op) {
-          if (f)
-            throw new TypeError("Generator is already executing.");
-          while (_)
-            try {
-              if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
-                return t;
-              if (y = 0, t)
-                op = [op[0] & 2, t.value];
-              switch (op[0]) {
-                case 0:
-                case 1:
-                  t = op;
-                  break;
-                case 4:
-                  _.label++;
-                  return { value: op[1], done: false };
-                case 5:
-                  _.label++;
-                  y = op[1];
-                  op = [0];
-                  continue;
-                case 7:
-                  op = _.ops.pop();
-                  _.trys.pop();
-                  continue;
-                default:
-                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                    _ = 0;
-                    continue;
-                  }
-                  if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                    _.label = op[1];
-                    break;
-                  }
-                  if (op[0] === 6 && _.label < t[1]) {
-                    _.label = t[1];
-                    t = op;
-                    break;
-                  }
-                  if (t && _.label < t[2]) {
-                    _.label = t[2];
-                    _.ops.push(op);
-                    break;
-                  }
-                  if (t[2])
-                    _.ops.pop();
-                  _.trys.pop();
-                  continue;
-              }
-              op = body.call(thisArg, _);
-            } catch (e) {
-              op = [6, e];
-              y = 0;
-            } finally {
-              f = t = 0;
-            }
-          if (op[0] & 5)
-            throw op[1];
-          return { value: op[0] ? op[1] : void 0, done: true };
-        }
-      };
-      exports2.__esModule = true;
-      var resolver_js_1 = require_resolver();
-      var transactions_js_1 = require_transactions();
-      var errors_js_1 = require_errors();
-      var validation_js_1 = require_validation();
-      var Name2 = function() {
-        function Name3(options) {
-          this.name = "";
-          var name = options.name, client = options.client, indexer = options.indexer;
-          this.name = name;
-          this.resolver = new resolver_js_1.Resolver(client, indexer);
-          this.transactions = new transactions_js_1.Transactions(client);
-        }
-        Name3.prototype.isRegistered = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            var status;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolver.resolveName(this.name)];
-                case 1:
-                  status = _a.sent();
-                  return [2, status.found];
-              }
-            });
-          });
-        };
-        Name3.prototype.getOwner = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolver.owner(this.name)];
-                case 1:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.getContent = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolver.content(this.name)];
-                case 1:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.getText = function(key) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolver.text(this.name, key)];
-                case 1:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.getAllInformation = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolver.resolveName(this.name)];
-                case 1:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.getExpiry = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.resolver.expiry(this.name)];
-                case 1:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.isValidTransaction = function(sender, receiver, method2) {
-          return __awaiter(this, void 0, void 0, function() {
-            var owner;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.isRegistered()];
-                case 1:
-                  if (!_a.sent()) {
-                    throw new errors_js_1.NameNotRegisteredError(this.name);
-                  }
-                  if (!validation_js_1.isValidAddress(sender)) {
-                    throw new errors_js_1.AddressValidationError();
-                  }
-                  if (receiver) {
-                    if (!validation_js_1.isValidAddress(receiver))
-                      throw new errors_js_1.AddressValidationError();
-                  }
-                  return [4, this.getOwner()];
-                case 2:
-                  owner = _a.sent();
-                  return [4, validation_js_1.isValidName(this.name)];
-                case 3:
-                  if (!_a.sent()) {
-                    throw new errors_js_1.InvalidNameError();
-                  }
-                  return [4, validation_js_1.isValidAddress(sender)];
-                case 4:
-                  if (!_a.sent()) {
-                    throw new errors_js_1.AddressValidationError();
-                  }
-                  if (!receiver && !method2) {
-                    if (owner !== sender) {
-                      throw new errors_js_1.IncorrectOwnerError(this.name, sender);
-                    }
-                  } else if (sender && receiver) {
-                    if (method2 === "initiate_transfer") {
-                      if (owner !== sender) {
-                        throw new errors_js_1.IncorrectOwnerError(this.name, sender);
-                      }
-                    } else if (method2 === "accept_transfer") {
-                      if (owner !== receiver) {
-                        throw new errors_js_1.IncorrectOwnerError(this.name, receiver);
-                      }
-                    }
-                  }
-                  return [2, true];
-              }
-            });
-          });
-        };
-        Name3.prototype.register = function(address, period) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.isRegistered()];
-                case 1:
-                  if (_a.sent()) {
-                    throw new Error("Name already registered");
-                  }
-                  if (!!validation_js_1.isValidAddress(address))
-                    return [3, 2];
-                  throw new errors_js_1.AddressValidationError();
-                case 2:
-                  return [
-                    4,
-                    this.transactions.prepareNameRegistrationTransactions(this.name, address, period)
-                  ];
-                case 3:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.update = function(address, editedHandles) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.isValidTransaction(address)];
-                case 1:
-                  _a.sent();
-                  return [
-                    4,
-                    this.transactions.prepareUpdateNamePropertyTransactions(this.name, address, editedHandles)
-                  ];
-                case 2:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.renew = function(address, years) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.isValidTransaction(address)];
-                case 1:
-                  _a.sent();
-                  return [
-                    4,
-                    this.transactions.prepareNameRenewalTxns(this.name, address, years)
-                  ];
-                case 2:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.initTransfer = function(owner, newOwner, price) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [
-                    4,
-                    this.isValidTransaction(owner, newOwner, "initiate_transfer")
-                  ];
-                case 1:
-                  _a.sent();
-                  return [
-                    4,
-                    this.transactions.prepareInitiateNameTransferTransaction(this.name, owner, newOwner, price)
-                  ];
-                case 2:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        Name3.prototype.acceptTransfer = function(newOwner, owner, price) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [
-                    4,
-                    this.isValidTransaction(newOwner, owner, "accept_transfer")
-                  ];
-                case 1:
-                  _a.sent();
-                  return [
-                    4,
-                    this.transactions.prepareAcceptNameTransferTransactions(this.name, newOwner, owner, price)
-                  ];
-                case 2:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        return Name3;
-      }();
-      exports2.Name = Name2;
-    }
-  });
-
-  // src/address.js
-  var require_address = __commonJS({
-    "src/address.js"(exports2) {
-      "use strict";
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
-        function adopt(value) {
-          return value instanceof P ? value : new P(function(resolve) {
-            resolve(value);
-          });
-        }
-        return new (P || (P = Promise))(function(resolve, reject) {
-          function fulfilled(value) {
-            try {
-              step(generator.next(value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function rejected(value) {
-            try {
-              step(generator["throw"](value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-          }
-          step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-      };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-          return this;
-        }), g;
-        function verb(n) {
-          return function(v) {
-            return step([n, v]);
-          };
-        }
-        function step(op) {
-          if (f)
-            throw new TypeError("Generator is already executing.");
-          while (_)
-            try {
-              if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
-                return t;
-              if (y = 0, t)
-                op = [op[0] & 2, t.value];
-              switch (op[0]) {
-                case 0:
-                case 1:
-                  t = op;
-                  break;
-                case 4:
-                  _.label++;
-                  return { value: op[1], done: false };
-                case 5:
-                  _.label++;
-                  y = op[1];
-                  op = [0];
-                  continue;
-                case 7:
-                  op = _.ops.pop();
-                  _.trys.pop();
-                  continue;
-                default:
-                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                    _ = 0;
-                    continue;
-                  }
-                  if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                    _.label = op[1];
-                    break;
-                  }
-                  if (op[0] === 6 && _.label < t[1]) {
-                    _.label = t[1];
-                    t = op;
-                    break;
-                  }
-                  if (t && _.label < t[2]) {
-                    _.label = t[2];
-                    _.ops.push(op);
-                    break;
-                  }
-                  if (t[2])
-                    _.ops.pop();
-                  _.trys.pop();
-                  continue;
-              }
-              op = body.call(thisArg, _);
-            } catch (e) {
-              op = [6, e];
-              y = 0;
-            } finally {
-              f = t = 0;
-            }
-          if (op[0] & 5)
-            throw op[1];
-          return { value: op[0] ? op[1] : void 0, done: true };
-        }
-      };
-      exports2.__esModule = true;
-      var resolver_js_1 = require_resolver();
-      var Address2 = function() {
-        function Address3(options) {
-          this.address = "";
-          var address = options.address, client = options.client, indexer = options.indexer;
-          this.address = address;
-          this.resolver = new resolver_js_1.Resolver(client, indexer);
-        }
-        Address3.prototype.getNames = function(options) {
-          return __awaiter(this, void 0, void 0, function() {
-            var socials, metadata, limit;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  socials = (options === null || options === void 0 ? void 0 : options.socials) || false, metadata = (options === null || options === void 0 ? void 0 : options.metadata) || false, limit = options === null || options === void 0 ? void 0 : options.metadata;
-                  return [
-                    4,
-                    this.resolver.getNamesOwnedByAddress(this.address, socials, metadata, limit)
-                  ];
-                case 1:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        return Address3;
-      }();
-      exports2.Address = Address2;
-    }
-  });
-
-  // src/index.ts
-  var import_errors = __toESM(require_errors());
-  var import_validation = __toESM(require_validation());
-  var import_name = __toESM(require_name());
-  var import_address4 = __toESM(require_address());
-  var ANS = class {
-    client;
-    indexer;
-    constructor(client, indexer) {
-      this.client = client;
-      this.indexer = indexer;
-    }
-    name(name) {
-      if (name.length > 0) {
-        name = name.toLowerCase();
-      }
-      name = name.split(".algo")[0];
-      if (!(0, import_validation.isValidName)(name)) {
-        throw new import_errors.InvalidNameError();
-      }
-      return new import_name.Name({
-        client: this.client,
-        indexer: this.indexer,
-        name
+  // node_modules/algosdk/dist/esm/src/bid.js
+  init_address();
+  init_encoding();
+  init_naclWrappers();
+  init_utils();
+  var Bid = class {
+    constructor({ bidderKey, bidAmount, bidID, auctionKey, auctionID, maxPrice }) {
+      this.name = "Bid";
+      this.tag = Buffer.from([97, 66]);
+      const decodedBidderKey = decodeAddress(bidderKey);
+      const decodedAuctionKey = decodeAddress(auctionKey);
+      if (!Number.isSafeInteger(bidAmount) || bidAmount < 0)
+        throw Error("Bid amount must be positive and 2^53-1");
+      if (!Number.isSafeInteger(bidID) || bidID < 0)
+        throw Error("BidID must be positive and 2^53-1");
+      if (!Number.isSafeInteger(auctionID) || auctionID < 0)
+        throw Error("auctionID must be positive");
+      Object.assign(this, {
+        bidderKey: decodedBidderKey,
+        bidAmount,
+        bidID,
+        auctionKey: decodedAuctionKey,
+        auctionID,
+        maxPrice
       });
+    }
+    get_obj_for_encoding() {
+      return {
+        bidder: Buffer.from(this.bidderKey.publicKey),
+        cur: this.bidAmount,
+        price: this.maxPrice,
+        id: this.bidID,
+        auc: Buffer.from(this.auctionKey.publicKey),
+        aid: this.auctionID
+      };
+    }
+    signBid(sk) {
+      const encodedMsg = encode2(this.get_obj_for_encoding());
+      const toBeSigned = Buffer.from(concatArrays(this.tag, encodedMsg));
+      const sig = sign(toBeSigned, sk);
+      const sBid = {
+        sig: Buffer.from(sig),
+        bid: this.get_obj_for_encoding()
+      };
+      const note = {
+        t: "b",
+        b: sBid
+      };
+      return new Uint8Array(encode2(note));
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/convert.js
+  var MICROALGOS_TO_ALGOS_RATIO = 1e6;
+  var INVALID_MICROALGOS_ERROR_MSG = "Microalgos should be positive and less than 2^53 - 1.";
+  function microalgosToAlgos(microalgos) {
+    if (microalgos < 0 || !Number.isSafeInteger(microalgos)) {
+      throw new Error(INVALID_MICROALGOS_ERROR_MSG);
+    }
+    return microalgos / MICROALGOS_TO_ALGOS_RATIO;
+  }
+  function algosToMicroalgos(algos) {
+    const microalgos = algos * MICROALGOS_TO_ALGOS_RATIO;
+    return Math.round(microalgos);
+  }
+
+  // node_modules/algosdk/dist/esm/src/main.js
+  init_utils();
+  __reExport(main_exports, __toESM(require_algod()));
+
+  // node_modules/algosdk/dist/esm/src/client/v2/serviceClient.js
+  init_client();
+  init_intDecoding();
+  function convertTokenStringToTokenHeader(token = "", headerIdentifier) {
+    const tokenHeader = {};
+    tokenHeader[headerIdentifier] = token;
+    return tokenHeader;
+  }
+  function isBaseHTTPClient(tbc) {
+    return typeof tbc.get === "function";
+  }
+  var ServiceClient = class {
+    constructor(tokenHeaderIdentifier, tokenHeaderOrStrOrBaseClient, baseServer, port, defaultHeaders = {}) {
+      if (isBaseHTTPClient(tokenHeaderOrStrOrBaseClient)) {
+        this.c = new HTTPClient(tokenHeaderOrStrOrBaseClient);
+      } else {
+        let tokenHeader;
+        if (typeof tokenHeaderOrStrOrBaseClient === "string") {
+          tokenHeader = convertTokenStringToTokenHeader(tokenHeaderOrStrOrBaseClient, tokenHeaderIdentifier);
+        } else {
+          tokenHeader = tokenHeaderOrStrOrBaseClient;
+        }
+        this.c = new HTTPClient(tokenHeader, baseServer, port, defaultHeaders);
+      }
+      this.intDecoding = intDecoding_default.DEFAULT;
+    }
+    setIntEncoding(method2) {
+      this.intDecoding = method2;
+    }
+    getIntEncoding() {
+      return this.intDecoding;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/accountInformation.js
+  init_jsonrequest();
+  var AccountInformation = class extends JSONRequest {
+    constructor(c, intDecoding, account) {
+      super(c, intDecoding);
+      this.account = account;
+      this.account = account;
+    }
+    path() {
+      return `/v2/accounts/${this.account}`;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/block.js
+  init_encoding();
+  init_jsonrequest();
+  var Block = class extends JSONRequest {
+    constructor(c, roundNumber) {
+      super(c);
+      if (!Number.isInteger(roundNumber))
+        throw Error("roundNumber should be an integer");
+      this.round = roundNumber;
+      this.query = { format: "msgpack" };
+    }
+    path() {
+      return `/v2/blocks/${this.round}`;
+    }
+    prepare(body) {
+      if (body && body.byteLength > 0) {
+        return decode2(body);
+      }
+      return void 0;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/compile.js
+  init_jsonrequest();
+  function setHeaders(headers = {}) {
+    let hdrs = headers;
+    if (Object.keys(hdrs).every((key) => key.toLowerCase() !== "content-type")) {
+      hdrs = __spreadValues({}, headers);
+      hdrs["Content-Type"] = "text/plain";
+    }
+    return hdrs;
+  }
+  var Compile = class extends JSONRequest {
+    constructor(c, source) {
+      super(c);
+      this.source = source;
+      this.source = source;
+    }
+    path() {
+      return `/v2/teal/compile`;
+    }
+    async do(headers = {}) {
+      const txHeaders = setHeaders(headers);
+      const res = await this.c.post(this.path(), Buffer.from(this.source), txHeaders);
+      return res.body;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/dryrun.js
+  init_jsonrequest();
+  init_encoding();
+  var Dryrun = class extends JSONRequest {
+    constructor(c, dr) {
+      super(c);
+      this.blob = encode2(dr.get_obj_for_encoding(true));
+    }
+    path() {
+      return "/v2/teal/dryrun";
+    }
+    async do(headers = {}) {
+      const txHeaders = setHeaders(headers);
+      const res = await this.c.post(this.path(), Buffer.from(this.blob), txHeaders);
+      return res.body;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/getAssetByID.js
+  init_jsonrequest();
+  var GetAssetByID = class extends JSONRequest {
+    constructor(c, intDecoding, index) {
+      super(c, intDecoding);
+      this.index = index;
+      this.index = index;
+    }
+    path() {
+      return `/v2/assets/${this.index}`;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/getApplicationByID.js
+  init_jsonrequest();
+  var GetApplicationByID = class extends JSONRequest {
+    constructor(c, intDecoding, index) {
+      super(c, intDecoding);
+      this.index = index;
+      this.index = index;
+    }
+    path() {
+      return `/v2/applications/${this.index}`;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/healthCheck.js
+  init_jsonrequest();
+  var HealthCheck = class extends JSONRequest {
+    path() {
+      return "/health";
+    }
+    async do(headers = {}) {
+      const res = await this.c.get(this.path(), {}, headers);
+      if (!res.ok) {
+        throw new Error(`Health response: ${res.status}`);
+      }
+      return {};
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactionInformation.js
+  init_jsonrequest();
+  init_encoding();
+  var PendingTransactionInformation = class extends JSONRequest {
+    constructor(c, txid) {
+      super(c);
+      this.txid = txid;
+      this.txid = txid;
+      this.query.format = "msgpack";
+    }
+    prepare(body) {
+      if (body && body.byteLength > 0) {
+        return decode2(body);
+      }
+      return void 0;
+    }
+    path() {
+      return `/v2/transactions/pending/${this.txid}`;
+    }
+    max(max) {
+      this.query.max = max;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactions.js
+  init_jsonrequest();
+  init_encoding();
+  var PendingTransactions = class extends JSONRequest {
+    constructor(c) {
+      super(c);
+      this.query.format = "msgpack";
+    }
+    path() {
+      return "/v2/transactions/pending";
+    }
+    prepare(body) {
+      if (body && body.byteLength > 0) {
+        return decode2(body);
+      }
+      return void 0;
+    }
+    max(max) {
+      this.query.max = max;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/pendingTransactionsByAddress.js
+  init_jsonrequest();
+  init_encoding();
+  var PendingTransactionsByAddress = class extends JSONRequest {
+    constructor(c, address) {
+      super(c);
+      this.address = address;
+      this.address = address;
+      this.query.format = "msgpack";
+    }
+    prepare(body) {
+      if (body && body.byteLength > 0) {
+        return decode2(body);
+      }
+      return void 0;
+    }
+    path() {
+      return `/v2/accounts/${this.address}/transactions/pending`;
+    }
+    max(max) {
+      this.query.max = max;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/algod.js
+  init_sendRawTransaction();
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/status.js
+  init_jsonrequest();
+  var Status = class extends JSONRequest {
+    path() {
+      return "/v2/status";
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/statusAfterBlock.js
+  init_jsonrequest();
+  var StatusAfterBlock = class extends JSONRequest {
+    constructor(c, intDecoding, round) {
+      super(c, intDecoding);
+      this.round = round;
+      if (!Number.isInteger(round))
+        throw Error("round should be an integer");
+      this.round = round;
+    }
+    path() {
+      return `/v2/status/wait-for-block-after/${this.round}`;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/suggestedParams.js
+  init_jsonrequest();
+  var SuggestedParamsRequest = class extends JSONRequest {
+    path() {
+      return "/v2/transactions/params";
+    }
+    prepare(body) {
+      return {
+        flatFee: false,
+        fee: body.fee,
+        firstRound: body["last-round"],
+        lastRound: body["last-round"] + 1e3,
+        genesisID: body["genesis-id"],
+        genesisHash: body["genesis-hash"]
+      };
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/supply.js
+  init_jsonrequest();
+  var Supply = class extends JSONRequest {
+    path() {
+      return "/v2/ledger/supply";
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/versions.js
+  init_jsonrequest();
+  var Versions = class extends JSONRequest {
+    path() {
+      return "/versions";
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/genesis.js
+  init_jsonrequest();
+  var Genesis = class extends JSONRequest {
+    path() {
+      return "/genesis";
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/proof.js
+  init_jsonrequest();
+  var Proof = class extends JSONRequest {
+    constructor(c, intDecoding, round, txID) {
+      super(c, intDecoding);
+      this.round = round;
+      this.txID = txID;
+      this.round = round;
+      this.txID = txID;
+    }
+    path() {
+      return `/v2/blocks/${this.round}/transactions/${this.txID}/proof`;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/algod.js
+  var AlgodClient = class extends ServiceClient {
+    constructor(tokenOrBaseClient, baseServer = "http://r2.algorand.network", port = 4180, headers = {}) {
+      super("X-Algo-API-Token", tokenOrBaseClient, baseServer, port, headers);
+    }
+    healthCheck() {
+      return new HealthCheck(this.c);
+    }
+    versionsCheck() {
+      return new Versions(this.c);
+    }
+    sendRawTransaction(stxOrStxs) {
+      return new SendRawTransaction(this.c, stxOrStxs);
+    }
+    accountInformation(account) {
+      return new AccountInformation(this.c, this.intDecoding, account);
+    }
+    block(roundNumber) {
+      return new Block(this.c, roundNumber);
+    }
+    pendingTransactionInformation(txid) {
+      return new PendingTransactionInformation(this.c, txid);
+    }
+    pendingTransactionsInformation() {
+      return new PendingTransactions(this.c);
+    }
+    pendingTransactionByAddress(address) {
+      return new PendingTransactionsByAddress(this.c, address);
+    }
+    status() {
+      return new Status(this.c, this.intDecoding);
+    }
+    statusAfterBlock(round) {
+      return new StatusAfterBlock(this.c, this.intDecoding, round);
+    }
+    getTransactionParams() {
+      return new SuggestedParamsRequest(this.c);
+    }
+    supply() {
+      return new Supply(this.c, this.intDecoding);
+    }
+    compile(source) {
+      return new Compile(this.c, source);
+    }
+    dryrun(dr) {
+      return new Dryrun(this.c, dr);
+    }
+    getAssetByID(index) {
+      return new GetAssetByID(this.c, this.intDecoding, index);
+    }
+    getApplicationByID(index) {
+      return new GetApplicationByID(this.c, this.intDecoding, index);
+    }
+    genesis() {
+      return new Genesis(this.c, this.intDecoding);
+    }
+    getProof(round, txID) {
+      return new Proof(this.c, this.intDecoding, round, txID);
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/kmd.js
+  init_transaction();
+  var Kmd = class extends ServiceClient {
+    constructor(token, baseServer = "http://127.0.0.1", port = 7833, headers = {}) {
+      super("X-KMD-API-Token", token, baseServer, port, headers);
+    }
+    async versions() {
+      const res = await this.c.get("/versions");
+      return res.body;
+    }
+    async listWallets() {
+      const res = await this.c.get("/v1/wallets");
+      return res.body;
+    }
+    async createWallet(walletName, walletPassword, walletMDK = "", walletDriverName = "sqlite") {
+      const req = {
+        wallet_name: walletName,
+        wallet_driver_name: walletDriverName,
+        wallet_password: walletPassword,
+        master_derivation_key: Buffer.from(walletMDK).toString("base64")
+      };
+      const res = await this.c.post("/v1/wallet", req);
+      return res.body;
+    }
+    async initWalletHandle(walletID, walletPassword) {
+      const req = {
+        wallet_id: walletID,
+        wallet_password: walletPassword
+      };
+      const res = await this.c.post("/v1/wallet/init", req);
+      return res.body;
+    }
+    async releaseWalletHandle(walletHandle) {
+      const req = {
+        wallet_handle_token: walletHandle
+      };
+      const res = await this.c.post("/v1/wallet/release", req);
+      return res.body;
+    }
+    async renewWalletHandle(walletHandle) {
+      const req = {
+        wallet_handle_token: walletHandle
+      };
+      const res = await this.c.post("/v1/wallet/renew", req);
+      return res.body;
+    }
+    async renameWallet(walletID, walletPassword, newWalletName) {
+      const req = {
+        wallet_id: walletID,
+        wallet_password: walletPassword,
+        wallet_name: newWalletName
+      };
+      const res = await this.c.post("/v1/wallet/rename", req);
+      return res.body;
+    }
+    async getWallet(walletHandle) {
+      const req = {
+        wallet_handle_token: walletHandle
+      };
+      const res = await this.c.post("/v1/wallet/info", req);
+      return res.body;
+    }
+    async exportMasterDerivationKey(walletHandle, walletPassword) {
+      const req = {
+        wallet_handle_token: walletHandle,
+        wallet_password: walletPassword
+      };
+      const res = await this.c.post("/v1/master-key/export", req);
+      return {
+        master_derivation_key: Buffer.from(res.body.master_derivation_key, "base64")
+      };
+    }
+    async importKey(walletHandle, secretKey) {
+      const req = {
+        wallet_handle_token: walletHandle,
+        private_key: Buffer.from(secretKey).toString("base64")
+      };
+      const res = await this.c.post("/v1/key/import", req);
+      return res.body;
+    }
+    async exportKey(walletHandle, walletPassword, addr) {
+      const req = {
+        wallet_handle_token: walletHandle,
+        address: addr,
+        wallet_password: walletPassword
+      };
+      const res = await this.c.post("/v1/key/export", req);
+      return { private_key: Buffer.from(res.body.private_key, "base64") };
+    }
+    async generateKey(walletHandle) {
+      const req = {
+        wallet_handle_token: walletHandle,
+        display_mnemonic: false
+      };
+      const res = await this.c.post("/v1/key", req);
+      return res.body;
+    }
+    async deleteKey(walletHandle, walletPassword, addr) {
+      const req = {
+        wallet_handle_token: walletHandle,
+        address: addr,
+        wallet_password: walletPassword
+      };
+      const res = await this.c.delete("/v1/key", req);
+      return res.body;
+    }
+    async listKeys(walletHandle) {
+      const req = {
+        wallet_handle_token: walletHandle
+      };
+      const res = await this.c.post("/v1/key/list", req);
+      return res.body;
+    }
+    async signTransaction(walletHandle, walletPassword, transaction) {
+      const tx = instantiateTxnIfNeeded(transaction);
+      const req = {
+        wallet_handle_token: walletHandle,
+        wallet_password: walletPassword,
+        transaction: Buffer.from(tx.toByte()).toString("base64")
+      };
+      const res = await this.c.post("/v1/transaction/sign", req);
+      if (res.status === 200) {
+        return Buffer.from(res.body.signed_transaction, "base64");
+      }
+      return res.body;
+    }
+    async signTransactionWithSpecificPublicKey(walletHandle, walletPassword, transaction, publicKey) {
+      const tx = instantiateTxnIfNeeded(transaction);
+      const req = {
+        wallet_handle_token: walletHandle,
+        wallet_password: walletPassword,
+        transaction: Buffer.from(tx.toByte()).toString("base64"),
+        public_key: Buffer.from(publicKey).toString("base64")
+      };
+      const res = await this.c.post("/v1/transaction/sign", req);
+      if (res.status === 200) {
+        return Buffer.from(res.body.signed_transaction, "base64");
+      }
+      return res.body;
+    }
+    async listMultisig(walletHandle) {
+      const req = {
+        wallet_handle_token: walletHandle
+      };
+      const res = await this.c.post("/v1/multisig/list", req);
+      return res.body;
+    }
+    async importMultisig(walletHandle, version, threshold, pks) {
+      const req = {
+        wallet_handle_token: walletHandle,
+        multisig_version: version,
+        threshold,
+        pks
+      };
+      const res = await this.c.post("/v1/multisig/import", req);
+      return res.body;
+    }
+    async exportMultisig(walletHandle, addr) {
+      const req = {
+        wallet_handle_token: walletHandle,
+        address: addr
+      };
+      const res = await this.c.post("/v1/multisig/export", req);
+      return res.body;
+    }
+    async signMultisigTransaction(walletHandle, pw, transaction, pk, partial) {
+      const tx = instantiateTxnIfNeeded(transaction);
+      const req = {
+        wallet_handle_token: walletHandle,
+        transaction: Buffer.from(tx.toByte()).toString("base64"),
+        public_key: Buffer.from(pk).toString("base64"),
+        partial_multisig: partial,
+        wallet_password: pw
+      };
+      const res = await this.c.post("/v1/multisig/sign", req);
+      return res.body;
+    }
+    async deleteMultisig(walletHandle, walletPassword, addr) {
+      const req = {
+        wallet_handle_token: walletHandle,
+        address: addr,
+        wallet_password: walletPassword
+      };
+      const res = await this.c.delete("/v1/multisig", req);
+      return res.body;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/main.js
+  init_intDecoding();
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/makeHealthCheck.js
+  init_jsonrequest();
+  var MakeHealthCheck = class extends JSONRequest {
+    path() {
+      return "/health";
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetBalances.js
+  init_jsonrequest();
+  var LookupAssetBalances = class extends JSONRequest {
+    constructor(c, intDecoding, index) {
+      super(c, intDecoding);
+      this.index = index;
+      this.index = index;
+    }
+    path() {
+      return `/v2/assets/${this.index}/balances`;
+    }
+    limit(limit) {
+      this.query.limit = limit;
+      return this;
+    }
+    round(round) {
+      this.query.round = round;
+      return this;
+    }
+    currencyGreaterThan(greater) {
+      this.query["currency-greater-than"] = greater;
+      return this;
+    }
+    currencyLessThan(lesser) {
+      this.query["currency-less-than"] = lesser;
+      return this;
+    }
+    nextToken(nextToken) {
+      this.query.next = nextToken;
+      return this;
+    }
+    includeAll(value = true) {
+      this.query["include-all"] = value;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetTransactions.js
+  init_jsonrequest();
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAccountTransactions.js
+  init_jsonrequest();
+  function base64StringFunnel(data) {
+    if (typeof data === "string") {
+      return data;
+    }
+    return Buffer.from(data).toString("base64");
+  }
+  var LookupAccountTransactions = class extends JSONRequest {
+    constructor(c, intDecoding, account) {
+      super(c, intDecoding);
+      this.account = account;
+      this.account = account;
+    }
+    path() {
+      return `/v2/accounts/${this.account}/transactions`;
+    }
+    notePrefix(prefix) {
+      this.query["note-prefix"] = base64StringFunnel(prefix);
+      return this;
+    }
+    txType(type) {
+      this.query["tx-type"] = type;
+      return this;
+    }
+    sigType(type) {
+      this.query["sig-type"] = type;
+      return this;
+    }
+    txid(txid) {
+      this.query.txid = txid;
+      return this;
+    }
+    round(round) {
+      this.query.round = round;
+      return this;
+    }
+    minRound(round) {
+      this.query["min-round"] = round;
+      return this;
+    }
+    maxRound(round) {
+      this.query["max-round"] = round;
+      return this;
+    }
+    assetID(id) {
+      this.query["asset-id"] = id;
+      return this;
+    }
+    limit(limit) {
+      this.query.limit = limit;
+      return this;
+    }
+    beforeTime(before) {
+      this.query["before-time"] = before;
+      return this;
+    }
+    afterTime(after) {
+      this.query["after-time"] = after;
+      return this;
+    }
+    currencyGreaterThan(greater) {
+      this.query["currency-greater-than"] = greater;
+      return this;
+    }
+    currencyLessThan(lesser) {
+      this.query["currency-less-than"] = lesser;
+      return this;
+    }
+    nextToken(nextToken) {
+      this.query.next = nextToken;
+      return this;
+    }
+    rekeyTo(rekeyTo) {
+      this.query["rekey-to"] = rekeyTo;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetTransactions.js
+  var LookupAssetTransactions = class extends JSONRequest {
+    constructor(c, intDecoding, index) {
+      super(c, intDecoding);
+      this.index = index;
+      this.index = index;
+    }
+    path() {
+      return `/v2/assets/${this.index}/transactions`;
+    }
+    notePrefix(prefix) {
+      this.query["note-prefix"] = base64StringFunnel(prefix);
+      return this;
+    }
+    txType(type) {
+      this.query["tx-type"] = type;
+      return this;
+    }
+    sigType(type) {
+      this.query["sig-type"] = type;
+      return this;
+    }
+    txid(txid) {
+      this.query.txid = txid;
+      return this;
+    }
+    round(round) {
+      this.query.round = round;
+      return this;
+    }
+    minRound(round) {
+      this.query["min-round"] = round;
+      return this;
+    }
+    maxRound(round) {
+      this.query["max-round"] = round;
+      return this;
+    }
+    assetID(id) {
+      this.query["asset-id"] = id;
+      return this;
+    }
+    limit(limit) {
+      this.query.limit = limit;
+      return this;
+    }
+    beforeTime(before) {
+      this.query["before-time"] = before;
+      return this;
+    }
+    afterTime(after) {
+      this.query["after-time"] = after;
+      return this;
+    }
+    currencyGreaterThan(greater) {
+      this.query["currency-greater-than"] = greater;
+      return this;
+    }
+    currencyLessThan(lesser) {
+      this.query["currency-less-than"] = lesser;
+      return this;
+    }
+    addressRole(role) {
+      this.query["address-role"] = role;
+      return this;
     }
     address(address) {
-      if (!(0, import_validation.isValidAddress)(address)) {
-        throw new import_errors.AddressValidationError();
+      this.query.address = address;
+      return this;
+    }
+    excludeCloseTo(exclude) {
+      this.query["exclude-close-to"] = exclude;
+      return this;
+    }
+    nextToken(nextToken) {
+      this.query.next = nextToken;
+      return this;
+    }
+    rekeyTo(rekeyTo) {
+      this.query["rekey-to"] = rekeyTo;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupBlock.js
+  init_jsonrequest();
+  var LookupBlock = class extends JSONRequest {
+    constructor(c, intDecoding, round) {
+      super(c, intDecoding);
+      this.round = round;
+      this.round = round;
+    }
+    path() {
+      return `/v2/blocks/${this.round}`;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupTransactionByID.js
+  init_jsonrequest();
+  var LookupTransactionByID = class extends JSONRequest {
+    constructor(c, intDecoding, txID) {
+      super(c, intDecoding);
+      this.txID = txID;
+      this.txID = txID;
+    }
+    path() {
+      return `/v2/transactions/${this.txID}`;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAccountByID.js
+  init_jsonrequest();
+  var LookupAccountByID = class extends JSONRequest {
+    constructor(c, intDecoding, account) {
+      super(c, intDecoding);
+      this.account = account;
+      this.account = account;
+    }
+    path() {
+      return `/v2/accounts/${this.account}`;
+    }
+    round(round) {
+      this.query.round = round;
+      return this;
+    }
+    includeAll(value = true) {
+      this.query["include-all"] = value;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupAssetByID.js
+  init_jsonrequest();
+  var LookupAssetByID = class extends JSONRequest {
+    constructor(c, intDecoding, index) {
+      super(c, intDecoding);
+      this.index = index;
+      this.index = index;
+    }
+    path() {
+      return `/v2/assets/${this.index}`;
+    }
+    includeAll(value = true) {
+      this.query["include-all"] = value;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupApplications.js
+  init_jsonrequest();
+  var LookupApplications = class extends JSONRequest {
+    constructor(c, intDecoding, index) {
+      super(c, intDecoding);
+      this.index = index;
+      this.index = index;
+    }
+    path() {
+      return `/v2/applications/${this.index}`;
+    }
+    includeAll(value = true) {
+      this.query["include-all"] = value;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/lookupApplicationLogs.js
+  init_jsonrequest();
+  var LookupApplicationLogs = class extends JSONRequest {
+    constructor(c, intDecoding, appID) {
+      super(c, intDecoding);
+      this.appID = appID;
+      this.appID = appID;
+    }
+    path() {
+      return `/v2/applications/${this.appID}/logs`;
+    }
+    limit(limit) {
+      this.query.limit = limit;
+      return this;
+    }
+    minRound(round) {
+      this.query["min-round"] = round;
+      return this;
+    }
+    maxRound(round) {
+      this.query["max-round"] = round;
+      return this;
+    }
+    nextToken(nextToken) {
+      this.query.next = nextToken;
+      return this;
+    }
+    sender(senderAddress) {
+      this.query["sender-address"] = senderAddress;
+      return this;
+    }
+    txid(txid) {
+      this.query.txid = txid;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/searchAccounts.js
+  init_jsonrequest();
+  var SearchAccounts = class extends JSONRequest {
+    path() {
+      return "/v2/accounts";
+    }
+    currencyGreaterThan(greater) {
+      this.query["currency-greater-than"] = greater;
+      return this;
+    }
+    currencyLessThan(lesser) {
+      this.query["currency-less-than"] = lesser;
+      return this;
+    }
+    limit(limit) {
+      this.query.limit = limit;
+      return this;
+    }
+    assetID(id) {
+      this.query["asset-id"] = id;
+      return this;
+    }
+    nextToken(nextToken) {
+      this.query.next = nextToken;
+      return this;
+    }
+    round(round) {
+      this.query.round = round;
+      return this;
+    }
+    authAddr(authAddr) {
+      this.query["auth-addr"] = authAddr;
+      return this;
+    }
+    applicationID(applicationID) {
+      this.query["application-id"] = applicationID;
+      return this;
+    }
+    includeAll(value = true) {
+      this.query["include-all"] = value;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForTransactions.js
+  init_jsonrequest();
+  var SearchForTransactions = class extends JSONRequest {
+    path() {
+      return "/v2/transactions";
+    }
+    notePrefix(prefix) {
+      this.query["note-prefix"] = base64StringFunnel(prefix);
+      return this;
+    }
+    txType(type) {
+      this.query["tx-type"] = type;
+      return this;
+    }
+    sigType(type) {
+      this.query["sig-type"] = type;
+      return this;
+    }
+    txid(txid) {
+      this.query.txid = txid;
+      return this;
+    }
+    round(round) {
+      this.query.round = round;
+      return this;
+    }
+    minRound(round) {
+      this.query["min-round"] = round;
+      return this;
+    }
+    maxRound(round) {
+      this.query["max-round"] = round;
+      return this;
+    }
+    assetID(id) {
+      this.query["asset-id"] = id;
+      return this;
+    }
+    limit(limit) {
+      this.query.limit = limit;
+      return this;
+    }
+    beforeTime(before) {
+      this.query["before-time"] = before;
+      return this;
+    }
+    afterTime(after) {
+      this.query["after-time"] = after;
+      return this;
+    }
+    currencyGreaterThan(greater) {
+      this.query["currency-greater-than"] = greater;
+      return this;
+    }
+    currencyLessThan(lesser) {
+      this.query["currency-less-than"] = lesser;
+      return this;
+    }
+    addressRole(role) {
+      this.query["address-role"] = role;
+      return this;
+    }
+    address(address) {
+      this.query.address = address;
+      return this;
+    }
+    excludeCloseTo(exclude) {
+      this.query["exclude-close-to"] = exclude;
+      return this;
+    }
+    nextToken(nextToken) {
+      this.query.next = nextToken;
+      return this;
+    }
+    rekeyTo(rekeyTo) {
+      this.query["rekey-to"] = rekeyTo;
+      return this;
+    }
+    applicationID(applicationID) {
+      this.query["application-id"] = applicationID;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForAssets.js
+  init_jsonrequest();
+  var SearchForAssets = class extends JSONRequest {
+    path() {
+      return "/v2/assets";
+    }
+    limit(limit) {
+      this.query.limit = limit;
+      return this;
+    }
+    creator(creator) {
+      this.query.creator = creator;
+      return this;
+    }
+    name(name) {
+      this.query.name = name;
+      return this;
+    }
+    unit(unit) {
+      this.query.unit = unit;
+      return this;
+    }
+    index(index) {
+      this.query["asset-id"] = index;
+      return this;
+    }
+    nextToken(nextToken) {
+      this.query.next = nextToken;
+      return this;
+    }
+    includeAll(value = true) {
+      this.query["include-all"] = value;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/searchForApplications.js
+  init_jsonrequest();
+  var SearchForApplications = class extends JSONRequest {
+    path() {
+      return "/v2/applications";
+    }
+    index(index) {
+      this.query["application-id"] = index;
+      return this;
+    }
+    nextToken(next) {
+      this.query.next = next;
+      return this;
+    }
+    limit(limit) {
+      this.query.limit = limit;
+      return this;
+    }
+    includeAll(value = true) {
+      this.query["include-all"] = value;
+      return this;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/indexer/indexer.js
+  var IndexerClient = class extends ServiceClient {
+    constructor(tokenOrBaseClient, baseServer = "http://127.0.0.1", port = 8080, headers = {}) {
+      super("X-Indexer-API-Token", tokenOrBaseClient, baseServer, port, headers);
+    }
+    makeHealthCheck() {
+      return new MakeHealthCheck(this.c, this.intDecoding);
+    }
+    lookupAssetBalances(index) {
+      return new LookupAssetBalances(this.c, this.intDecoding, index);
+    }
+    lookupAssetTransactions(index) {
+      return new LookupAssetTransactions(this.c, this.intDecoding, index);
+    }
+    lookupAccountTransactions(account) {
+      return new LookupAccountTransactions(this.c, this.intDecoding, account);
+    }
+    lookupBlock(round) {
+      return new LookupBlock(this.c, this.intDecoding, round);
+    }
+    lookupTransactionByID(txID) {
+      return new LookupTransactionByID(this.c, this.intDecoding, txID);
+    }
+    lookupAccountByID(account) {
+      return new LookupAccountByID(this.c, this.intDecoding, account);
+    }
+    lookupAssetByID(index) {
+      return new LookupAssetByID(this.c, this.intDecoding, index);
+    }
+    lookupApplications(index) {
+      return new LookupApplications(this.c, this.intDecoding, index);
+    }
+    lookupApplicationLogs(appID) {
+      return new LookupApplicationLogs(this.c, this.intDecoding, appID);
+    }
+    searchAccounts() {
+      return new SearchAccounts(this.c, this.intDecoding);
+    }
+    searchForTransactions() {
+      return new SearchForTransactions(this.c, this.intDecoding);
+    }
+    searchForAssets() {
+      return new SearchForAssets(this.c, this.intDecoding);
+    }
+    searchForApplications() {
+      return new SearchForApplications(this.c, this.intDecoding);
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/wait.js
+  async function waitForConfirmation(client, txid, waitRounds) {
+    const status = await client.status().do();
+    if (typeof status === "undefined") {
+      throw new Error("Unable to get node status");
+    }
+    const startRound = status["last-round"] + 1;
+    let currentRound = startRound;
+    while (currentRound < startRound + waitRounds) {
+      let poolError = false;
+      try {
+        const pendingInfo = await client.pendingTransactionInformation(txid).do();
+        if (pendingInfo["confirmed-round"]) {
+          return pendingInfo;
+        }
+        if (pendingInfo["pool-error"]) {
+          poolError = true;
+          throw new Error(`Transaction Rejected: ${pendingInfo["pool-error"]}`);
+        }
+      } catch (err) {
+        if (poolError) {
+          throw err;
+        }
       }
-      return new import_address4.Address({
-        client: this.client,
-        indexer: this.indexer,
-        address
+      await client.statusAfterBlock(currentRound).do();
+      currentRound += 1;
+    }
+    throw new Error(`Transaction not confirmed after ${waitRounds} rounds`);
+  }
+
+  // node_modules/algosdk/dist/esm/src/main.js
+  init_address();
+  init_uint64();
+
+  // node_modules/algosdk/dist/esm/src/account.js
+  init_naclWrappers();
+  init_address();
+  function generateAccount() {
+    const keys = keyPair();
+    const encodedPk = encodeAddress(keys.publicKey);
+    return { addr: encodedPk, sk: keys.secretKey };
+  }
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/models/types.js
+  var types_exports = {};
+  __export(types_exports, {
+    Account: () => Account,
+    AccountParticipation: () => AccountParticipation,
+    AccountStateDelta: () => AccountStateDelta,
+    Application: () => Application,
+    ApplicationLocalState: () => ApplicationLocalState,
+    ApplicationParams: () => ApplicationParams,
+    ApplicationStateSchema: () => ApplicationStateSchema,
+    Asset: () => Asset,
+    AssetHolding: () => AssetHolding,
+    AssetParams: () => AssetParams,
+    BlockResponse: () => BlockResponse,
+    BuildVersion: () => BuildVersion,
+    CatchpointAbortResponse: () => CatchpointAbortResponse,
+    CatchpointStartResponse: () => CatchpointStartResponse,
+    CompileResponse: () => CompileResponse,
+    DryrunRequest: () => DryrunRequest,
+    DryrunResponse: () => DryrunResponse,
+    DryrunSource: () => DryrunSource,
+    DryrunState: () => DryrunState,
+    DryrunTxnResult: () => DryrunTxnResult,
+    ErrorResponse: () => ErrorResponse,
+    EvalDelta: () => EvalDelta,
+    EvalDeltaKeyValue: () => EvalDeltaKeyValue,
+    NodeStatusResponse: () => NodeStatusResponse,
+    PendingTransactionResponse: () => PendingTransactionResponse,
+    PendingTransactionsResponse: () => PendingTransactionsResponse,
+    PostTransactionsResponse: () => PostTransactionsResponse,
+    ProofResponse: () => ProofResponse,
+    SupplyResponse: () => SupplyResponse,
+    TealKeyValue: () => TealKeyValue,
+    TealValue: () => TealValue,
+    TransactionParametersResponse: () => TransactionParametersResponse,
+    Version: () => Version
+  });
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/models/base.js
+  function _is_primitive(val) {
+    return val === void 0 || val == null || typeof val !== "object" && typeof val !== "function";
+  }
+  function _get_obj_for_encoding(val, binary) {
+    let targetPropValue;
+    if (val instanceof Uint8Array) {
+      targetPropValue = binary ? val : Buffer.from(val).toString("base64");
+    } else if (typeof val.get_obj_for_encoding === "function") {
+      targetPropValue = val.get_obj_for_encoding(binary);
+    } else if (Array.isArray(val)) {
+      targetPropValue = [];
+      for (const elem of val) {
+        targetPropValue.push(_get_obj_for_encoding(elem, binary));
+      }
+    } else if (typeof val === "object") {
+      const obj = {};
+      for (const prop of Object.keys(val)) {
+        obj[prop] = _get_obj_for_encoding(val[prop], binary);
+      }
+      targetPropValue = obj;
+    } else if (_is_primitive(val)) {
+      targetPropValue = val;
+    } else {
+      throw new Error(`Unsupported value: ${String(val)}`);
+    }
+    return targetPropValue;
+  }
+  var BaseModel = class {
+    get_obj_for_encoding(binary = false) {
+      const obj = {};
+      for (const prop of Object.keys(this.attribute_map)) {
+        const name = this.attribute_map[prop];
+        const value = this[prop];
+        if (typeof value !== "undefined") {
+          obj[name] = value === null ? null : _get_obj_for_encoding(value, binary);
+        }
+      }
+      return obj;
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/client/v2/algod/models/types.js
+  var Account = class extends BaseModel {
+    constructor({ address, amount, amountWithoutPendingRewards, pendingRewards, rewards, round, status, appsLocalState, appsTotalExtraPages, appsTotalSchema, assets, authAddr, createdApps, createdAssets, participation, rewardBase, sigType }) {
+      super();
+      this.address = address;
+      this.amount = amount;
+      this.amountWithoutPendingRewards = amountWithoutPendingRewards;
+      this.pendingRewards = pendingRewards;
+      this.rewards = rewards;
+      this.round = round;
+      this.status = status;
+      this.appsLocalState = appsLocalState;
+      this.appsTotalExtraPages = appsTotalExtraPages;
+      this.appsTotalSchema = appsTotalSchema;
+      this.assets = assets;
+      this.authAddr = authAddr;
+      this.createdApps = createdApps;
+      this.createdAssets = createdAssets;
+      this.participation = participation;
+      this.rewardBase = rewardBase;
+      this.sigType = sigType;
+      this.attribute_map = {
+        address: "address",
+        amount: "amount",
+        amountWithoutPendingRewards: "amount-without-pending-rewards",
+        pendingRewards: "pending-rewards",
+        rewards: "rewards",
+        round: "round",
+        status: "status",
+        appsLocalState: "apps-local-state",
+        appsTotalExtraPages: "apps-total-extra-pages",
+        appsTotalSchema: "apps-total-schema",
+        assets: "assets",
+        authAddr: "auth-addr",
+        createdApps: "created-apps",
+        createdAssets: "created-assets",
+        participation: "participation",
+        rewardBase: "reward-base",
+        sigType: "sig-type"
+      };
+    }
+  };
+  var AccountParticipation = class extends BaseModel {
+    constructor({ selectionParticipationKey, voteFirstValid, voteKeyDilution, voteLastValid, voteParticipationKey }) {
+      super();
+      this.selectionParticipationKey = typeof selectionParticipationKey === "string" ? new Uint8Array(Buffer.from(selectionParticipationKey, "base64")) : selectionParticipationKey;
+      this.voteFirstValid = voteFirstValid;
+      this.voteKeyDilution = voteKeyDilution;
+      this.voteLastValid = voteLastValid;
+      this.voteParticipationKey = typeof voteParticipationKey === "string" ? new Uint8Array(Buffer.from(voteParticipationKey, "base64")) : voteParticipationKey;
+      this.attribute_map = {
+        selectionParticipationKey: "selection-participation-key",
+        voteFirstValid: "vote-first-valid",
+        voteKeyDilution: "vote-key-dilution",
+        voteLastValid: "vote-last-valid",
+        voteParticipationKey: "vote-participation-key"
+      };
+    }
+  };
+  var AccountStateDelta = class extends BaseModel {
+    constructor(address, delta) {
+      super();
+      this.address = address;
+      this.delta = delta;
+      this.attribute_map = {
+        address: "address",
+        delta: "delta"
+      };
+    }
+  };
+  var Application = class extends BaseModel {
+    constructor(id, params) {
+      super();
+      this.id = id;
+      this.params = params;
+      this.attribute_map = {
+        id: "id",
+        params: "params"
+      };
+    }
+  };
+  var ApplicationLocalState = class extends BaseModel {
+    constructor(id, schema, keyValue) {
+      super();
+      this.id = id;
+      this.schema = schema;
+      this.keyValue = keyValue;
+      this.attribute_map = {
+        id: "id",
+        schema: "schema",
+        keyValue: "key-value"
+      };
+    }
+  };
+  var ApplicationParams = class extends BaseModel {
+    constructor({ approvalProgram, clearStateProgram, creator, extraProgramPages, globalState, globalStateSchema, localStateSchema }) {
+      super();
+      this.approvalProgram = typeof approvalProgram === "string" ? new Uint8Array(Buffer.from(approvalProgram, "base64")) : approvalProgram;
+      this.clearStateProgram = typeof clearStateProgram === "string" ? new Uint8Array(Buffer.from(clearStateProgram, "base64")) : clearStateProgram;
+      this.creator = creator;
+      this.extraProgramPages = extraProgramPages;
+      this.globalState = globalState;
+      this.globalStateSchema = globalStateSchema;
+      this.localStateSchema = localStateSchema;
+      this.attribute_map = {
+        approvalProgram: "approval-program",
+        clearStateProgram: "clear-state-program",
+        creator: "creator",
+        extraProgramPages: "extra-program-pages",
+        globalState: "global-state",
+        globalStateSchema: "global-state-schema",
+        localStateSchema: "local-state-schema"
+      };
+    }
+  };
+  var ApplicationStateSchema = class extends BaseModel {
+    constructor(numUint, numByteSlice) {
+      super();
+      this.numUint = numUint;
+      this.numByteSlice = numByteSlice;
+      this.attribute_map = {
+        numUint: "num-uint",
+        numByteSlice: "num-byte-slice"
+      };
+    }
+  };
+  var Asset = class extends BaseModel {
+    constructor(index, params) {
+      super();
+      this.index = index;
+      this.params = params;
+      this.attribute_map = {
+        index: "index",
+        params: "params"
+      };
+    }
+  };
+  var AssetHolding = class extends BaseModel {
+    constructor(amount, assetId, creator, isFrozen) {
+      super();
+      this.amount = amount;
+      this.assetId = assetId;
+      this.creator = creator;
+      this.isFrozen = isFrozen;
+      this.attribute_map = {
+        amount: "amount",
+        assetId: "asset-id",
+        creator: "creator",
+        isFrozen: "is-frozen"
+      };
+    }
+  };
+  var AssetParams = class extends BaseModel {
+    constructor({ creator, decimals, total, clawback, defaultFrozen, freeze, manager, metadataHash, name, nameB64, reserve, unitName, unitNameB64, url, urlB64 }) {
+      super();
+      this.creator = creator;
+      this.decimals = decimals;
+      this.total = total;
+      this.clawback = clawback;
+      this.defaultFrozen = defaultFrozen;
+      this.freeze = freeze;
+      this.manager = manager;
+      this.metadataHash = typeof metadataHash === "string" ? new Uint8Array(Buffer.from(metadataHash, "base64")) : metadataHash;
+      this.name = name;
+      this.nameB64 = typeof nameB64 === "string" ? new Uint8Array(Buffer.from(nameB64, "base64")) : nameB64;
+      this.reserve = reserve;
+      this.unitName = unitName;
+      this.unitNameB64 = typeof unitNameB64 === "string" ? new Uint8Array(Buffer.from(unitNameB64, "base64")) : unitNameB64;
+      this.url = url;
+      this.urlB64 = typeof urlB64 === "string" ? new Uint8Array(Buffer.from(urlB64, "base64")) : urlB64;
+      this.attribute_map = {
+        creator: "creator",
+        decimals: "decimals",
+        total: "total",
+        clawback: "clawback",
+        defaultFrozen: "default-frozen",
+        freeze: "freeze",
+        manager: "manager",
+        metadataHash: "metadata-hash",
+        name: "name",
+        nameB64: "name-b64",
+        reserve: "reserve",
+        unitName: "unit-name",
+        unitNameB64: "unit-name-b64",
+        url: "url",
+        urlB64: "url-b64"
+      };
+    }
+  };
+  var BlockResponse = class extends BaseModel {
+    constructor(block, cert) {
+      super();
+      this.block = block;
+      this.cert = cert;
+      this.attribute_map = {
+        block: "block",
+        cert: "cert"
+      };
+    }
+  };
+  var BuildVersion = class extends BaseModel {
+    constructor({ branch, buildNumber, channel, commitHash, major, minor }) {
+      super();
+      this.branch = branch;
+      this.buildNumber = buildNumber;
+      this.channel = channel;
+      this.commitHash = commitHash;
+      this.major = major;
+      this.minor = minor;
+      this.attribute_map = {
+        branch: "branch",
+        buildNumber: "build_number",
+        channel: "channel",
+        commitHash: "commit_hash",
+        major: "major",
+        minor: "minor"
+      };
+    }
+  };
+  var CatchpointAbortResponse = class extends BaseModel {
+    constructor(catchupMessage) {
+      super();
+      this.catchupMessage = catchupMessage;
+      this.attribute_map = {
+        catchupMessage: "catchup-message"
+      };
+    }
+  };
+  var CatchpointStartResponse = class extends BaseModel {
+    constructor(catchupMessage) {
+      super();
+      this.catchupMessage = catchupMessage;
+      this.attribute_map = {
+        catchupMessage: "catchup-message"
+      };
+    }
+  };
+  var CompileResponse = class extends BaseModel {
+    constructor(hash, result) {
+      super();
+      this.hash = hash;
+      this.result = result;
+      this.attribute_map = {
+        hash: "hash",
+        result: "result"
+      };
+    }
+  };
+  var DryrunRequest = class extends BaseModel {
+    constructor({ accounts, apps, latestTimestamp, protocolVersion, round, sources, txns }) {
+      super();
+      this.accounts = accounts;
+      this.apps = apps;
+      this.latestTimestamp = latestTimestamp;
+      this.protocolVersion = protocolVersion;
+      this.round = round;
+      this.sources = sources;
+      this.txns = txns;
+      this.attribute_map = {
+        accounts: "accounts",
+        apps: "apps",
+        latestTimestamp: "latest-timestamp",
+        protocolVersion: "protocol-version",
+        round: "round",
+        sources: "sources",
+        txns: "txns"
+      };
+    }
+  };
+  var DryrunResponse = class extends BaseModel {
+    constructor(error, protocolVersion, txns) {
+      super();
+      this.error = error;
+      this.protocolVersion = protocolVersion;
+      this.txns = txns;
+      this.attribute_map = {
+        error: "error",
+        protocolVersion: "protocol-version",
+        txns: "txns"
+      };
+    }
+  };
+  var DryrunSource = class extends BaseModel {
+    constructor(fieldName, source, txnIndex, appIndex) {
+      super();
+      this.fieldName = fieldName;
+      this.source = source;
+      this.txnIndex = txnIndex;
+      this.appIndex = appIndex;
+      this.attribute_map = {
+        fieldName: "field-name",
+        source: "source",
+        txnIndex: "txn-index",
+        appIndex: "app-index"
+      };
+    }
+  };
+  var DryrunState = class extends BaseModel {
+    constructor({ line, pc, stack, error, scratch }) {
+      super();
+      this.line = line;
+      this.pc = pc;
+      this.stack = stack;
+      this.error = error;
+      this.scratch = scratch;
+      this.attribute_map = {
+        line: "line",
+        pc: "pc",
+        stack: "stack",
+        error: "error",
+        scratch: "scratch"
+      };
+    }
+  };
+  var DryrunTxnResult = class extends BaseModel {
+    constructor({ disassembly, appCallMessages, appCallTrace, cost, globalDelta, localDeltas, logicSigMessages, logicSigTrace, logs }) {
+      super();
+      this.disassembly = disassembly;
+      this.appCallMessages = appCallMessages;
+      this.appCallTrace = appCallTrace;
+      this.cost = cost;
+      this.globalDelta = globalDelta;
+      this.localDeltas = localDeltas;
+      this.logicSigMessages = logicSigMessages;
+      this.logicSigTrace = logicSigTrace;
+      this.logs = logs;
+      this.attribute_map = {
+        disassembly: "disassembly",
+        appCallMessages: "app-call-messages",
+        appCallTrace: "app-call-trace",
+        cost: "cost",
+        globalDelta: "global-delta",
+        localDeltas: "local-deltas",
+        logicSigMessages: "logic-sig-messages",
+        logicSigTrace: "logic-sig-trace",
+        logs: "logs"
+      };
+    }
+  };
+  var ErrorResponse = class extends BaseModel {
+    constructor(message, data) {
+      super();
+      this.message = message;
+      this.data = data;
+      this.attribute_map = {
+        message: "message",
+        data: "data"
+      };
+    }
+  };
+  var EvalDelta = class extends BaseModel {
+    constructor(action, bytes, uint) {
+      super();
+      this.action = action;
+      this.bytes = bytes;
+      this.uint = uint;
+      this.attribute_map = {
+        action: "action",
+        bytes: "bytes",
+        uint: "uint"
+      };
+    }
+  };
+  var EvalDeltaKeyValue = class extends BaseModel {
+    constructor(key, value) {
+      super();
+      this.key = key;
+      this.value = value;
+      this.attribute_map = {
+        key: "key",
+        value: "value"
+      };
+    }
+  };
+  var NodeStatusResponse = class extends BaseModel {
+    constructor({ catchupTime, lastRound, lastVersion, nextVersion, nextVersionRound, nextVersionSupported, stoppedAtUnsupportedRound, timeSinceLastRound, catchpoint, catchpointAcquiredBlocks, catchpointProcessedAccounts, catchpointTotalAccounts, catchpointTotalBlocks, catchpointVerifiedAccounts, lastCatchpoint }) {
+      super();
+      this.catchupTime = catchupTime;
+      this.lastRound = lastRound;
+      this.lastVersion = lastVersion;
+      this.nextVersion = nextVersion;
+      this.nextVersionRound = nextVersionRound;
+      this.nextVersionSupported = nextVersionSupported;
+      this.stoppedAtUnsupportedRound = stoppedAtUnsupportedRound;
+      this.timeSinceLastRound = timeSinceLastRound;
+      this.catchpoint = catchpoint;
+      this.catchpointAcquiredBlocks = catchpointAcquiredBlocks;
+      this.catchpointProcessedAccounts = catchpointProcessedAccounts;
+      this.catchpointTotalAccounts = catchpointTotalAccounts;
+      this.catchpointTotalBlocks = catchpointTotalBlocks;
+      this.catchpointVerifiedAccounts = catchpointVerifiedAccounts;
+      this.lastCatchpoint = lastCatchpoint;
+      this.attribute_map = {
+        catchupTime: "catchup-time",
+        lastRound: "last-round",
+        lastVersion: "last-version",
+        nextVersion: "next-version",
+        nextVersionRound: "next-version-round",
+        nextVersionSupported: "next-version-supported",
+        stoppedAtUnsupportedRound: "stopped-at-unsupported-round",
+        timeSinceLastRound: "time-since-last-round",
+        catchpoint: "catchpoint",
+        catchpointAcquiredBlocks: "catchpoint-acquired-blocks",
+        catchpointProcessedAccounts: "catchpoint-processed-accounts",
+        catchpointTotalAccounts: "catchpoint-total-accounts",
+        catchpointTotalBlocks: "catchpoint-total-blocks",
+        catchpointVerifiedAccounts: "catchpoint-verified-accounts",
+        lastCatchpoint: "last-catchpoint"
+      };
+    }
+  };
+  var PendingTransactionResponse = class extends BaseModel {
+    constructor({ poolError, txn, applicationIndex, assetClosingAmount, assetIndex, closeRewards, closingAmount, confirmedRound, globalStateDelta, innerTxns, localStateDelta, logs, receiverRewards, senderRewards }) {
+      super();
+      this.poolError = poolError;
+      this.txn = txn;
+      this.applicationIndex = applicationIndex;
+      this.assetClosingAmount = assetClosingAmount;
+      this.assetIndex = assetIndex;
+      this.closeRewards = closeRewards;
+      this.closingAmount = closingAmount;
+      this.confirmedRound = confirmedRound;
+      this.globalStateDelta = globalStateDelta;
+      this.innerTxns = innerTxns;
+      this.localStateDelta = localStateDelta;
+      this.logs = logs;
+      this.receiverRewards = receiverRewards;
+      this.senderRewards = senderRewards;
+      this.attribute_map = {
+        poolError: "pool-error",
+        txn: "txn",
+        applicationIndex: "application-index",
+        assetClosingAmount: "asset-closing-amount",
+        assetIndex: "asset-index",
+        closeRewards: "close-rewards",
+        closingAmount: "closing-amount",
+        confirmedRound: "confirmed-round",
+        globalStateDelta: "global-state-delta",
+        innerTxns: "inner-txns",
+        localStateDelta: "local-state-delta",
+        logs: "logs",
+        receiverRewards: "receiver-rewards",
+        senderRewards: "sender-rewards"
+      };
+    }
+  };
+  var PendingTransactionsResponse = class extends BaseModel {
+    constructor(topTransactions, totalTransactions) {
+      super();
+      this.topTransactions = topTransactions;
+      this.totalTransactions = totalTransactions;
+      this.attribute_map = {
+        topTransactions: "top-transactions",
+        totalTransactions: "total-transactions"
+      };
+    }
+  };
+  var PostTransactionsResponse = class extends BaseModel {
+    constructor(txid) {
+      super();
+      this.txid = txid;
+      this.attribute_map = {
+        txid: "txId"
+      };
+    }
+  };
+  var ProofResponse = class extends BaseModel {
+    constructor(idx, proof, stibhash) {
+      super();
+      this.idx = idx;
+      this.proof = typeof proof === "string" ? new Uint8Array(Buffer.from(proof, "base64")) : proof;
+      this.stibhash = typeof stibhash === "string" ? new Uint8Array(Buffer.from(stibhash, "base64")) : stibhash;
+      this.attribute_map = {
+        idx: "idx",
+        proof: "proof",
+        stibhash: "stibhash"
+      };
+    }
+  };
+  var SupplyResponse = class extends BaseModel {
+    constructor(currentRound, onlineMoney, totalMoney) {
+      super();
+      this.currentRound = currentRound;
+      this.onlineMoney = onlineMoney;
+      this.totalMoney = totalMoney;
+      this.attribute_map = {
+        currentRound: "current_round",
+        onlineMoney: "online-money",
+        totalMoney: "total-money"
+      };
+    }
+  };
+  var TealKeyValue = class extends BaseModel {
+    constructor(key, value) {
+      super();
+      this.key = key;
+      this.value = value;
+      this.attribute_map = {
+        key: "key",
+        value: "value"
+      };
+    }
+  };
+  var TealValue = class extends BaseModel {
+    constructor(type, bytes, uint) {
+      super();
+      this.type = type;
+      this.bytes = bytes;
+      this.uint = uint;
+      this.attribute_map = {
+        type: "type",
+        bytes: "bytes",
+        uint: "uint"
+      };
+    }
+  };
+  var TransactionParametersResponse = class extends BaseModel {
+    constructor({ consensusVersion, fee, genesisHash, genesisId, lastRound, minFee }) {
+      super();
+      this.consensusVersion = consensusVersion;
+      this.fee = fee;
+      this.genesisHash = typeof genesisHash === "string" ? new Uint8Array(Buffer.from(genesisHash, "base64")) : genesisHash;
+      this.genesisId = genesisId;
+      this.lastRound = lastRound;
+      this.minFee = minFee;
+      this.attribute_map = {
+        consensusVersion: "consensus-version",
+        fee: "fee",
+        genesisHash: "genesis-hash",
+        genesisId: "genesis-id",
+        lastRound: "last-round",
+        minFee: "min-fee"
+      };
+    }
+  };
+  var Version = class extends BaseModel {
+    constructor(build, genesisHashB64, genesisId, versions) {
+      super();
+      this.build = build;
+      this.genesisHashB64 = typeof genesisHashB64 === "string" ? new Uint8Array(Buffer.from(genesisHashB64, "base64")) : genesisHashB64;
+      this.genesisId = genesisId;
+      this.versions = versions;
+      this.attribute_map = {
+        build: "build",
+        genesisHashB64: "genesis_hash_b64",
+        genesisId: "genesis_id",
+        versions: "versions"
+      };
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/mnemonic/wordlists/english.js
+  var english = [
+    "abandon",
+    "ability",
+    "able",
+    "about",
+    "above",
+    "absent",
+    "absorb",
+    "abstract",
+    "absurd",
+    "abuse",
+    "access",
+    "accident",
+    "account",
+    "accuse",
+    "achieve",
+    "acid",
+    "acoustic",
+    "acquire",
+    "across",
+    "act",
+    "action",
+    "actor",
+    "actress",
+    "actual",
+    "adapt",
+    "add",
+    "addict",
+    "address",
+    "adjust",
+    "admit",
+    "adult",
+    "advance",
+    "advice",
+    "aerobic",
+    "affair",
+    "afford",
+    "afraid",
+    "again",
+    "age",
+    "agent",
+    "agree",
+    "ahead",
+    "aim",
+    "air",
+    "airport",
+    "aisle",
+    "alarm",
+    "album",
+    "alcohol",
+    "alert",
+    "alien",
+    "all",
+    "alley",
+    "allow",
+    "almost",
+    "alone",
+    "alpha",
+    "already",
+    "also",
+    "alter",
+    "always",
+    "amateur",
+    "amazing",
+    "among",
+    "amount",
+    "amused",
+    "analyst",
+    "anchor",
+    "ancient",
+    "anger",
+    "angle",
+    "angry",
+    "animal",
+    "ankle",
+    "announce",
+    "annual",
+    "another",
+    "answer",
+    "antenna",
+    "antique",
+    "anxiety",
+    "any",
+    "apart",
+    "apology",
+    "appear",
+    "apple",
+    "approve",
+    "april",
+    "arch",
+    "arctic",
+    "area",
+    "arena",
+    "argue",
+    "arm",
+    "armed",
+    "armor",
+    "army",
+    "around",
+    "arrange",
+    "arrest",
+    "arrive",
+    "arrow",
+    "art",
+    "artefact",
+    "artist",
+    "artwork",
+    "ask",
+    "aspect",
+    "assault",
+    "asset",
+    "assist",
+    "assume",
+    "asthma",
+    "athlete",
+    "atom",
+    "attack",
+    "attend",
+    "attitude",
+    "attract",
+    "auction",
+    "audit",
+    "august",
+    "aunt",
+    "author",
+    "auto",
+    "autumn",
+    "average",
+    "avocado",
+    "avoid",
+    "awake",
+    "aware",
+    "away",
+    "awesome",
+    "awful",
+    "awkward",
+    "axis",
+    "baby",
+    "bachelor",
+    "bacon",
+    "badge",
+    "bag",
+    "balance",
+    "balcony",
+    "ball",
+    "bamboo",
+    "banana",
+    "banner",
+    "bar",
+    "barely",
+    "bargain",
+    "barrel",
+    "base",
+    "basic",
+    "basket",
+    "battle",
+    "beach",
+    "bean",
+    "beauty",
+    "because",
+    "become",
+    "beef",
+    "before",
+    "begin",
+    "behave",
+    "behind",
+    "believe",
+    "below",
+    "belt",
+    "bench",
+    "benefit",
+    "best",
+    "betray",
+    "better",
+    "between",
+    "beyond",
+    "bicycle",
+    "bid",
+    "bike",
+    "bind",
+    "biology",
+    "bird",
+    "birth",
+    "bitter",
+    "black",
+    "blade",
+    "blame",
+    "blanket",
+    "blast",
+    "bleak",
+    "bless",
+    "blind",
+    "blood",
+    "blossom",
+    "blouse",
+    "blue",
+    "blur",
+    "blush",
+    "board",
+    "boat",
+    "body",
+    "boil",
+    "bomb",
+    "bone",
+    "bonus",
+    "book",
+    "boost",
+    "border",
+    "boring",
+    "borrow",
+    "boss",
+    "bottom",
+    "bounce",
+    "box",
+    "boy",
+    "bracket",
+    "brain",
+    "brand",
+    "brass",
+    "brave",
+    "bread",
+    "breeze",
+    "brick",
+    "bridge",
+    "brief",
+    "bright",
+    "bring",
+    "brisk",
+    "broccoli",
+    "broken",
+    "bronze",
+    "broom",
+    "brother",
+    "brown",
+    "brush",
+    "bubble",
+    "buddy",
+    "budget",
+    "buffalo",
+    "build",
+    "bulb",
+    "bulk",
+    "bullet",
+    "bundle",
+    "bunker",
+    "burden",
+    "burger",
+    "burst",
+    "bus",
+    "business",
+    "busy",
+    "butter",
+    "buyer",
+    "buzz",
+    "cabbage",
+    "cabin",
+    "cable",
+    "cactus",
+    "cage",
+    "cake",
+    "call",
+    "calm",
+    "camera",
+    "camp",
+    "can",
+    "canal",
+    "cancel",
+    "candy",
+    "cannon",
+    "canoe",
+    "canvas",
+    "canyon",
+    "capable",
+    "capital",
+    "captain",
+    "car",
+    "carbon",
+    "card",
+    "cargo",
+    "carpet",
+    "carry",
+    "cart",
+    "case",
+    "cash",
+    "casino",
+    "castle",
+    "casual",
+    "cat",
+    "catalog",
+    "catch",
+    "category",
+    "cattle",
+    "caught",
+    "cause",
+    "caution",
+    "cave",
+    "ceiling",
+    "celery",
+    "cement",
+    "census",
+    "century",
+    "cereal",
+    "certain",
+    "chair",
+    "chalk",
+    "champion",
+    "change",
+    "chaos",
+    "chapter",
+    "charge",
+    "chase",
+    "chat",
+    "cheap",
+    "check",
+    "cheese",
+    "chef",
+    "cherry",
+    "chest",
+    "chicken",
+    "chief",
+    "child",
+    "chimney",
+    "choice",
+    "choose",
+    "chronic",
+    "chuckle",
+    "chunk",
+    "churn",
+    "cigar",
+    "cinnamon",
+    "circle",
+    "citizen",
+    "city",
+    "civil",
+    "claim",
+    "clap",
+    "clarify",
+    "claw",
+    "clay",
+    "clean",
+    "clerk",
+    "clever",
+    "click",
+    "client",
+    "cliff",
+    "climb",
+    "clinic",
+    "clip",
+    "clock",
+    "clog",
+    "close",
+    "cloth",
+    "cloud",
+    "clown",
+    "club",
+    "clump",
+    "cluster",
+    "clutch",
+    "coach",
+    "coast",
+    "coconut",
+    "code",
+    "coffee",
+    "coil",
+    "coin",
+    "collect",
+    "color",
+    "column",
+    "combine",
+    "come",
+    "comfort",
+    "comic",
+    "common",
+    "company",
+    "concert",
+    "conduct",
+    "confirm",
+    "congress",
+    "connect",
+    "consider",
+    "control",
+    "convince",
+    "cook",
+    "cool",
+    "copper",
+    "copy",
+    "coral",
+    "core",
+    "corn",
+    "correct",
+    "cost",
+    "cotton",
+    "couch",
+    "country",
+    "couple",
+    "course",
+    "cousin",
+    "cover",
+    "coyote",
+    "crack",
+    "cradle",
+    "craft",
+    "cram",
+    "crane",
+    "crash",
+    "crater",
+    "crawl",
+    "crazy",
+    "cream",
+    "credit",
+    "creek",
+    "crew",
+    "cricket",
+    "crime",
+    "crisp",
+    "critic",
+    "crop",
+    "cross",
+    "crouch",
+    "crowd",
+    "crucial",
+    "cruel",
+    "cruise",
+    "crumble",
+    "crunch",
+    "crush",
+    "cry",
+    "crystal",
+    "cube",
+    "culture",
+    "cup",
+    "cupboard",
+    "curious",
+    "current",
+    "curtain",
+    "curve",
+    "cushion",
+    "custom",
+    "cute",
+    "cycle",
+    "dad",
+    "damage",
+    "damp",
+    "dance",
+    "danger",
+    "daring",
+    "dash",
+    "daughter",
+    "dawn",
+    "day",
+    "deal",
+    "debate",
+    "debris",
+    "decade",
+    "december",
+    "decide",
+    "decline",
+    "decorate",
+    "decrease",
+    "deer",
+    "defense",
+    "define",
+    "defy",
+    "degree",
+    "delay",
+    "deliver",
+    "demand",
+    "demise",
+    "denial",
+    "dentist",
+    "deny",
+    "depart",
+    "depend",
+    "deposit",
+    "depth",
+    "deputy",
+    "derive",
+    "describe",
+    "desert",
+    "design",
+    "desk",
+    "despair",
+    "destroy",
+    "detail",
+    "detect",
+    "develop",
+    "device",
+    "devote",
+    "diagram",
+    "dial",
+    "diamond",
+    "diary",
+    "dice",
+    "diesel",
+    "diet",
+    "differ",
+    "digital",
+    "dignity",
+    "dilemma",
+    "dinner",
+    "dinosaur",
+    "direct",
+    "dirt",
+    "disagree",
+    "discover",
+    "disease",
+    "dish",
+    "dismiss",
+    "disorder",
+    "display",
+    "distance",
+    "divert",
+    "divide",
+    "divorce",
+    "dizzy",
+    "doctor",
+    "document",
+    "dog",
+    "doll",
+    "dolphin",
+    "domain",
+    "donate",
+    "donkey",
+    "donor",
+    "door",
+    "dose",
+    "double",
+    "dove",
+    "draft",
+    "dragon",
+    "drama",
+    "drastic",
+    "draw",
+    "dream",
+    "dress",
+    "drift",
+    "drill",
+    "drink",
+    "drip",
+    "drive",
+    "drop",
+    "drum",
+    "dry",
+    "duck",
+    "dumb",
+    "dune",
+    "during",
+    "dust",
+    "dutch",
+    "duty",
+    "dwarf",
+    "dynamic",
+    "eager",
+    "eagle",
+    "early",
+    "earn",
+    "earth",
+    "easily",
+    "east",
+    "easy",
+    "echo",
+    "ecology",
+    "economy",
+    "edge",
+    "edit",
+    "educate",
+    "effort",
+    "egg",
+    "eight",
+    "either",
+    "elbow",
+    "elder",
+    "electric",
+    "elegant",
+    "element",
+    "elephant",
+    "elevator",
+    "elite",
+    "else",
+    "embark",
+    "embody",
+    "embrace",
+    "emerge",
+    "emotion",
+    "employ",
+    "empower",
+    "empty",
+    "enable",
+    "enact",
+    "end",
+    "endless",
+    "endorse",
+    "enemy",
+    "energy",
+    "enforce",
+    "engage",
+    "engine",
+    "enhance",
+    "enjoy",
+    "enlist",
+    "enough",
+    "enrich",
+    "enroll",
+    "ensure",
+    "enter",
+    "entire",
+    "entry",
+    "envelope",
+    "episode",
+    "equal",
+    "equip",
+    "era",
+    "erase",
+    "erode",
+    "erosion",
+    "error",
+    "erupt",
+    "escape",
+    "essay",
+    "essence",
+    "estate",
+    "eternal",
+    "ethics",
+    "evidence",
+    "evil",
+    "evoke",
+    "evolve",
+    "exact",
+    "example",
+    "excess",
+    "exchange",
+    "excite",
+    "exclude",
+    "excuse",
+    "execute",
+    "exercise",
+    "exhaust",
+    "exhibit",
+    "exile",
+    "exist",
+    "exit",
+    "exotic",
+    "expand",
+    "expect",
+    "expire",
+    "explain",
+    "expose",
+    "express",
+    "extend",
+    "extra",
+    "eye",
+    "eyebrow",
+    "fabric",
+    "face",
+    "faculty",
+    "fade",
+    "faint",
+    "faith",
+    "fall",
+    "false",
+    "fame",
+    "family",
+    "famous",
+    "fan",
+    "fancy",
+    "fantasy",
+    "farm",
+    "fashion",
+    "fat",
+    "fatal",
+    "father",
+    "fatigue",
+    "fault",
+    "favorite",
+    "feature",
+    "february",
+    "federal",
+    "fee",
+    "feed",
+    "feel",
+    "female",
+    "fence",
+    "festival",
+    "fetch",
+    "fever",
+    "few",
+    "fiber",
+    "fiction",
+    "field",
+    "figure",
+    "file",
+    "film",
+    "filter",
+    "final",
+    "find",
+    "fine",
+    "finger",
+    "finish",
+    "fire",
+    "firm",
+    "first",
+    "fiscal",
+    "fish",
+    "fit",
+    "fitness",
+    "fix",
+    "flag",
+    "flame",
+    "flash",
+    "flat",
+    "flavor",
+    "flee",
+    "flight",
+    "flip",
+    "float",
+    "flock",
+    "floor",
+    "flower",
+    "fluid",
+    "flush",
+    "fly",
+    "foam",
+    "focus",
+    "fog",
+    "foil",
+    "fold",
+    "follow",
+    "food",
+    "foot",
+    "force",
+    "forest",
+    "forget",
+    "fork",
+    "fortune",
+    "forum",
+    "forward",
+    "fossil",
+    "foster",
+    "found",
+    "fox",
+    "fragile",
+    "frame",
+    "frequent",
+    "fresh",
+    "friend",
+    "fringe",
+    "frog",
+    "front",
+    "frost",
+    "frown",
+    "frozen",
+    "fruit",
+    "fuel",
+    "fun",
+    "funny",
+    "furnace",
+    "fury",
+    "future",
+    "gadget",
+    "gain",
+    "galaxy",
+    "gallery",
+    "game",
+    "gap",
+    "garage",
+    "garbage",
+    "garden",
+    "garlic",
+    "garment",
+    "gas",
+    "gasp",
+    "gate",
+    "gather",
+    "gauge",
+    "gaze",
+    "general",
+    "genius",
+    "genre",
+    "gentle",
+    "genuine",
+    "gesture",
+    "ghost",
+    "giant",
+    "gift",
+    "giggle",
+    "ginger",
+    "giraffe",
+    "girl",
+    "give",
+    "glad",
+    "glance",
+    "glare",
+    "glass",
+    "glide",
+    "glimpse",
+    "globe",
+    "gloom",
+    "glory",
+    "glove",
+    "glow",
+    "glue",
+    "goat",
+    "goddess",
+    "gold",
+    "good",
+    "goose",
+    "gorilla",
+    "gospel",
+    "gossip",
+    "govern",
+    "gown",
+    "grab",
+    "grace",
+    "grain",
+    "grant",
+    "grape",
+    "grass",
+    "gravity",
+    "great",
+    "green",
+    "grid",
+    "grief",
+    "grit",
+    "grocery",
+    "group",
+    "grow",
+    "grunt",
+    "guard",
+    "guess",
+    "guide",
+    "guilt",
+    "guitar",
+    "gun",
+    "gym",
+    "habit",
+    "hair",
+    "half",
+    "hammer",
+    "hamster",
+    "hand",
+    "happy",
+    "harbor",
+    "hard",
+    "harsh",
+    "harvest",
+    "hat",
+    "have",
+    "hawk",
+    "hazard",
+    "head",
+    "health",
+    "heart",
+    "heavy",
+    "hedgehog",
+    "height",
+    "hello",
+    "helmet",
+    "help",
+    "hen",
+    "hero",
+    "hidden",
+    "high",
+    "hill",
+    "hint",
+    "hip",
+    "hire",
+    "history",
+    "hobby",
+    "hockey",
+    "hold",
+    "hole",
+    "holiday",
+    "hollow",
+    "home",
+    "honey",
+    "hood",
+    "hope",
+    "horn",
+    "horror",
+    "horse",
+    "hospital",
+    "host",
+    "hotel",
+    "hour",
+    "hover",
+    "hub",
+    "huge",
+    "human",
+    "humble",
+    "humor",
+    "hundred",
+    "hungry",
+    "hunt",
+    "hurdle",
+    "hurry",
+    "hurt",
+    "husband",
+    "hybrid",
+    "ice",
+    "icon",
+    "idea",
+    "identify",
+    "idle",
+    "ignore",
+    "ill",
+    "illegal",
+    "illness",
+    "image",
+    "imitate",
+    "immense",
+    "immune",
+    "impact",
+    "impose",
+    "improve",
+    "impulse",
+    "inch",
+    "include",
+    "income",
+    "increase",
+    "index",
+    "indicate",
+    "indoor",
+    "industry",
+    "infant",
+    "inflict",
+    "inform",
+    "inhale",
+    "inherit",
+    "initial",
+    "inject",
+    "injury",
+    "inmate",
+    "inner",
+    "innocent",
+    "input",
+    "inquiry",
+    "insane",
+    "insect",
+    "inside",
+    "inspire",
+    "install",
+    "intact",
+    "interest",
+    "into",
+    "invest",
+    "invite",
+    "involve",
+    "iron",
+    "island",
+    "isolate",
+    "issue",
+    "item",
+    "ivory",
+    "jacket",
+    "jaguar",
+    "jar",
+    "jazz",
+    "jealous",
+    "jeans",
+    "jelly",
+    "jewel",
+    "job",
+    "join",
+    "joke",
+    "journey",
+    "joy",
+    "judge",
+    "juice",
+    "jump",
+    "jungle",
+    "junior",
+    "junk",
+    "just",
+    "kangaroo",
+    "keen",
+    "keep",
+    "ketchup",
+    "key",
+    "kick",
+    "kid",
+    "kidney",
+    "kind",
+    "kingdom",
+    "kiss",
+    "kit",
+    "kitchen",
+    "kite",
+    "kitten",
+    "kiwi",
+    "knee",
+    "knife",
+    "knock",
+    "know",
+    "lab",
+    "label",
+    "labor",
+    "ladder",
+    "lady",
+    "lake",
+    "lamp",
+    "language",
+    "laptop",
+    "large",
+    "later",
+    "latin",
+    "laugh",
+    "laundry",
+    "lava",
+    "law",
+    "lawn",
+    "lawsuit",
+    "layer",
+    "lazy",
+    "leader",
+    "leaf",
+    "learn",
+    "leave",
+    "lecture",
+    "left",
+    "leg",
+    "legal",
+    "legend",
+    "leisure",
+    "lemon",
+    "lend",
+    "length",
+    "lens",
+    "leopard",
+    "lesson",
+    "letter",
+    "level",
+    "liar",
+    "liberty",
+    "library",
+    "license",
+    "life",
+    "lift",
+    "light",
+    "like",
+    "limb",
+    "limit",
+    "link",
+    "lion",
+    "liquid",
+    "list",
+    "little",
+    "live",
+    "lizard",
+    "load",
+    "loan",
+    "lobster",
+    "local",
+    "lock",
+    "logic",
+    "lonely",
+    "long",
+    "loop",
+    "lottery",
+    "loud",
+    "lounge",
+    "love",
+    "loyal",
+    "lucky",
+    "luggage",
+    "lumber",
+    "lunar",
+    "lunch",
+    "luxury",
+    "lyrics",
+    "machine",
+    "mad",
+    "magic",
+    "magnet",
+    "maid",
+    "mail",
+    "main",
+    "major",
+    "make",
+    "mammal",
+    "man",
+    "manage",
+    "mandate",
+    "mango",
+    "mansion",
+    "manual",
+    "maple",
+    "marble",
+    "march",
+    "margin",
+    "marine",
+    "market",
+    "marriage",
+    "mask",
+    "mass",
+    "master",
+    "match",
+    "material",
+    "math",
+    "matrix",
+    "matter",
+    "maximum",
+    "maze",
+    "meadow",
+    "mean",
+    "measure",
+    "meat",
+    "mechanic",
+    "medal",
+    "media",
+    "melody",
+    "melt",
+    "member",
+    "memory",
+    "mention",
+    "menu",
+    "mercy",
+    "merge",
+    "merit",
+    "merry",
+    "mesh",
+    "message",
+    "metal",
+    "method",
+    "middle",
+    "midnight",
+    "milk",
+    "million",
+    "mimic",
+    "mind",
+    "minimum",
+    "minor",
+    "minute",
+    "miracle",
+    "mirror",
+    "misery",
+    "miss",
+    "mistake",
+    "mix",
+    "mixed",
+    "mixture",
+    "mobile",
+    "model",
+    "modify",
+    "mom",
+    "moment",
+    "monitor",
+    "monkey",
+    "monster",
+    "month",
+    "moon",
+    "moral",
+    "more",
+    "morning",
+    "mosquito",
+    "mother",
+    "motion",
+    "motor",
+    "mountain",
+    "mouse",
+    "move",
+    "movie",
+    "much",
+    "muffin",
+    "mule",
+    "multiply",
+    "muscle",
+    "museum",
+    "mushroom",
+    "music",
+    "must",
+    "mutual",
+    "myself",
+    "mystery",
+    "myth",
+    "naive",
+    "name",
+    "napkin",
+    "narrow",
+    "nasty",
+    "nation",
+    "nature",
+    "near",
+    "neck",
+    "need",
+    "negative",
+    "neglect",
+    "neither",
+    "nephew",
+    "nerve",
+    "nest",
+    "net",
+    "network",
+    "neutral",
+    "never",
+    "news",
+    "next",
+    "nice",
+    "night",
+    "noble",
+    "noise",
+    "nominee",
+    "noodle",
+    "normal",
+    "north",
+    "nose",
+    "notable",
+    "note",
+    "nothing",
+    "notice",
+    "novel",
+    "now",
+    "nuclear",
+    "number",
+    "nurse",
+    "nut",
+    "oak",
+    "obey",
+    "object",
+    "oblige",
+    "obscure",
+    "observe",
+    "obtain",
+    "obvious",
+    "occur",
+    "ocean",
+    "october",
+    "odor",
+    "off",
+    "offer",
+    "office",
+    "often",
+    "oil",
+    "okay",
+    "old",
+    "olive",
+    "olympic",
+    "omit",
+    "once",
+    "one",
+    "onion",
+    "online",
+    "only",
+    "open",
+    "opera",
+    "opinion",
+    "oppose",
+    "option",
+    "orange",
+    "orbit",
+    "orchard",
+    "order",
+    "ordinary",
+    "organ",
+    "orient",
+    "original",
+    "orphan",
+    "ostrich",
+    "other",
+    "outdoor",
+    "outer",
+    "output",
+    "outside",
+    "oval",
+    "oven",
+    "over",
+    "own",
+    "owner",
+    "oxygen",
+    "oyster",
+    "ozone",
+    "pact",
+    "paddle",
+    "page",
+    "pair",
+    "palace",
+    "palm",
+    "panda",
+    "panel",
+    "panic",
+    "panther",
+    "paper",
+    "parade",
+    "parent",
+    "park",
+    "parrot",
+    "party",
+    "pass",
+    "patch",
+    "path",
+    "patient",
+    "patrol",
+    "pattern",
+    "pause",
+    "pave",
+    "payment",
+    "peace",
+    "peanut",
+    "pear",
+    "peasant",
+    "pelican",
+    "pen",
+    "penalty",
+    "pencil",
+    "people",
+    "pepper",
+    "perfect",
+    "permit",
+    "person",
+    "pet",
+    "phone",
+    "photo",
+    "phrase",
+    "physical",
+    "piano",
+    "picnic",
+    "picture",
+    "piece",
+    "pig",
+    "pigeon",
+    "pill",
+    "pilot",
+    "pink",
+    "pioneer",
+    "pipe",
+    "pistol",
+    "pitch",
+    "pizza",
+    "place",
+    "planet",
+    "plastic",
+    "plate",
+    "play",
+    "please",
+    "pledge",
+    "pluck",
+    "plug",
+    "plunge",
+    "poem",
+    "poet",
+    "point",
+    "polar",
+    "pole",
+    "police",
+    "pond",
+    "pony",
+    "pool",
+    "popular",
+    "portion",
+    "position",
+    "possible",
+    "post",
+    "potato",
+    "pottery",
+    "poverty",
+    "powder",
+    "power",
+    "practice",
+    "praise",
+    "predict",
+    "prefer",
+    "prepare",
+    "present",
+    "pretty",
+    "prevent",
+    "price",
+    "pride",
+    "primary",
+    "print",
+    "priority",
+    "prison",
+    "private",
+    "prize",
+    "problem",
+    "process",
+    "produce",
+    "profit",
+    "program",
+    "project",
+    "promote",
+    "proof",
+    "property",
+    "prosper",
+    "protect",
+    "proud",
+    "provide",
+    "public",
+    "pudding",
+    "pull",
+    "pulp",
+    "pulse",
+    "pumpkin",
+    "punch",
+    "pupil",
+    "puppy",
+    "purchase",
+    "purity",
+    "purpose",
+    "purse",
+    "push",
+    "put",
+    "puzzle",
+    "pyramid",
+    "quality",
+    "quantum",
+    "quarter",
+    "question",
+    "quick",
+    "quit",
+    "quiz",
+    "quote",
+    "rabbit",
+    "raccoon",
+    "race",
+    "rack",
+    "radar",
+    "radio",
+    "rail",
+    "rain",
+    "raise",
+    "rally",
+    "ramp",
+    "ranch",
+    "random",
+    "range",
+    "rapid",
+    "rare",
+    "rate",
+    "rather",
+    "raven",
+    "raw",
+    "razor",
+    "ready",
+    "real",
+    "reason",
+    "rebel",
+    "rebuild",
+    "recall",
+    "receive",
+    "recipe",
+    "record",
+    "recycle",
+    "reduce",
+    "reflect",
+    "reform",
+    "refuse",
+    "region",
+    "regret",
+    "regular",
+    "reject",
+    "relax",
+    "release",
+    "relief",
+    "rely",
+    "remain",
+    "remember",
+    "remind",
+    "remove",
+    "render",
+    "renew",
+    "rent",
+    "reopen",
+    "repair",
+    "repeat",
+    "replace",
+    "report",
+    "require",
+    "rescue",
+    "resemble",
+    "resist",
+    "resource",
+    "response",
+    "result",
+    "retire",
+    "retreat",
+    "return",
+    "reunion",
+    "reveal",
+    "review",
+    "reward",
+    "rhythm",
+    "rib",
+    "ribbon",
+    "rice",
+    "rich",
+    "ride",
+    "ridge",
+    "rifle",
+    "right",
+    "rigid",
+    "ring",
+    "riot",
+    "ripple",
+    "risk",
+    "ritual",
+    "rival",
+    "river",
+    "road",
+    "roast",
+    "robot",
+    "robust",
+    "rocket",
+    "romance",
+    "roof",
+    "rookie",
+    "room",
+    "rose",
+    "rotate",
+    "rough",
+    "round",
+    "route",
+    "royal",
+    "rubber",
+    "rude",
+    "rug",
+    "rule",
+    "run",
+    "runway",
+    "rural",
+    "sad",
+    "saddle",
+    "sadness",
+    "safe",
+    "sail",
+    "salad",
+    "salmon",
+    "salon",
+    "salt",
+    "salute",
+    "same",
+    "sample",
+    "sand",
+    "satisfy",
+    "satoshi",
+    "sauce",
+    "sausage",
+    "save",
+    "say",
+    "scale",
+    "scan",
+    "scare",
+    "scatter",
+    "scene",
+    "scheme",
+    "school",
+    "science",
+    "scissors",
+    "scorpion",
+    "scout",
+    "scrap",
+    "screen",
+    "script",
+    "scrub",
+    "sea",
+    "search",
+    "season",
+    "seat",
+    "second",
+    "secret",
+    "section",
+    "security",
+    "seed",
+    "seek",
+    "segment",
+    "select",
+    "sell",
+    "seminar",
+    "senior",
+    "sense",
+    "sentence",
+    "series",
+    "service",
+    "session",
+    "settle",
+    "setup",
+    "seven",
+    "shadow",
+    "shaft",
+    "shallow",
+    "share",
+    "shed",
+    "shell",
+    "sheriff",
+    "shield",
+    "shift",
+    "shine",
+    "ship",
+    "shiver",
+    "shock",
+    "shoe",
+    "shoot",
+    "shop",
+    "short",
+    "shoulder",
+    "shove",
+    "shrimp",
+    "shrug",
+    "shuffle",
+    "shy",
+    "sibling",
+    "sick",
+    "side",
+    "siege",
+    "sight",
+    "sign",
+    "silent",
+    "silk",
+    "silly",
+    "silver",
+    "similar",
+    "simple",
+    "since",
+    "sing",
+    "siren",
+    "sister",
+    "situate",
+    "six",
+    "size",
+    "skate",
+    "sketch",
+    "ski",
+    "skill",
+    "skin",
+    "skirt",
+    "skull",
+    "slab",
+    "slam",
+    "sleep",
+    "slender",
+    "slice",
+    "slide",
+    "slight",
+    "slim",
+    "slogan",
+    "slot",
+    "slow",
+    "slush",
+    "small",
+    "smart",
+    "smile",
+    "smoke",
+    "smooth",
+    "snack",
+    "snake",
+    "snap",
+    "sniff",
+    "snow",
+    "soap",
+    "soccer",
+    "social",
+    "sock",
+    "soda",
+    "soft",
+    "solar",
+    "soldier",
+    "solid",
+    "solution",
+    "solve",
+    "someone",
+    "song",
+    "soon",
+    "sorry",
+    "sort",
+    "soul",
+    "sound",
+    "soup",
+    "source",
+    "south",
+    "space",
+    "spare",
+    "spatial",
+    "spawn",
+    "speak",
+    "special",
+    "speed",
+    "spell",
+    "spend",
+    "sphere",
+    "spice",
+    "spider",
+    "spike",
+    "spin",
+    "spirit",
+    "split",
+    "spoil",
+    "sponsor",
+    "spoon",
+    "sport",
+    "spot",
+    "spray",
+    "spread",
+    "spring",
+    "spy",
+    "square",
+    "squeeze",
+    "squirrel",
+    "stable",
+    "stadium",
+    "staff",
+    "stage",
+    "stairs",
+    "stamp",
+    "stand",
+    "start",
+    "state",
+    "stay",
+    "steak",
+    "steel",
+    "stem",
+    "step",
+    "stereo",
+    "stick",
+    "still",
+    "sting",
+    "stock",
+    "stomach",
+    "stone",
+    "stool",
+    "story",
+    "stove",
+    "strategy",
+    "street",
+    "strike",
+    "strong",
+    "struggle",
+    "student",
+    "stuff",
+    "stumble",
+    "style",
+    "subject",
+    "submit",
+    "subway",
+    "success",
+    "such",
+    "sudden",
+    "suffer",
+    "sugar",
+    "suggest",
+    "suit",
+    "summer",
+    "sun",
+    "sunny",
+    "sunset",
+    "super",
+    "supply",
+    "supreme",
+    "sure",
+    "surface",
+    "surge",
+    "surprise",
+    "surround",
+    "survey",
+    "suspect",
+    "sustain",
+    "swallow",
+    "swamp",
+    "swap",
+    "swarm",
+    "swear",
+    "sweet",
+    "swift",
+    "swim",
+    "swing",
+    "switch",
+    "sword",
+    "symbol",
+    "symptom",
+    "syrup",
+    "system",
+    "table",
+    "tackle",
+    "tag",
+    "tail",
+    "talent",
+    "talk",
+    "tank",
+    "tape",
+    "target",
+    "task",
+    "taste",
+    "tattoo",
+    "taxi",
+    "teach",
+    "team",
+    "tell",
+    "ten",
+    "tenant",
+    "tennis",
+    "tent",
+    "term",
+    "test",
+    "text",
+    "thank",
+    "that",
+    "theme",
+    "then",
+    "theory",
+    "there",
+    "they",
+    "thing",
+    "this",
+    "thought",
+    "three",
+    "thrive",
+    "throw",
+    "thumb",
+    "thunder",
+    "ticket",
+    "tide",
+    "tiger",
+    "tilt",
+    "timber",
+    "time",
+    "tiny",
+    "tip",
+    "tired",
+    "tissue",
+    "title",
+    "toast",
+    "tobacco",
+    "today",
+    "toddler",
+    "toe",
+    "together",
+    "toilet",
+    "token",
+    "tomato",
+    "tomorrow",
+    "tone",
+    "tongue",
+    "tonight",
+    "tool",
+    "tooth",
+    "top",
+    "topic",
+    "topple",
+    "torch",
+    "tornado",
+    "tortoise",
+    "toss",
+    "total",
+    "tourist",
+    "toward",
+    "tower",
+    "town",
+    "toy",
+    "track",
+    "trade",
+    "traffic",
+    "tragic",
+    "train",
+    "transfer",
+    "trap",
+    "trash",
+    "travel",
+    "tray",
+    "treat",
+    "tree",
+    "trend",
+    "trial",
+    "tribe",
+    "trick",
+    "trigger",
+    "trim",
+    "trip",
+    "trophy",
+    "trouble",
+    "truck",
+    "true",
+    "truly",
+    "trumpet",
+    "trust",
+    "truth",
+    "try",
+    "tube",
+    "tuition",
+    "tumble",
+    "tuna",
+    "tunnel",
+    "turkey",
+    "turn",
+    "turtle",
+    "twelve",
+    "twenty",
+    "twice",
+    "twin",
+    "twist",
+    "two",
+    "type",
+    "typical",
+    "ugly",
+    "umbrella",
+    "unable",
+    "unaware",
+    "uncle",
+    "uncover",
+    "under",
+    "undo",
+    "unfair",
+    "unfold",
+    "unhappy",
+    "uniform",
+    "unique",
+    "unit",
+    "universe",
+    "unknown",
+    "unlock",
+    "until",
+    "unusual",
+    "unveil",
+    "update",
+    "upgrade",
+    "uphold",
+    "upon",
+    "upper",
+    "upset",
+    "urban",
+    "urge",
+    "usage",
+    "use",
+    "used",
+    "useful",
+    "useless",
+    "usual",
+    "utility",
+    "vacant",
+    "vacuum",
+    "vague",
+    "valid",
+    "valley",
+    "valve",
+    "van",
+    "vanish",
+    "vapor",
+    "various",
+    "vast",
+    "vault",
+    "vehicle",
+    "velvet",
+    "vendor",
+    "venture",
+    "venue",
+    "verb",
+    "verify",
+    "version",
+    "very",
+    "vessel",
+    "veteran",
+    "viable",
+    "vibrant",
+    "vicious",
+    "victory",
+    "video",
+    "view",
+    "village",
+    "vintage",
+    "violin",
+    "virtual",
+    "virus",
+    "visa",
+    "visit",
+    "visual",
+    "vital",
+    "vivid",
+    "vocal",
+    "voice",
+    "void",
+    "volcano",
+    "volume",
+    "vote",
+    "voyage",
+    "wage",
+    "wagon",
+    "wait",
+    "walk",
+    "wall",
+    "walnut",
+    "want",
+    "warfare",
+    "warm",
+    "warrior",
+    "wash",
+    "wasp",
+    "waste",
+    "water",
+    "wave",
+    "way",
+    "wealth",
+    "weapon",
+    "wear",
+    "weasel",
+    "weather",
+    "web",
+    "wedding",
+    "weekend",
+    "weird",
+    "welcome",
+    "west",
+    "wet",
+    "whale",
+    "what",
+    "wheat",
+    "wheel",
+    "when",
+    "where",
+    "whip",
+    "whisper",
+    "wide",
+    "width",
+    "wife",
+    "wild",
+    "will",
+    "win",
+    "window",
+    "wine",
+    "wing",
+    "wink",
+    "winner",
+    "winter",
+    "wire",
+    "wisdom",
+    "wise",
+    "wish",
+    "witness",
+    "wolf",
+    "woman",
+    "wonder",
+    "wood",
+    "wool",
+    "word",
+    "work",
+    "world",
+    "worry",
+    "worth",
+    "wrap",
+    "wreck",
+    "wrestle",
+    "wrist",
+    "write",
+    "wrong",
+    "yard",
+    "year",
+    "yellow",
+    "you",
+    "young",
+    "youth",
+    "zebra",
+    "zero",
+    "zone",
+    "zoo"
+  ];
+  var english_default = english;
+
+  // node_modules/algosdk/dist/esm/src/mnemonic/mnemonic.js
+  init_naclWrappers();
+  init_address();
+  var FAIL_TO_DECODE_MNEMONIC_ERROR_MSG = "failed to decode mnemonic";
+  var NOT_IN_WORDS_LIST_ERROR_MSG = "the mnemonic contains a word that is not in the wordlist";
+  function toUint11Array(buffer8) {
+    const buffer11 = [];
+    let acc = 0;
+    let accBits = 0;
+    function add(octet) {
+      acc |= octet << accBits;
+      accBits += 8;
+      if (accBits >= 11) {
+        buffer11.push(acc & 2047);
+        acc >>= 11;
+        accBits -= 11;
+      }
+    }
+    function flush() {
+      if (accBits) {
+        buffer11.push(acc);
+      }
+    }
+    buffer8.forEach(add);
+    flush();
+    return buffer11;
+  }
+  function applyWords(nums) {
+    return nums.map((n) => english_default[n]);
+  }
+  function computeChecksum(seed) {
+    const hashBuffer = genericHash(seed);
+    const uint11Hash = toUint11Array(hashBuffer);
+    const words = applyWords(uint11Hash);
+    return words[0];
+  }
+  function mnemonicFromSeed(seed) {
+    if (seed.length !== SEED_BTYES_LENGTH) {
+      throw new RangeError(`Seed length must be ${SEED_BTYES_LENGTH}`);
+    }
+    const uint11Array = toUint11Array(seed);
+    const words = applyWords(uint11Array);
+    const checksumWord = computeChecksum(seed);
+    return `${words.join(" ")} ${checksumWord}`;
+  }
+  function toUint8Array(buffer11) {
+    const buffer8 = [];
+    let acc = 0;
+    let accBits = 0;
+    function add(ui11) {
+      acc |= ui11 << accBits;
+      accBits += 11;
+      while (accBits >= 8) {
+        buffer8.push(acc & 255);
+        acc >>= 8;
+        accBits -= 8;
+      }
+    }
+    function flush() {
+      if (accBits) {
+        buffer8.push(acc);
+      }
+    }
+    buffer11.forEach(add);
+    flush();
+    return new Uint8Array(buffer8);
+  }
+  function seedFromMnemonic(mnemonic) {
+    const words = mnemonic.split(" ");
+    const key = words.slice(0, 24);
+    for (const w of key) {
+      if (english_default.indexOf(w) === -1)
+        throw new Error(NOT_IN_WORDS_LIST_ERROR_MSG);
+    }
+    const checksum = words[words.length - 1];
+    const uint11Array = key.map((word) => english_default.indexOf(word));
+    let uint8Array = toUint8Array(uint11Array);
+    if (uint8Array.length !== 33)
+      throw new Error(FAIL_TO_DECODE_MNEMONIC_ERROR_MSG);
+    if (uint8Array[uint8Array.length - 1] !== 0)
+      throw new Error(FAIL_TO_DECODE_MNEMONIC_ERROR_MSG);
+    uint8Array = uint8Array.slice(0, uint8Array.length - 1);
+    const cs = computeChecksum(uint8Array);
+    if (cs === checksum)
+      return uint8Array;
+    throw new Error(FAIL_TO_DECODE_MNEMONIC_ERROR_MSG);
+  }
+  function mnemonicToSecretKey(mn) {
+    const seed = seedFromMnemonic(mn);
+    const keys = keyPairFromSeed(seed);
+    const encodedPk = encodeAddress(keys.publicKey);
+    return { addr: encodedPk, sk: keys.secretKey };
+  }
+  function secretKeyToMnemonic(sk) {
+    const seed = sk.slice(0, SEED_BTYES_LENGTH);
+    return mnemonicFromSeed(seed);
+  }
+  function mnemonicToMasterDerivationKey(mn) {
+    return seedFromMnemonic(mn);
+  }
+  function masterDerivationKeyToMnemonic(mdk) {
+    return mnemonicFromSeed(mdk);
+  }
+
+  // node_modules/algosdk/dist/esm/src/main.js
+  init_group();
+  init_logicsig();
+  init_multisig();
+
+  // node_modules/algosdk/dist/esm/src/dryrun.js
+  init_transactions();
+  init_address();
+  var defaultAppId = 1380011588;
+  function decodePrograms(ap) {
+    ap.params["approval-program"] = Buffer.from(ap.params["approval-program"].toString(), "base64");
+    ap.params["clear-state-program"] = Buffer.from(ap.params["clear-state-program"].toString(), "base64");
+    return ap;
+  }
+  async function createDryrun({ client, txns, protocolVersion, latestTimestamp, round, sources }) {
+    const appInfos = [];
+    const acctInfos = [];
+    const apps = [];
+    const assets = [];
+    const accts = [];
+    for (const t of txns) {
+      if (t.txn.type === TransactionType.appl) {
+        accts.push(encodeAddress(t.txn.from.publicKey));
+        if (t.txn.appAccounts)
+          accts.push(...t.txn.appAccounts.map((a) => encodeAddress(a.publicKey)));
+        if (t.txn.appForeignApps)
+          apps.push(...t.txn.appForeignApps);
+        if (t.txn.appForeignAssets)
+          assets.push(...t.txn.appForeignAssets);
+        if (t.txn.appIndex === 0) {
+          appInfos.push(new Application(defaultAppId, new ApplicationParams({
+            creator: encodeAddress(t.txn.from.publicKey),
+            approvalProgram: t.txn.appApprovalProgram,
+            clearStateProgram: t.txn.appClearProgram,
+            localStateSchema: new ApplicationStateSchema(t.txn.appLocalInts, t.txn.appLocalByteSlices),
+            globalStateSchema: new ApplicationStateSchema(t.txn.appGlobalInts, t.txn.appGlobalByteSlices)
+          })));
+        } else {
+          apps.push(t.txn.appIndex);
+          accts.push(getApplicationAddress(t.txn.appIndex));
+        }
+      }
+    }
+    const assetPromises = [];
+    for (const assetId of [...new Set(assets)]) {
+      assetPromises.push(client.getAssetByID(assetId).do().then((assetInfo) => {
+        accts.push(assetInfo.params.creator);
+      }));
+    }
+    await Promise.all(assetPromises);
+    const appPromises = [];
+    for (const appId of [...new Set(apps)]) {
+      appPromises.push(client.getApplicationByID(appId).do().then((appInfo) => {
+        const ai = decodePrograms(appInfo);
+        appInfos.push(ai);
+        accts.push(ai.params.creator);
+      }));
+    }
+    await Promise.all(appPromises);
+    const acctPromises = [];
+    for (const acct of [...new Set(accts)]) {
+      acctPromises.push(client.accountInformation(acct).do().then((acctInfo) => {
+        if ("created-apps" in acctInfo) {
+          acctInfo["created-apps"] = acctInfo["created-apps"].map((app) => decodePrograms(app));
+        }
+        acctInfos.push(acctInfo);
+      }));
+    }
+    await Promise.all(acctPromises);
+    return new DryrunRequest({
+      txns: txns.map((st) => __spreadProps(__spreadValues({}, st), { txn: st.txn.get_obj_for_encoding() })),
+      accounts: acctInfos,
+      apps: appInfos,
+      latestTimestamp,
+      round,
+      protocolVersion,
+      sources
+    });
+  }
+
+  // node_modules/algosdk/dist/esm/src/main.js
+  init_makeTxn();
+  init_transaction();
+
+  // node_modules/algosdk/dist/esm/src/signer.js
+  init_logicsig();
+  init_multisig();
+  function makeBasicAccountTransactionSigner(account) {
+    return (txnGroup, indexesToSign) => {
+      const signed = [];
+      for (const index of indexesToSign) {
+        signed.push(txnGroup[index].signTxn(account.sk));
+      }
+      return Promise.resolve(signed);
+    };
+  }
+  function makeLogicSigAccountTransactionSigner(account) {
+    return (txnGroup, indexesToSign) => {
+      const signed = [];
+      for (const index of indexesToSign) {
+        const { blob } = signLogicSigTransactionObject(txnGroup[index], account);
+        signed.push(blob);
+      }
+      return Promise.resolve(signed);
+    };
+  }
+  function makeMultiSigAccountTransactionSigner(msig, sks) {
+    return (txnGroup, indexesToSign) => {
+      const signed = [];
+      for (const index of indexesToSign) {
+        const txn = txnGroup[index];
+        const partialSigs = [];
+        for (const sk of sks) {
+          const { blob } = signMultisigTransaction(txn, msig, sk);
+          partialSigs.push(blob);
+        }
+        signed.push(mergeMultisigTransactions(partialSigs));
+      }
+      return Promise.resolve(signed);
+    };
+  }
+  function isTransactionWithSigner(value) {
+    return typeof value === "object" && Object.keys(value).length === 2 && typeof value.txn === "object" && typeof value.signer === "function";
+  }
+
+  // node_modules/algosdk/dist/esm/src/abi/abi_type.js
+  init_address();
+
+  // node_modules/algosdk/dist/esm/src/encoding/bigint.js
+  function bigIntToBytes(bi, size) {
+    let hex = bi.toString(16);
+    if (hex.length !== size * 2) {
+      hex = hex.padStart(size * 2, "0");
+    }
+    const byteArray = new Uint8Array(hex.length / 2);
+    for (let i = 0, j = 0; i < hex.length / 2; i++, j += 2) {
+      byteArray[i] = parseInt(hex.slice(j, j + 2), 16);
+    }
+    return byteArray;
+  }
+  function bytesToBigInt(bytes) {
+    let res = BigInt(0);
+    const buf = Buffer.from(bytes);
+    for (let i = 0; i < bytes.length; i++) {
+      res = BigInt(Number(buf.readUIntBE(i, 1))) + res * BigInt(256);
+    }
+    return res;
+  }
+
+  // node_modules/algosdk/dist/esm/src/abi/abi_type.js
+  init_utils();
+  var MAX_LEN = 2 ** 16 - 1;
+  var ADDR_BYTE_SIZE = 32;
+  var SINGLE_BYTE_SIZE = 1;
+  var SINGLE_BOOL_SIZE = 1;
+  var LENGTH_ENCODE_BYTE_SIZE = 2;
+  var staticArrayRegexp = /^([a-z\d[\](),]+)\[([1-9][\d]*)]$/;
+  var ufixedRegexp = /^ufixed([1-9][\d]*)x([1-9][\d]*)$/;
+  var ABIType = class {
+    static from(str) {
+      if (str.endsWith("[]")) {
+        const arrayArgType = ABIType.from(str.slice(0, str.length - 2));
+        return new ABIArrayDynamicType(arrayArgType);
+      }
+      if (str.endsWith("]")) {
+        const stringMatches = str.match(staticArrayRegexp);
+        if (stringMatches.length !== 3) {
+          throw new Error(`malformed static array string: ${str}`);
+        }
+        const arrayLengthStr = stringMatches[2];
+        const arrayLength = parseInt(arrayLengthStr, 10);
+        if (arrayLength > MAX_LEN) {
+          throw new Error(`array length exceeds limit ${MAX_LEN}`);
+        }
+        const arrayType = ABIType.from(stringMatches[1]);
+        return new ABIArrayStaticType(arrayType, arrayLength);
+      }
+      if (str.startsWith("uint")) {
+        const digitsOnly = (string) => [...string].every((c) => "0123456789".includes(c));
+        const typeSizeStr = str.slice(4, str.length);
+        if (!digitsOnly(typeSizeStr)) {
+          throw new Error(`malformed uint string: ${typeSizeStr}`);
+        }
+        const typeSize = parseInt(typeSizeStr, 10);
+        if (typeSize > MAX_LEN) {
+          throw new Error(`malformed uint string: ${typeSize}`);
+        }
+        return new ABIUintType(typeSize);
+      }
+      if (str === "byte") {
+        return new ABIByteType();
+      }
+      if (str.startsWith("ufixed")) {
+        const stringMatches = str.match(ufixedRegexp);
+        if (stringMatches.length !== 3) {
+          throw new Error(`malformed ufixed type: ${str}`);
+        }
+        const ufixedSize = parseInt(stringMatches[1], 10);
+        const ufixedPrecision = parseInt(stringMatches[2], 10);
+        return new ABIUfixedType(ufixedSize, ufixedPrecision);
+      }
+      if (str === "bool") {
+        return new ABIBoolType();
+      }
+      if (str === "address") {
+        return new ABIAddressType();
+      }
+      if (str === "string") {
+        return new ABIStringType();
+      }
+      if (str.length >= 2 && str[0] === "(" && str[str.length - 1] === ")") {
+        const tupleContent = ABITupleType.parseTupleContent(str.slice(1, str.length - 1));
+        const tupleTypes = [];
+        for (let i = 0; i < tupleContent.length; i++) {
+          const ti = ABIType.from(tupleContent[i]);
+          tupleTypes.push(ti);
+        }
+        return new ABITupleType(tupleTypes);
+      }
+      throw new Error(`cannot convert a string ${str} to an ABI type`);
+    }
+  };
+  var ABIUintType = class extends ABIType {
+    constructor(size) {
+      super();
+      if (size % 8 !== 0 || size < 8 || size > 512) {
+        throw new Error(`unsupported uint type bitSize: ${size}`);
+      }
+      this.bitSize = size;
+    }
+    toString() {
+      return `uint${this.bitSize}`;
+    }
+    equals(other) {
+      return other instanceof ABIUintType && this.bitSize === other.bitSize;
+    }
+    isDynamic() {
+      return false;
+    }
+    byteLen() {
+      return this.bitSize / 8;
+    }
+    encode(value) {
+      if (typeof value !== "bigint" && typeof value !== "number") {
+        throw new Error(`Cannot encode value as uint${this.bitSize}: ${value}`);
+      }
+      if (value >= BigInt(2 ** this.bitSize) || value < BigInt(0)) {
+        throw new Error(`${value} is not a non-negative int or too big to fit in size uint${this.bitSize}`);
+      }
+      if (typeof value === "number" && !Number.isSafeInteger(value)) {
+        throw new Error(`${value} should be converted into a BigInt before it is encoded`);
+      }
+      return bigIntToBytes(value, this.bitSize / 8);
+    }
+    decode(byteString) {
+      if (byteString.length !== this.bitSize / 8) {
+        throw new Error(`byte string must correspond to a uint${this.bitSize}`);
+      }
+      return bytesToBigInt(byteString);
+    }
+  };
+  var ABIUfixedType = class extends ABIType {
+    constructor(size, denominator) {
+      super();
+      if (size % 8 !== 0 || size < 8 || size > 512) {
+        throw new Error(`unsupported ufixed type bitSize: ${size}`);
+      }
+      if (denominator > 160 || denominator < 1) {
+        throw new Error(`unsupported ufixed type precision: ${denominator}`);
+      }
+      this.bitSize = size;
+      this.precision = denominator;
+    }
+    toString() {
+      return `ufixed${this.bitSize}x${this.precision}`;
+    }
+    equals(other) {
+      return other instanceof ABIUfixedType && this.bitSize === other.bitSize && this.precision === other.precision;
+    }
+    isDynamic() {
+      return false;
+    }
+    byteLen() {
+      return this.bitSize / 8;
+    }
+    encode(value) {
+      if (typeof value !== "bigint" && typeof value !== "number") {
+        throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
+      }
+      if (value >= BigInt(2 ** this.bitSize) || value < BigInt(0)) {
+        throw new Error(`${value} is not a non-negative int or too big to fit in size ${this.toString()}`);
+      }
+      if (typeof value === "number" && !Number.isSafeInteger(value)) {
+        throw new Error(`${value} should be converted into a BigInt before it is encoded`);
+      }
+      return bigIntToBytes(value, this.bitSize / 8);
+    }
+    decode(byteString) {
+      if (byteString.length !== this.bitSize / 8) {
+        throw new Error(`byte string must correspond to a ${this.toString()}`);
+      }
+      return bytesToBigInt(byteString);
+    }
+  };
+  var ABIAddressType = class extends ABIType {
+    toString() {
+      return "address";
+    }
+    equals(other) {
+      return other instanceof ABIAddressType;
+    }
+    isDynamic() {
+      return false;
+    }
+    byteLen() {
+      return ADDR_BYTE_SIZE;
+    }
+    encode(value) {
+      if (typeof value !== "string" && !(value instanceof Uint8Array)) {
+        throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
+      }
+      if (typeof value === "string") {
+        const decodedAddress = decodeAddress(value);
+        return decodedAddress.publicKey;
+      }
+      if (value.byteLength !== 32) {
+        throw new Error(`byte string must be 32 bytes long for an address`);
+      }
+      return value;
+    }
+    decode(byteString) {
+      if (byteString.byteLength !== 32) {
+        throw new Error(`byte string must be 32 bytes long for an address`);
+      }
+      return encodeAddress(byteString);
+    }
+  };
+  var ABIBoolType = class extends ABIType {
+    toString() {
+      return "bool";
+    }
+    equals(other) {
+      return other instanceof ABIBoolType;
+    }
+    isDynamic() {
+      return false;
+    }
+    byteLen() {
+      return SINGLE_BOOL_SIZE;
+    }
+    encode(value) {
+      if (typeof value !== "boolean") {
+        throw new Error(`Cannot encode value as bool: ${value}`);
+      }
+      if (value) {
+        return new Uint8Array([128]);
+      }
+      return new Uint8Array([0]);
+    }
+    decode(byteString) {
+      if (byteString.byteLength !== 1) {
+        throw new Error(`bool string must be 1 byte long`);
+      }
+      const value = byteString[0];
+      if (value === 128) {
+        return true;
+      }
+      if (value === 0) {
+        return false;
+      }
+      throw new Error(`boolean could not be decoded from the byte string`);
+    }
+  };
+  var ABIByteType = class extends ABIType {
+    toString() {
+      return "byte";
+    }
+    equals(other) {
+      return other instanceof ABIByteType;
+    }
+    isDynamic() {
+      return false;
+    }
+    byteLen() {
+      return SINGLE_BYTE_SIZE;
+    }
+    encode(value) {
+      if (typeof value !== "number" && typeof value !== "bigint") {
+        throw new Error(`Cannot encode value as byte: ${value}`);
+      }
+      if (typeof value === "bigint") {
+        value = Number(value);
+      }
+      if (value < 0 || value > 255) {
+        throw new Error(`${value} cannot be encoded into a byte`);
+      }
+      return new Uint8Array([value]);
+    }
+    decode(byteString) {
+      if (byteString.byteLength !== 1) {
+        throw new Error(`byte string must be 1 byte long`);
+      }
+      return byteString[0];
+    }
+  };
+  var ABIStringType = class extends ABIType {
+    toString() {
+      return "string";
+    }
+    equals(other) {
+      return other instanceof ABIStringType;
+    }
+    isDynamic() {
+      return true;
+    }
+    byteLen() {
+      throw new Error(`${this.toString()} is a dynamic type`);
+    }
+    encode(value) {
+      if (typeof value !== "string" && !(value instanceof Uint8Array)) {
+        throw new Error(`Cannot encode value as string: ${value}`);
+      }
+      const encodedBytes = Buffer.from(value);
+      const encodedLength = bigIntToBytes(value.length, LENGTH_ENCODE_BYTE_SIZE);
+      const mergedBytes = new Uint8Array(value.length + LENGTH_ENCODE_BYTE_SIZE);
+      mergedBytes.set(encodedLength);
+      mergedBytes.set(encodedBytes, LENGTH_ENCODE_BYTE_SIZE);
+      return mergedBytes;
+    }
+    decode(byteString) {
+      if (byteString.length < LENGTH_ENCODE_BYTE_SIZE) {
+        throw new Error(`byte string is too short to be decoded. Actual length is ${byteString.length}, but expected at least ${LENGTH_ENCODE_BYTE_SIZE}`);
+      }
+      const buf = Buffer.from(byteString);
+      const byteLength = buf.readUIntBE(0, LENGTH_ENCODE_BYTE_SIZE);
+      const byteValue = byteString.slice(LENGTH_ENCODE_BYTE_SIZE, byteString.length);
+      if (byteLength !== byteValue.length) {
+        throw new Error(`string length bytes do not match the actual length of string. Expected ${byteLength}, got ${byteValue.length}`);
+      }
+      return Buffer.from(byteValue).toString("utf-8");
+    }
+  };
+  var ABIArrayStaticType = class extends ABIType {
+    constructor(argType, arrayLength) {
+      super();
+      if (arrayLength < 1) {
+        throw new Error(`static array must have a length greater than 0: ${arrayLength}`);
+      }
+      this.childType = argType;
+      this.staticLength = arrayLength;
+    }
+    toString() {
+      return `${this.childType.toString()}[${this.staticLength}]`;
+    }
+    equals(other) {
+      return other instanceof ABIArrayStaticType && this.staticLength === other.staticLength && this.childType.equals(other.childType);
+    }
+    isDynamic() {
+      return this.childType.isDynamic();
+    }
+    byteLen() {
+      if (this.childType.constructor === ABIBoolType) {
+        return Math.ceil(this.staticLength / 8);
+      }
+      return this.staticLength * this.childType.byteLen();
+    }
+    encode(value) {
+      if (!Array.isArray(value) && !(value instanceof Uint8Array)) {
+        throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
+      }
+      if (value.length !== this.staticLength) {
+        throw new Error(`Value array does not match static array length. Expected ${this.staticLength}, got ${value.length}`);
+      }
+      const convertedTuple = this.toABITupleType();
+      return convertedTuple.encode(value);
+    }
+    decode(byteString) {
+      const convertedTuple = this.toABITupleType();
+      return convertedTuple.decode(byteString);
+    }
+    toABITupleType() {
+      return new ABITupleType(Array(this.staticLength).fill(this.childType));
+    }
+  };
+  var ABIArrayDynamicType = class extends ABIType {
+    constructor(argType) {
+      super();
+      this.childType = argType;
+    }
+    toString() {
+      return `${this.childType.toString()}[]`;
+    }
+    equals(other) {
+      return other instanceof ABIArrayDynamicType && this.childType.equals(other.childType);
+    }
+    isDynamic() {
+      return true;
+    }
+    byteLen() {
+      throw new Error(`${this.toString()} is a dynamic type`);
+    }
+    encode(value) {
+      if (!Array.isArray(value) && !(value instanceof Uint8Array)) {
+        throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
+      }
+      const convertedTuple = this.toABITupleType(value.length);
+      const encodedTuple = convertedTuple.encode(value);
+      const encodedLength = bigIntToBytes(convertedTuple.childTypes.length, LENGTH_ENCODE_BYTE_SIZE);
+      const mergedBytes = concatArrays(encodedLength, encodedTuple);
+      return mergedBytes;
+    }
+    decode(byteString) {
+      const buf = Buffer.from(byteString);
+      const byteLength = buf.readUIntBE(0, LENGTH_ENCODE_BYTE_SIZE);
+      const convertedTuple = this.toABITupleType(byteLength);
+      return convertedTuple.decode(byteString.slice(LENGTH_ENCODE_BYTE_SIZE, byteString.length));
+    }
+    toABITupleType(length) {
+      return new ABITupleType(Array(length).fill(this.childType));
+    }
+  };
+  var ABITupleType = class extends ABIType {
+    constructor(argTypes) {
+      super();
+      if (argTypes.length >= MAX_LEN) {
+        throw new Error("tuple type child type number larger than maximum uint16 error");
+      }
+      this.childTypes = argTypes;
+    }
+    toString() {
+      const typeStrings = [];
+      for (let i = 0; i < this.childTypes.length; i++) {
+        typeStrings[i] = this.childTypes[i].toString();
+      }
+      return `(${typeStrings.join(",")})`;
+    }
+    equals(other) {
+      return other instanceof ABITupleType && this.childTypes.length === other.childTypes.length && this.childTypes.every((child, index) => child.equals(other.childTypes[index]));
+    }
+    isDynamic() {
+      const isDynamic = (child) => child.isDynamic();
+      return this.childTypes.some(isDynamic);
+    }
+    byteLen() {
+      let size = 0;
+      for (let i = 0; i < this.childTypes.length; i++) {
+        if (this.childTypes[i].constructor === ABIBoolType) {
+          const after = findBoolLR(this.childTypes, i, 1);
+          const boolNum = after + 1;
+          i += after;
+          size += Math.trunc((boolNum + 7) / 8);
+        } else {
+          const childByteSize = this.childTypes[i].byteLen();
+          size += childByteSize;
+        }
+      }
+      return size;
+    }
+    encode(value) {
+      if (!Array.isArray(value) && !(value instanceof Uint8Array)) {
+        throw new Error(`Cannot encode value as ${this.toString()}: ${value}`);
+      }
+      const values = Array.from(value);
+      if (value.length > MAX_LEN) {
+        throw new Error("length of tuple array should not exceed a uint16");
+      }
+      const tupleTypes = this.childTypes;
+      const heads = [];
+      const tails = [];
+      const isDynamicIndex = /* @__PURE__ */ new Map();
+      let i = 0;
+      while (i < tupleTypes.length) {
+        const tupleType = tupleTypes[i];
+        if (tupleType.isDynamic()) {
+          isDynamicIndex.set(heads.length, true);
+          heads.push(new Uint8Array([0, 0]));
+          tails.push(tupleType.encode(values[i]));
+        } else {
+          if (tupleType.constructor === ABIBoolType) {
+            const before = findBoolLR(tupleTypes, i, -1);
+            let after = findBoolLR(tupleTypes, i, 1);
+            if (before % 8 !== 0) {
+              throw new Error("expected before index should have number of bool mod 8 equal 0");
+            }
+            after = Math.min(7, after);
+            const compressedInt = compressMultipleBool(values.slice(i, i + after + 1));
+            heads.push(bigIntToBytes(compressedInt, 1));
+            i += after;
+          } else {
+            const encodedTupleValue = tupleType.encode(values[i]);
+            heads.push(encodedTupleValue);
+          }
+          isDynamicIndex.set(i, false);
+          tails.push(new Uint8Array());
+        }
+        i += 1;
+      }
+      let headLength = 0;
+      for (const headElement of heads) {
+        headLength += headElement.length;
+      }
+      let tailLength = 0;
+      for (let j = 0; j < heads.length; j++) {
+        if (isDynamicIndex.get(j)) {
+          const headValue = headLength + tailLength;
+          if (headValue > MAX_LEN) {
+            throw new Error(`byte length of ${headValue} should not exceed a uint16`);
+          }
+          heads[j] = bigIntToBytes(headValue, LENGTH_ENCODE_BYTE_SIZE);
+        }
+        tailLength += tails[j].length;
+      }
+      return concatArrays(...heads, ...tails);
+    }
+    decode(byteString) {
+      const tupleTypes = this.childTypes;
+      const dynamicSegments = [];
+      const valuePartition = [];
+      let i = 0;
+      let iterIndex = 0;
+      const buf = Buffer.from(byteString);
+      while (i < tupleTypes.length) {
+        const tupleType = tupleTypes[i];
+        if (tupleType.isDynamic()) {
+          if (byteString.slice(iterIndex, byteString.length).length < LENGTH_ENCODE_BYTE_SIZE) {
+            throw new Error("dynamic type in tuple is too short to be decoded");
+          }
+          const dynamicIndex = buf.readUIntBE(iterIndex, LENGTH_ENCODE_BYTE_SIZE);
+          if (dynamicSegments.length > 0) {
+            dynamicSegments[dynamicSegments.length - 1].right = dynamicIndex;
+            if (dynamicIndex < dynamicSegments[dynamicSegments.length - 1].left) {
+              throw new Error("dynamic index segment miscalculation: left is greater than right index");
+            }
+          }
+          const seg = {
+            left: dynamicIndex,
+            right: -1
+          };
+          dynamicSegments.push(seg);
+          valuePartition.push(null);
+          iterIndex += LENGTH_ENCODE_BYTE_SIZE;
+        } else {
+          if (tupleType.constructor === ABIBoolType) {
+            const before = findBoolLR(this.childTypes, i, -1);
+            let after = findBoolLR(this.childTypes, i, 1);
+            if (before % 8 !== 0) {
+              throw new Error("expected before bool number mod 8 === 0");
+            }
+            after = Math.min(7, after);
+            for (let boolIndex = 0; boolIndex <= after; boolIndex++) {
+              const boolMask = 128 >> boolIndex;
+              if ((byteString[iterIndex] & boolMask) > 0) {
+                valuePartition.push(new Uint8Array([128]));
+              } else {
+                valuePartition.push(new Uint8Array([0]));
+              }
+            }
+            i += after;
+            iterIndex += 1;
+          } else {
+            const currLen = tupleType.byteLen();
+            valuePartition.push(byteString.slice(iterIndex, iterIndex + currLen));
+            iterIndex += currLen;
+          }
+        }
+        if (i !== tupleTypes.length - 1 && iterIndex >= byteString.length) {
+          throw new Error("input byte not enough to decode");
+        }
+        i += 1;
+      }
+      if (dynamicSegments.length > 0) {
+        dynamicSegments[dynamicSegments.length - 1].right = byteString.length;
+        iterIndex = byteString.length;
+      }
+      if (iterIndex < byteString.length) {
+        throw new Error("input byte not fully consumed");
+      }
+      for (let j = 0; j < dynamicSegments.length; j++) {
+        const seg = dynamicSegments[j];
+        if (seg.left > seg.right) {
+          throw new Error("dynamic segment should display a [l, r] space with l <= r");
+        }
+        if (j !== dynamicSegments.length - 1 && seg.right !== dynamicSegments[j + 1].left) {
+          throw new Error("dynamic segment should be consecutive");
+        }
+      }
+      let segIndex = 0;
+      for (let j = 0; j < tupleTypes.length; j++) {
+        if (tupleTypes[j].isDynamic()) {
+          valuePartition[j] = byteString.slice(dynamicSegments[segIndex].left, dynamicSegments[segIndex].right);
+          segIndex += 1;
+        }
+      }
+      const returnValues = [];
+      for (let j = 0; j < tupleTypes.length; j++) {
+        const valueTi = tupleTypes[j].decode(valuePartition[j]);
+        returnValues.push(valueTi);
+      }
+      return returnValues;
+    }
+    static parseTupleContent(str) {
+      if (str.length === 0) {
+        return [];
+      }
+      if (str.endsWith(",") || str.startsWith(",")) {
+        throw new Error("tuple string should not start with comma");
+      }
+      if (str.includes(",,")) {
+        throw new Error("tuple string should not have consecutive commas");
+      }
+      const tupleStrings = [];
+      let depth = 0;
+      let word = "";
+      for (const char of str) {
+        word += char;
+        if (char === "(") {
+          depth += 1;
+        } else if (char === ")") {
+          depth -= 1;
+        } else if (char === ",") {
+          if (depth === 0) {
+            tupleStrings.push(word.slice(0, word.length - 1));
+            word = "";
+          }
+        }
+      }
+      if (word.length !== 0) {
+        tupleStrings.push(word);
+      }
+      if (depth !== 0) {
+        throw new Error("tuple string has mismatched parentheses");
+      }
+      return tupleStrings;
+    }
+  };
+  function compressMultipleBool(valueList) {
+    let res = 0;
+    if (valueList.length > 8) {
+      throw new Error("value list passed in should be no greater than length 8");
+    }
+    for (let i = 0; i < valueList.length; i++) {
+      const boolVal = valueList[i];
+      if (typeof boolVal !== "boolean") {
+        throw new Error("non-boolean values cannot be compressed into a byte");
+      }
+      if (boolVal) {
+        res |= 1 << 7 - i;
+      }
+    }
+    return res;
+  }
+  function findBoolLR(typeList, index, delta) {
+    let until = 0;
+    while (true) {
+      const curr = index + delta * until;
+      if (typeList[curr].constructor === ABIBoolType) {
+        if (curr !== typeList.length - 1 && delta === 1) {
+          until += 1;
+        } else if (curr > 0 && delta === -1) {
+          until += 1;
+        } else {
+          break;
+        }
+      } else {
+        until -= 1;
+        break;
+      }
+    }
+    return until;
+  }
+
+  // node_modules/algosdk/dist/esm/src/abi/method.js
+  init_naclWrappers();
+
+  // node_modules/algosdk/dist/esm/src/abi/transaction.js
+  var ABITransactionType;
+  (function(ABITransactionType2) {
+    ABITransactionType2["any"] = "txn";
+    ABITransactionType2["pay"] = "pay";
+    ABITransactionType2["keyreg"] = "keyreg";
+    ABITransactionType2["acfg"] = "acfg";
+    ABITransactionType2["axfer"] = "axfer";
+    ABITransactionType2["afrz"] = "afrz";
+    ABITransactionType2["appl"] = "appl";
+  })(ABITransactionType || (ABITransactionType = {}));
+  function abiTypeIsTransaction(type) {
+    return type === ABITransactionType.any || type === ABITransactionType.pay || type === ABITransactionType.keyreg || type === ABITransactionType.acfg || type === ABITransactionType.axfer || type === ABITransactionType.afrz || type === ABITransactionType.appl;
+  }
+  function abiCheckTransactionType(type, txn) {
+    if (type === ABITransactionType.any) {
+      return true;
+    }
+    return txn.type && txn.type.toString() === type.toString();
+  }
+
+  // node_modules/algosdk/dist/esm/src/abi/reference.js
+  var ABIReferenceType;
+  (function(ABIReferenceType2) {
+    ABIReferenceType2["account"] = "account";
+    ABIReferenceType2["application"] = "application";
+    ABIReferenceType2["asset"] = "asset";
+  })(ABIReferenceType || (ABIReferenceType = {}));
+  function abiTypeIsReference(type) {
+    return type === ABIReferenceType.account || type === ABIReferenceType.application || type === ABIReferenceType.asset;
+  }
+
+  // node_modules/algosdk/dist/esm/src/abi/method.js
+  function parseMethodSignature(signature) {
+    const argsStart = signature.indexOf("(");
+    if (argsStart === -1) {
+      throw new Error(`Invalid method signature: ${signature}`);
+    }
+    let argsEnd = -1;
+    let depth = 0;
+    for (let i = argsStart; i < signature.length; i++) {
+      const char = signature[i];
+      if (char === "(") {
+        depth += 1;
+      } else if (char === ")") {
+        if (depth === 0) {
+          break;
+        }
+        depth -= 1;
+        if (depth === 0) {
+          argsEnd = i;
+          break;
+        }
+      }
+    }
+    if (argsEnd === -1) {
+      throw new Error(`Invalid method signature: ${signature}`);
+    }
+    return {
+      name: signature.slice(0, argsStart),
+      args: ABITupleType.parseTupleContent(signature.slice(argsStart + 1, argsEnd)),
+      returns: signature.slice(argsEnd + 1)
+    };
+  }
+  var ABIMethod = class {
+    constructor(params) {
+      if (typeof params.name !== "string" || typeof params.returns !== "object" || !Array.isArray(params.args)) {
+        throw new Error("Invalid ABIMethod parameters");
+      }
+      this.name = params.name;
+      this.description = params.desc;
+      this.args = params.args.map(({ type, name, desc }) => {
+        if (abiTypeIsTransaction(type) || abiTypeIsReference(type)) {
+          return {
+            type,
+            name,
+            description: desc
+          };
+        }
+        return {
+          type: ABIType.from(type),
+          name,
+          description: desc
+        };
       });
+      this.returns = {
+        type: params.returns.type === "void" ? params.returns.type : ABIType.from(params.returns.type),
+        description: params.returns.desc
+      };
+    }
+    getSignature() {
+      const args = this.args.map((arg) => arg.type.toString()).join(",");
+      const returns = this.returns.type.toString();
+      return `${this.name}(${args})${returns}`;
+    }
+    getSelector() {
+      const hash = genericHash(this.getSignature());
+      return new Uint8Array(hash.slice(0, 4));
+    }
+    txnCount() {
+      let count = 1;
+      for (const arg of this.args) {
+        if (typeof arg.type === "string" && abiTypeIsTransaction(arg.type)) {
+          count += 1;
+        }
+      }
+      return count;
+    }
+    toJSON() {
+      return {
+        name: this.name,
+        desc: this.description,
+        args: this.args.map(({ type, name, description }) => ({
+          type: type.toString(),
+          name,
+          desc: description
+        })),
+        returns: {
+          type: this.returns.type.toString(),
+          desc: this.returns.description
+        }
+      };
+    }
+    static fromSignature(signature) {
+      const { name, args, returns } = parseMethodSignature(signature);
+      return new ABIMethod({
+        name,
+        args: args.map((arg) => ({ type: arg })),
+        returns: { type: returns }
+      });
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/abi/contract.js
+  var ABIContract = class {
+    constructor(params) {
+      if (typeof params.name !== "string" || !Array.isArray(params.methods) || params.networks && typeof params.networks !== "object") {
+        throw new Error("Invalid ABIContract parameters");
+      }
+      this.name = params.name;
+      this.description = params.desc;
+      this.networks = params.networks ? __spreadValues({}, params.networks) : {};
+      this.methods = params.methods.map((method2) => new ABIMethod(method2));
+    }
+    toJSON() {
+      return {
+        name: this.name,
+        desc: this.description,
+        networks: this.networks,
+        methods: this.methods.map((method2) => method2.toJSON())
+      };
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/abi/interface.js
+  var ABIInterface = class {
+    constructor(params) {
+      if (typeof params.name !== "string" || !Array.isArray(params.methods)) {
+        throw new Error("Invalid ABIInterface parameters");
+      }
+      this.name = params.name;
+      this.description = params.desc;
+      this.methods = params.methods.map((method2) => new ABIMethod(method2));
+    }
+    toJSON() {
+      return {
+        name: this.name,
+        desc: this.description,
+        methods: this.methods.map((method2) => method2.toJSON())
+      };
+    }
+  };
+
+  // node_modules/algosdk/dist/esm/src/composer.js
+  init_transaction();
+  init_makeTxn();
+  init_group();
+  init_base();
+  var RETURN_PREFIX = Buffer.from([21, 31, 124, 117]);
+  var MAX_APP_ARGS = 16;
+  var AtomicTransactionComposerStatus;
+  (function(AtomicTransactionComposerStatus2) {
+    AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["BUILDING"] = 0] = "BUILDING";
+    AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["BUILT"] = 1] = "BUILT";
+    AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["SIGNED"] = 2] = "SIGNED";
+    AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["SUBMITTED"] = 3] = "SUBMITTED";
+    AtomicTransactionComposerStatus2[AtomicTransactionComposerStatus2["COMMITTED"] = 4] = "COMMITTED";
+  })(AtomicTransactionComposerStatus || (AtomicTransactionComposerStatus = {}));
+  function populateForeignArray(valueToAdd, array, zeroValue) {
+    if (zeroValue != null && valueToAdd === zeroValue) {
+      return 0;
+    }
+    const offset = zeroValue == null ? 0 : 1;
+    for (let i = 0; i < array.length; i++) {
+      if (valueToAdd === array[i]) {
+        return i + offset;
+      }
+    }
+    array.push(valueToAdd);
+    return array.length - 1 + offset;
+  }
+  var AtomicTransactionComposer = class {
+    constructor() {
+      this.status = AtomicTransactionComposerStatus.BUILDING;
+      this.transactions = [];
+      this.methodCalls = /* @__PURE__ */ new Map();
+      this.signedTxns = [];
+      this.txIDs = [];
+    }
+    getStatus() {
+      return this.status;
+    }
+    count() {
+      return this.transactions.length;
+    }
+    clone() {
+      const theClone = new AtomicTransactionComposer();
+      theClone.transactions = this.transactions.map(({ txn, signer }) => ({
+        txn: Transaction.from_obj_for_encoding(__spreadProps(__spreadValues({}, txn.get_obj_for_encoding()), {
+          grp: void 0
+        })),
+        signer
+      }));
+      theClone.methodCalls = new Map(this.methodCalls);
+      return theClone;
+    }
+    addTransaction(txnAndSigner) {
+      if (this.status !== AtomicTransactionComposerStatus.BUILDING) {
+        throw new Error("Cannot add transactions when composer status is not BUILDING");
+      }
+      if (this.transactions.length === AtomicTransactionComposer.MAX_GROUP_SIZE) {
+        throw new Error(`Adding an additional transaction exceeds the maximum atomic group size of ${AtomicTransactionComposer.MAX_GROUP_SIZE}`);
+      }
+      if (txnAndSigner.txn.group && txnAndSigner.txn.group.some((v) => v !== 0)) {
+        throw new Error("Cannot add a transaction with nonzero group ID");
+      }
+      this.transactions.push(txnAndSigner);
+    }
+    addMethodCall({ appID, method: method2, methodArgs, sender, suggestedParams, onComplete, approvalProgram, clearProgram, numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices, extraPages, note, lease, rekeyTo, signer }) {
+      if (this.status !== AtomicTransactionComposerStatus.BUILDING) {
+        throw new Error("Cannot add transactions when composer status is not BUILDING");
+      }
+      if (this.transactions.length + method2.txnCount() > AtomicTransactionComposer.MAX_GROUP_SIZE) {
+        throw new Error(`Adding additional transactions exceeds the maximum atomic group size of ${AtomicTransactionComposer.MAX_GROUP_SIZE}`);
+      }
+      if (appID === 0) {
+        if (approvalProgram == null || clearProgram == null || numGlobalInts == null || numGlobalByteSlices == null || numLocalInts == null || numLocalByteSlices == null) {
+          throw new Error("One of the following required parameters for application creation is missing: approvalProgram, clearProgram, numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices");
+        }
+      } else if (onComplete === OnApplicationComplete.UpdateApplicationOC) {
+        if (approvalProgram == null || clearProgram == null) {
+          throw new Error("One of the following required parameters for OnApplicationComplete.UpdateApplicationOC is missing: approvalProgram, clearProgram");
+        }
+        if (numGlobalInts != null || numGlobalByteSlices != null || numLocalInts != null || numLocalByteSlices != null || extraPages != null) {
+          throw new Error("One of the following application creation parameters were set on a non-creation call: numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices, extraPages");
+        }
+      } else if (approvalProgram != null || clearProgram != null || numGlobalInts != null || numGlobalByteSlices != null || numLocalInts != null || numLocalByteSlices != null || extraPages != null) {
+        throw new Error("One of the following application creation parameters were set on a non-creation call: approvalProgram, clearProgram, numGlobalInts, numGlobalByteSlices, numLocalInts, numLocalByteSlices, extraPages");
+      }
+      if (methodArgs == null) {
+        methodArgs = [];
+      }
+      if (methodArgs.length !== method2.args.length) {
+        throw new Error(`Incorrect number of method arguments. Expected ${method2.args.length}, got ${methodArgs.length}`);
+      }
+      let basicArgTypes = [];
+      let basicArgValues = [];
+      const txnArgs = [];
+      const refArgTypes = [];
+      const refArgValues = [];
+      const refArgIndexToBasicArgIndex = /* @__PURE__ */ new Map();
+      for (let i = 0; i < methodArgs.length; i++) {
+        let argType = method2.args[i].type;
+        const argValue = methodArgs[i];
+        if (abiTypeIsTransaction(argType)) {
+          if (!isTransactionWithSigner(argValue) || !abiCheckTransactionType(argType, argValue.txn)) {
+            throw new Error(`Expected ${argType} transaction for argument at index ${i}`);
+          }
+          if (argValue.txn.group && argValue.txn.group.some((v) => v !== 0)) {
+            throw new Error("Cannot add a transaction with nonzero group ID");
+          }
+          txnArgs.push(argValue);
+          continue;
+        }
+        if (isTransactionWithSigner(argValue)) {
+          throw new Error(`Expected non-transaction value for argument at index ${i}`);
+        }
+        if (abiTypeIsReference(argType)) {
+          refArgIndexToBasicArgIndex.set(refArgTypes.length, basicArgTypes.length);
+          refArgTypes.push(argType);
+          refArgValues.push(argValue);
+          argType = new ABIUintType(8);
+        }
+        if (typeof argType === "string") {
+          throw new Error(`Unknown ABI type: ${argType}`);
+        }
+        basicArgTypes.push(argType);
+        basicArgValues.push(argValue);
+      }
+      const resolvedRefIndexes = [];
+      const foreignAccounts = [];
+      const foreignApps = [];
+      const foreignAssets = [];
+      for (let i = 0; i < refArgTypes.length; i++) {
+        const refType = refArgTypes[i];
+        const refValue = refArgValues[i];
+        let resolved = 0;
+        switch (refType) {
+          case ABIReferenceType.account: {
+            const addressType = new ABIAddressType();
+            const address = addressType.decode(addressType.encode(refValue));
+            resolved = populateForeignArray(address, foreignAccounts, sender);
+            break;
+          }
+          case ABIReferenceType.application: {
+            const uint64Type = new ABIUintType(64);
+            const refAppID = uint64Type.decode(uint64Type.encode(refValue));
+            if (refAppID > Number.MAX_SAFE_INTEGER) {
+              throw new Error(`Expected safe integer for application value, got ${refAppID}`);
+            }
+            resolved = populateForeignArray(Number(refAppID), foreignApps, appID);
+            break;
+          }
+          case ABIReferenceType.asset: {
+            const uint64Type = new ABIUintType(64);
+            const refAssetID = uint64Type.decode(uint64Type.encode(refValue));
+            if (refAssetID > Number.MAX_SAFE_INTEGER) {
+              throw new Error(`Expected safe integer for asset value, got ${refAssetID}`);
+            }
+            resolved = populateForeignArray(Number(refAssetID), foreignAssets);
+            break;
+          }
+          default:
+            throw new Error(`Unknown reference type: ${refType}`);
+        }
+        resolvedRefIndexes.push(resolved);
+      }
+      for (let i = 0; i < resolvedRefIndexes.length; i++) {
+        const basicArgIndex = refArgIndexToBasicArgIndex.get(i);
+        basicArgValues[basicArgIndex] = resolvedRefIndexes[i];
+      }
+      if (basicArgTypes.length > MAX_APP_ARGS - 1) {
+        const lastArgTupleTypes = basicArgTypes.slice(MAX_APP_ARGS - 2);
+        const lastArgTupleValues = basicArgValues.slice(MAX_APP_ARGS - 2);
+        basicArgTypes = basicArgTypes.slice(0, MAX_APP_ARGS - 2);
+        basicArgValues = basicArgValues.slice(0, MAX_APP_ARGS - 2);
+        basicArgTypes.push(new ABITupleType(lastArgTupleTypes));
+        basicArgValues.push(lastArgTupleValues);
+      }
+      const appArgsEncoded = [method2.getSelector()];
+      for (let i = 0; i < basicArgTypes.length; i++) {
+        appArgsEncoded.push(basicArgTypes[i].encode(basicArgValues[i]));
+      }
+      const appCall = {
+        txn: makeApplicationCallTxnFromObject({
+          from: sender,
+          appIndex: appID,
+          appArgs: appArgsEncoded,
+          accounts: foreignAccounts,
+          foreignApps,
+          foreignAssets,
+          onComplete: onComplete == null ? OnApplicationComplete.NoOpOC : onComplete,
+          approvalProgram,
+          clearProgram,
+          numGlobalInts,
+          numGlobalByteSlices,
+          numLocalInts,
+          numLocalByteSlices,
+          extraPages,
+          lease,
+          note,
+          rekeyTo,
+          suggestedParams
+        }),
+        signer
+      };
+      this.transactions.push(...txnArgs, appCall);
+      this.methodCalls.set(this.transactions.length - 1, method2);
+    }
+    buildGroup() {
+      if (this.status === AtomicTransactionComposerStatus.BUILDING) {
+        if (this.transactions.length === 0) {
+          throw new Error("Cannot build a group with 0 transactions");
+        }
+        if (this.transactions.length > 1) {
+          assignGroupID(this.transactions.map((txnWithSigner) => txnWithSigner.txn));
+        }
+        this.status = AtomicTransactionComposerStatus.BUILT;
+      }
+      return this.transactions;
+    }
+    async gatherSignatures() {
+      if (this.status >= AtomicTransactionComposerStatus.SIGNED) {
+        return this.signedTxns;
+      }
+      const txnsWithSigners = this.buildGroup();
+      const txnGroup = txnsWithSigners.map((txnWithSigner) => txnWithSigner.txn);
+      const indexesPerSigner = /* @__PURE__ */ new Map();
+      for (let i = 0; i < txnsWithSigners.length; i++) {
+        const { signer } = txnsWithSigners[i];
+        if (!indexesPerSigner.has(signer)) {
+          indexesPerSigner.set(signer, []);
+        }
+        indexesPerSigner.get(signer).push(i);
+      }
+      const orderedSigners = Array.from(indexesPerSigner);
+      const batchedSigs = await Promise.all(orderedSigners.map(([signer, indexes]) => signer(txnGroup, indexes)));
+      const signedTxns = txnsWithSigners.map(() => null);
+      for (let signerIndex = 0; signerIndex < orderedSigners.length; signerIndex++) {
+        const indexes = orderedSigners[signerIndex][1];
+        const sigs = batchedSigs[signerIndex];
+        for (let i = 0; i < indexes.length; i++) {
+          signedTxns[indexes[i]] = sigs[i];
+        }
+      }
+      if (!signedTxns.every((sig) => sig != null)) {
+        throw new Error(`Missing signatures. Got ${signedTxns}`);
+      }
+      const txIDs = signedTxns.map((stxn, index) => {
+        try {
+          return decodeSignedTransaction(stxn).txn.txID();
+        } catch (err) {
+          throw new Error(`Cannot decode signed transaction at index ${index}. ${err}`);
+        }
+      });
+      this.signedTxns = signedTxns;
+      this.txIDs = txIDs;
+      this.status = AtomicTransactionComposerStatus.SIGNED;
+      return signedTxns;
+    }
+    async submit(client) {
+      if (this.status > AtomicTransactionComposerStatus.SUBMITTED) {
+        throw new Error("Transaction group cannot be resubmitted");
+      }
+      const stxns = await this.gatherSignatures();
+      await client.sendRawTransaction(stxns).do();
+      this.status = AtomicTransactionComposerStatus.SUBMITTED;
+      return this.txIDs;
+    }
+    async execute(client, waitRounds) {
+      if (this.status === AtomicTransactionComposerStatus.COMMITTED) {
+        throw new Error("Transaction group has already been executed successfully");
+      }
+      const txIDs = await this.submit(client);
+      this.status = AtomicTransactionComposerStatus.SUBMITTED;
+      const firstMethodCallIndex = this.transactions.findIndex((_, index) => this.methodCalls.has(index));
+      const indexToWaitFor = firstMethodCallIndex === -1 ? 0 : firstMethodCallIndex;
+      const confirmedTxnInfo = await waitForConfirmation(client, txIDs[indexToWaitFor], waitRounds);
+      this.status = AtomicTransactionComposerStatus.COMMITTED;
+      const confirmedRound = confirmedTxnInfo["confirmed-round"];
+      const methodResults = [];
+      for (const [txnIndex, method2] of this.methodCalls) {
+        const txID = txIDs[txnIndex];
+        const methodResult = {
+          txID,
+          rawReturnValue: new Uint8Array()
+        };
+        try {
+          if (method2.returns.type !== "void") {
+            const pendingInfo = txnIndex === firstMethodCallIndex ? confirmedTxnInfo : await client.pendingTransactionInformation(txID).do();
+            const logs = pendingInfo.logs || [];
+            if (logs.length === 0) {
+              throw new Error("App call transaction did not log a return value");
+            }
+            const lastLog = Buffer.from(logs[logs.length - 1], "base64");
+            if (lastLog.byteLength < 4 || !lastLog.slice(0, 4).equals(RETURN_PREFIX)) {
+              throw new Error("App call transaction did not log a return value");
+            }
+            methodResult.rawReturnValue = new Uint8Array(lastLog.slice(4));
+            methodResult.returnValue = method2.returns.type.decode(methodResult.rawReturnValue);
+          }
+        } catch (err) {
+          methodResult.decodeError = err;
+        }
+        methodResults.push(methodResult);
+      }
+      return {
+        confirmedRound,
+        txIDs,
+        methodResults
+      };
+    }
+  };
+  AtomicTransactionComposer.MAX_GROUP_SIZE = 16;
+
+  // node_modules/algosdk/dist/esm/src/types/index.js
+  init_transactions();
+
+  // node_modules/algosdk/dist/esm/src/main.js
+  var SIGN_BYTES_PREFIX = Buffer.from([77, 88]);
+  var MULTISIG_BAD_SENDER_ERROR_MSG = "The transaction sender address and multisig preimage do not match.";
+  function signTransaction(txn, sk) {
+    if (typeof txn.from === "undefined") {
+      const key = keyPairFromSecretKey(sk);
+      txn.from = encodeAddress(key.publicKey);
+    }
+    const algoTxn = instantiateTxnIfNeeded(txn);
+    return {
+      txID: algoTxn.txID().toString(),
+      blob: algoTxn.signTxn(sk)
+    };
+  }
+  function signBid(bid, sk) {
+    const signedBid = new Bid(bid);
+    return signedBid.signBid(sk);
+  }
+  function signBytes(bytes, sk) {
+    const toBeSigned = Buffer.from(concatArrays(SIGN_BYTES_PREFIX, bytes));
+    const sig = sign(toBeSigned, sk);
+    return sig;
+  }
+  function verifyBytes(bytes, signature, addr) {
+    const toBeVerified = Buffer.from(concatArrays(SIGN_BYTES_PREFIX, bytes));
+    const pk = decodeAddress(addr).publicKey;
+    return verify(toBeVerified, signature, pk);
+  }
+  function encodeObj(o) {
+    return new Uint8Array(encode2(o));
+  }
+  function decodeObj(o) {
+    return decode2(o);
+  }
+  var ERROR_MULTISIG_BAD_SENDER = new Error(MULTISIG_BAD_SENDER_ERROR_MSG);
+  var ERROR_INVALID_MICROALGOS = new Error(INVALID_MICROALGOS_ERROR_MSG);
+  var LogicTemplates = LogicTemplatesCommonJSExport.default;
+
+  // node_modules/algosdk/dist/esm/index.js
+  __reExport(esm_exports, main_exports);
+  var esm_default = main_exports;
+
+  // src/transactions.ts
+  var import_constants = __toESM(require_constants2());
+  var import_errors = __toESM(require_errors());
+  var import_generateTeal = __toESM(require_generateTeal());
+  var Transactions = class {
+    algodClient;
+    constructor(client) {
+      this.algodClient = client;
+    }
+    async generateLsig(name) {
+      name = name.split(".algo")[0];
+      const client = this.algodClient;
+      let program = await client.compile((0, import_generateTeal.generateTeal)(name)).do();
+      program = new Uint8Array(Buffer.from(program.result, "base64"));
+      return new esm_default.LogicSigAccount(program);
+    }
+    calculatePrice(name, period) {
+      let amount = 0;
+      name = name.split(".algo")[0];
+      if (name.length === 3) {
+        amount = import_constants.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
+      } else if (name.length === 4) {
+        amount = import_constants.REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
+      } else if (name.length >= 5) {
+        amount = import_constants.REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
+      }
+      return amount;
+    }
+    async prepareNameRegistrationTransactions(name, address, period) {
+      const algodClient = this.algodClient;
+      if (name.split(".algo")[0].length < 3)
+        throw new import_errors.InvalidNameError();
+      let amount = 0;
+      const lsig = await this.generateLsig(name);
+      const params = await algodClient.getTransactionParams().do();
+      params.fee = 1e3;
+      params.flatFee = true;
+      let receiver = esm_default.getApplicationAddress(import_constants.APP_ID);
+      let sender = address;
+      if (period === void 0) {
+        period = 1;
+      }
+      amount = this.calculatePrice(name, period);
+      const closeToRemaninder = void 0;
+      const note = void 0;
+      const txn1 = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
+      const groupTxns = [];
+      groupTxns.push(txn1);
+      sender = address;
+      receiver = lsig.address();
+      amount = 915e3;
+      const txn2 = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
+      groupTxns.push(txn2);
+      const txn3 = await esm_default.makeApplicationOptInTxnFromObject({
+        from: lsig.address(),
+        suggestedParams: params,
+        appIndex: import_constants.APP_ID
+      });
+      groupTxns.push(txn3);
+      sender = lsig.address();
+      receiver = address;
+      amount = 0;
+      const method2 = "register_name";
+      const appArgs = [];
+      period++;
+      appArgs.push(new Uint8Array(Buffer.from(method2)));
+      appArgs.push(new Uint8Array(Buffer.from(name)));
+      appArgs.push(esm_default.encodeUint64(period));
+      const txn4 = await esm_default.makeApplicationNoOpTxn(address, params, import_constants.APP_ID, appArgs, [lsig.address()]);
+      groupTxns.push(txn4);
+      esm_default.assignGroupID(groupTxns);
+      const signedOptinTxn = esm_default.signLogicSigTransaction(groupTxns[2], lsig);
+      return {
+        optinTxn: signedOptinTxn,
+        txns: groupTxns,
+        unsignedOptinTxn: groupTxns[2]
+      };
+    }
+    async prepareUpdateNamePropertyTransactions(name, address, editedHandles) {
+      const algodClient = this.algodClient;
+      const lsig = await this.generateLsig(name);
+      const params = await algodClient.getTransactionParams().do();
+      params.fee = 1e3;
+      params.flatFee = true;
+      const method2 = "update_name";
+      const groupTxns = [];
+      for (const key in editedHandles) {
+        const appArgs = [];
+        const network = key;
+        const handle = editedHandles[key];
+        appArgs.push(new Uint8Array(Buffer.from(method2)));
+        appArgs.push(new Uint8Array(Buffer.from(network)));
+        appArgs.push(new Uint8Array(Buffer.from(handle)));
+        const txn = await esm_default.makeApplicationNoOpTxn(address, params, import_constants.APP_ID, appArgs, [lsig.address()]);
+        groupTxns.push(txn);
+      }
+      if (Object.keys(editedHandles).length > 1) {
+        esm_default.assignGroupID(groupTxns);
+      }
+      return groupTxns;
+    }
+    async preparePaymentTxn(sender, receiver, amt, note) {
+      const algodClient = this.algodClient;
+      const params = await algodClient.getTransactionParams().do();
+      amt = esm_default.algosToMicroalgos(amt);
+      const enc = new TextEncoder();
+      note = enc.encode(note);
+      const closeToRemaninder = void 0;
+      return esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
+    }
+    async prepareNameRenewalTxns(name, sender, years) {
+      name = name.split(".algo")[0];
+      const algodClient = this.algodClient;
+      const params = await algodClient.getTransactionParams().do();
+      const receiver = esm_default.getApplicationAddress(import_constants.APP_ID);
+      const closeToRemaninder = void 0;
+      const note = void 0;
+      const paymentTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(name, years), closeToRemaninder, note, params);
+      const lsig = await this.generateLsig(name);
+      const appArgs = [];
+      appArgs.push(new Uint8Array(Buffer.from("renew_name")));
+      appArgs.push(esm_default.encodeUint64(years));
+      const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, import_constants.APP_ID, appArgs, [lsig.address()]);
+      esm_default.assignGroupID([paymentTxn, applicationTxn]);
+      return [paymentTxn, applicationTxn];
+    }
+    async prepareInitiateNameTransferTransaction(name, sender, newOwner, price) {
+      const algodClient = this.algodClient;
+      price = esm_default.algosToMicroalgos(price);
+      const params = await algodClient.getTransactionParams().do();
+      name = name.split(".algo")[0];
+      const lsig = await this.generateLsig(name);
+      const appArgs = [];
+      appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
+      appArgs.push(esm_default.encodeUint64(price));
+      return esm_default.makeApplicationNoOpTxn(sender, params, import_constants.APP_ID, appArgs, [
+        lsig.address(),
+        newOwner
+      ]);
+    }
+    async prepareAcceptNameTransferTransactions(name, sender, receiver, amt) {
+      amt = esm_default.algosToMicroalgos(amt);
+      const algodClient = this.algodClient;
+      const params = await algodClient.getTransactionParams().do();
+      const closeToRemaninder = void 0;
+      const note = void 0;
+      const paymentToOwnerTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
+      receiver = esm_default.getApplicationAddress(import_constants.APP_ID);
+      const paymentToSmartContractTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, import_constants.TRANSFER_FEE, closeToRemaninder, note, params);
+      name = name.split(".algo")[0];
+      const lsig = await this.generateLsig(name);
+      const appArgs = [];
+      appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
+      const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, import_constants.APP_ID, appArgs, [lsig.address()]);
+      esm_default.assignGroupID([
+        paymentToOwnerTxn,
+        paymentToSmartContractTxn,
+        applicationTxn
+      ]);
+      return [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn];
     }
   };
 })();
@@ -38700,4 +37061,4 @@
  * @copyright Chen, Yi-Cyuan 2015-2018
  * @license MIT
  */
-//# sourceMappingURL=index.global.js.map
+//# sourceMappingURL=transactions.global.js.map

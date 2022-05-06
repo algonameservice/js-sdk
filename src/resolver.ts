@@ -274,7 +274,7 @@ export class Resolver {
     } else return "Not Registered";
   }
 
-  async content() {
+  async content(name:string) {
     //TODO: Must return the content value
   }
 }
