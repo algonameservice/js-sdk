@@ -248,13 +248,20 @@ export class Resolver {
   async text(name: string, key: string) {
     const domainInformation: any = await this.resolveName(name);
     if (domainInformation.found === true) {
-      const textRecords = domainInformation.socials.filter(
+      const socialRecords = domainInformation.socials.filter(
         (social: any) => social.key === key
       );
-      if (textRecords.length > 0) {
-        return textRecords[0].value;
+      if (socialRecords.length > 0) {
+        return socialRecords[0].value;
       } else {
-        return "Property Not Set";
+        const metadataRecords = domainInformation.metadata.filter(
+          (metadata: any) => metadata.key === key
+        );
+        if (metadataRecords.length > 0) {
+          return metadataRecords[0].value;
+        } else {
+          return "Property not set";
+        }
       }
     } else {
       return "Not Registered";
@@ -282,14 +289,7 @@ export class Resolver {
       if (contentRecords.length > 0) {
         return contentRecords[0].value;
       } else {
-        const ipAddr: any[] = domainInformation.metadata.filter(
-          (kv: any) => kv.key === "ipaddress"
-        );
-        if (ipAddr.length > 0) {
-          return ipAddr[0].value;
-        } else {
-          return "Content Record and IP Address not set";
-        }
+        return "Content field is not set";
       }
     } else {
       return "Domain not registered";
