@@ -1,19 +1,16 @@
 import algosdk from "algosdk";
 import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
-import { InvalidNameError } from "./errors.js";
 import { generateTeal } from "./generateTeal.js";
 
 export class Transactions {
-  private algodClient: any;
+  private algodClient: algosdk.Algodv2;
 
-  constructor(client?: any) {
+  constructor(client: algosdk.Algodv2) {
     this.algodClient = client;
   }
 
   async generateLsig(name: string) {
-    name = name.split(".algo")[0];
-    const client = this.algodClient;
-    let program = await client.compile(generateTeal(name)).do();
+    let program = await this.algodClient.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
 
     return new algosdk.LogicSigAccount(program);
@@ -21,7 +18,6 @@ export class Transactions {
 
   calculatePrice(name: string, period: number) {
     let amount = 0;
-    name = name.split(".algo")[0];
     if (name.length === 3) {
       amount = REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
     } else if (name.length === 4) {
@@ -38,7 +34,6 @@ export class Transactions {
     period: number
   ) {
     const algodClient = this.algodClient;
-    if (name.split(".algo")[0].length < 3) throw new InvalidNameError();
     /* 1st Txn - Payment to Smart Contract */
 
     let amount = 0;
@@ -137,7 +132,7 @@ export class Transactions {
   async prepareUpdateNamePropertyTransactions(
     name: string,
     address: string,
-    editedHandles: any
+    editedHandles: object[]
   ) {
     const algodClient = this.algodClient;
 
@@ -200,7 +195,6 @@ export class Transactions {
   }
 
   async prepareNameRenewalTxns(name: string, sender: string, years: number) {
-    name = name.split(".algo")[0];
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
     const receiver = algosdk.getApplicationAddress(APP_ID);
@@ -243,7 +237,6 @@ export class Transactions {
     const algodClient = this.algodClient;
     price = algosdk.algosToMicroalgos(price);
     const params = await algodClient.getTransactionParams().do();
-    name = name.split(".algo")[0];
 
     const lsig = await this.generateLsig(name);
 
@@ -288,9 +281,6 @@ export class Transactions {
       note,
       params
     );
-
-    name = name.split(".algo")[0];
-
     const lsig = await this.generateLsig(name);
 
     const appArgs = [];

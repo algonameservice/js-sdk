@@ -25,3 +25,5 @@ export const ALLOWED_SOCIALS = [
   "reddit",
   "discord",
 ];
+
+export const ALLOWED_TLDS = ["algo"];

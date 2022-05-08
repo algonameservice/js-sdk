@@ -20,6 +20,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var constants_exports = {};
 __export(constants_exports, {
   ALLOWED_SOCIALS: () => ALLOWED_SOCIALS,
+  ALLOWED_TLDS: () => ALLOWED_TLDS,
   APP_ID: () => APP_ID,
   ASCII_CODES: () => ASCII_CODES,
   IPFS_LINK: () => IPFS_LINK,
@@ -49,9 +50,11 @@ var ALLOWED_SOCIALS = [
   "reddit",
   "discord"
 ];
+var ALLOWED_TLDS = ["algo"];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   ALLOWED_SOCIALS,
+  ALLOWED_TLDS,
   APP_ID,
   ASCII_CODES,
   IPFS_LINK,

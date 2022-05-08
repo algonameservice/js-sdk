@@ -31176,6 +31176,78 @@
         "reddit",
         "discord"
       ];
+      exports2.ALLOWED_TLDS = ["algo"];
+    }
+  });
+
+  // src/errors.js
+  var require_errors = __commonJS({
+    "src/errors.js"(exports2) {
+      "use strict";
+      var __extends = exports2 && exports2.__extends || function() {
+        var extendStatics = function(d, b) {
+          extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
+            d2.__proto__ = b2;
+          } || function(d2, b2) {
+            for (var p in b2)
+              if (b2.hasOwnProperty(p))
+                d2[p] = b2[p];
+          };
+          return extendStatics(d, b);
+        };
+        return function(d, b) {
+          extendStatics(d, b);
+          function __() {
+            this.constructor = d;
+          }
+          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+      }();
+      exports2.__esModule = true;
+      var AddressValidationError = function(_super) {
+        __extends(AddressValidationError2, _super);
+        function AddressValidationError2() {
+          var _this = _super.call(this, "This is not a valid Algorand address") || this;
+          _this.name = "InvalidAddressError";
+          _this.type = "InvalidAddressError";
+          return _this;
+        }
+        return AddressValidationError2;
+      }(Error);
+      exports2.AddressValidationError = AddressValidationError;
+      var InvalidNameError2 = function(_super) {
+        __extends(InvalidNameError3, _super);
+        function InvalidNameError3() {
+          var _this = _super.call(this, "The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters") || this;
+          _this.name = "InvalidNameError";
+          _this.type = "InvalidNameError";
+          return _this;
+        }
+        return InvalidNameError3;
+      }(Error);
+      exports2.InvalidNameError = InvalidNameError2;
+      var NameNotRegisteredError = function(_super) {
+        __extends(NameNotRegisteredError2, _super);
+        function NameNotRegisteredError2(name) {
+          var _this = _super.call(this, "Name " + name + " is not registered") || this;
+          _this.name = "NameNotRegisteredError";
+          _this.type = "NameNotRegisteredError";
+          return _this;
+        }
+        return NameNotRegisteredError2;
+      }(Error);
+      exports2.NameNotRegisteredError = NameNotRegisteredError;
+      var IncorrectOwnerError = function(_super) {
+        __extends(IncorrectOwnerError2, _super);
+        function IncorrectOwnerError2(name, address) {
+          var _this = _super.call(this, "Name " + name + ".algo is not owned by " + address) || this;
+          _this.name = "IncorrectOwnerError";
+          _this.type = "IncorrectOwnerError";
+          return _this;
+        }
+        return IncorrectOwnerError2;
+      }(Error);
+      exports2.IncorrectOwnerError = IncorrectOwnerError;
     }
   });
 
@@ -36768,19 +36840,26 @@
 
   // src/validation.ts
   var import_constants = __toESM(require_constants2());
+  var import_constants2 = __toESM(require_constants2());
+  var import_errors = __toESM(require_errors());
   function isValidAddress2(address) {
     return esm_default.isValidAddress(address);
   }
-  function isValidName(name) {
-    name = name.split(".algo")[0];
+  function normalizeName(name) {
+    const tld = name.split(".").pop();
+    if (import_constants2.ALLOWED_TLDS.includes(tld)) {
+      name = name.split(".")[0].toLowerCase();
+    } else {
+      throw new Error("TLD not supported");
+    }
     const lengthOfName = name.length;
     for (let i = 0; i < lengthOfName; i++) {
       if (!(name.charCodeAt(i) >= import_constants.ASCII_CODES.ASCII_0 && name.charCodeAt(i) <= import_constants.ASCII_CODES.ASCII_9)) {
         if (!(name.charCodeAt(i) >= import_constants.ASCII_CODES.ASCII_A && name.charCodeAt(i) <= import_constants.ASCII_CODES.ASCII_Z))
-          return false;
+          throw new import_errors.InvalidNameError();
       }
     }
-    return true;
+    return name;
   }
 })();
 /*

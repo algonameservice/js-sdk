@@ -22,5 +22,6 @@
     "reddit",
     "discord"
   ];
+  var ALLOWED_TLDS = ["algo"];
 })();
 //# sourceMappingURL=constants.global.js.map

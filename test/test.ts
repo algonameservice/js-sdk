@@ -104,6 +104,7 @@ describe("Testing name resolution methods", function () {
       "Not returning 2 transactions for updating properties"
     );
   });
+
   it("Prepares a list of transactions to renew name", async function () {
     this.timeout(100000);
     const nameRenewalTxns = await sdk

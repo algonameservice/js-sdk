@@ -11,7 +11,7 @@ import {
   DomainInformation,
   RegistrationTxns,
 } from "./interfaces.js";
-import { isValidAddress, isValidName } from "./validation.js";
+import { isValidAddress } from "./validation.js";
 
 export class Name {
   private name = "";
@@ -70,9 +70,7 @@ export class Name {
       if (!isValidAddress(receiver)) throw new AddressValidationError();
     }
     const owner: string = await this.getOwner();
-    if (!(await isValidName(this.name))) {
-      throw new InvalidNameError();
-    }
+
     if (!(await isValidAddress(sender))) {
       throw new AddressValidationError();
     }

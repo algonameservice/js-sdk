@@ -31176,6 +31176,7 @@
         "reddit",
         "discord"
       ];
+      exports2.ALLOWED_TLDS = ["algo"];
     }
   });
 
@@ -36861,8 +36862,7 @@
       this.indexerClient = indexer;
     }
     async generateLsig(name) {
-      const client = this.algodClient;
-      let program = await client.compile((0, import_generateTeal.generateTeal)(name)).do();
+      let program = await this.algodClient.compile((0, import_generateTeal.generateTeal)(name)).do();
       program = new Uint8Array(Buffer.from(program.result, "base64"));
       return new esm_default.LogicSigAccount(program);
     }
@@ -36870,16 +36870,14 @@
       if (name.length === 0 || name.length > 64) {
         throw new import_errors.InvalidNameError();
       } else {
-        name = name.split(".algo")[0];
-        name = name.toLowerCase();
         const indexer = await this.indexerClient;
         const lsig = await this.generateLsig(name);
+        let found = false;
         try {
           let accountInfo = await indexer.lookupAccountByID(lsig.address()).do();
           accountInfo = accountInfo.account["apps-local-state"];
           const length = accountInfo.length;
-          let owner;
-          let found = false;
+          let address;
           let socials = [], metadata = [];
           for (let i = 0; i < length; i++) {
             const app = accountInfo[i];
@@ -36889,20 +36887,20 @@
               socials = this.filterKvPairs(decodedKvPairs, "socials");
               metadata = this.filterKvPairs(decodedKvPairs, "metadata");
               found = true;
-              owner = metadata.filter((kv2) => kv2.key === "owner")[0].value;
+              address = metadata.filter((kv2) => kv2.key === "owner")[0].value;
             }
           }
           if (found) {
             return {
-              found: true,
-              address: owner,
+              found,
+              address,
               socials,
               metadata
             };
           } else
-            return { found: false };
+            return { found };
         } catch (err) {
-          return { found: false };
+          return { found };
         }
       }
     }
@@ -36947,10 +36945,12 @@
                   name: ""
                 };
                 domain.name = names[i] + ".algo";
-                if (socials)
+                if (socials) {
                   domain["socials"] = info.socials;
-                if (metadata)
+                }
+                if (metadata) {
                   domain["metadata"] = info.metadata;
+                }
                 details.push(domain);
               }
             } else {
@@ -36970,10 +36970,11 @@
           key,
           value
         };
-        if (import_constants.ALLOWED_SOCIALS.includes(key))
+        if (import_constants.ALLOWED_SOCIALS.includes(key)) {
           socials.push(kvObj);
-        else
+        } else {
           metadata.push(kvObj);
+        }
       }
       if (type === "socials") {
         return socials;
@@ -37037,7 +37038,7 @@
       return names;
     }
     async owner(name) {
-      const domainInformation = await this.resolveName(name.split(".algo")[0]);
+      const domainInformation = await this.resolveName(name);
       if (domainInformation.found === true) {
         return domainInformation.address;
       } else
@@ -37048,7 +37049,7 @@
       if (domainInformation.found === true) {
         const textRecords = domainInformation.socials.filter((social) => social.key === key);
         if (textRecords.length > 0) {
-          return domainInformation.socials.filter((social) => social.key === key)[0].value;
+          return textRecords[0].value;
         } else {
           return "Property Not Set";
         }
@@ -37057,13 +37058,29 @@
       }
     }
     async expiry(name) {
-      const domainInformation = await this.resolveName(name.split(".algo")[0]);
+      const domainInformation = await this.resolveName(name);
       if (domainInformation.found === true) {
         return new Date(domainInformation.metadata.filter((data) => data.key === "expiry")[0].value * 1e3);
       } else
         return "Not Registered";
     }
     async content(name) {
+      const domainInformation = await this.resolveName(name);
+      if (domainInformation.found === true) {
+        const contentRecords = domainInformation.metadata.filter((kv) => kv.key === "content");
+        if (contentRecords.length > 0) {
+          return contentRecords[0].value;
+        } else {
+          const ipAddr = domainInformation.metadata.filter((kv) => kv.key === "ipaddress");
+          if (ipAddr.length > 0) {
+            return ipAddr[0].value;
+          } else {
+            return "Content Record and IP Address not set";
+          }
+        }
+      } else {
+        return "Domain not registered";
+      }
     }
   };
 })();

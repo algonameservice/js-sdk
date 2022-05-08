@@ -1,12 +1,13 @@
+import algosdk from "algosdk";
 export declare type NameConstructor = {
-    client: object;
-    indexer: object;
+    client: algosdk.Algodv2;
+    indexer: algosdk.Indexer;
     name: string;
 };
 export declare type AddressConstructor = {
     address: string;
-    client: object;
-    indexer: object;
+    client: algosdk.Algodv2;
+    indexer: algosdk.Indexer;
 };
 export declare type DomainInformation = {
     found: boolean;

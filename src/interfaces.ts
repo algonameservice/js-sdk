@@ -1,13 +1,15 @@
+import algosdk from "algosdk";
+
 export type NameConstructor = {
-  client: object;
-  indexer: object;
+  client: algosdk.Algodv2;
+  indexer: algosdk.Indexer;
   name: string;
 };
 
 export type AddressConstructor = {
   address: string;
-  client: object;
-  indexer: object;
+  client: algosdk.Algodv2;
+  indexer: algosdk.Indexer;
 };
 
 export type DomainInformation = {

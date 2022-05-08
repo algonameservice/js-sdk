@@ -6,17 +6,16 @@ import { generateTeal } from "./generateTeal.js";
 declare const Buffer: any;
 
 export class Resolver {
-  private algodClient: any;
-  private indexerClient: any;
+  private algodClient: algosdk.Algodv2;
+  private indexerClient: algosdk.Indexer;
 
-  constructor(client?: any, indexer?: any) {
+  constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer) {
     this.algodClient = client;
     this.indexerClient = indexer;
   }
 
   async generateLsig(name: string) {
-    const client = this.algodClient;
-    let program = await client.compile(generateTeal(name)).do();
+    let program = await this.algodClient.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
     return new algosdk.LogicSigAccount(program);
   }
@@ -25,19 +24,17 @@ export class Resolver {
     if (name.length === 0 || name.length > 64) {
       throw new InvalidNameError();
     } else {
-      name = name.split(".algo")[0];
-      name = name.toLowerCase();
       const indexer = await this.indexerClient;
       const lsig = await this.generateLsig(name);
-
+      let found = false;
       try {
         let accountInfo = await indexer.lookupAccountByID(lsig.address()).do();
 
         accountInfo = accountInfo.account["apps-local-state"];
 
         const length = accountInfo.length;
-        let owner;
-        let found = false;
+        let address;
+
         let socials: any = [],
           metadata: any = [];
         for (let i = 0; i < length; i++) {
@@ -48,20 +45,20 @@ export class Resolver {
             socials = this.filterKvPairs(decodedKvPairs, "socials");
             metadata = this.filterKvPairs(decodedKvPairs, "metadata");
             found = true;
-            owner = metadata.filter((kv: any) => kv.key === "owner")[0].value;
+            address = metadata.filter((kv: any) => kv.key === "owner")[0].value;
           }
         }
 
         if (found) {
           return {
-            found: true,
-            address: owner,
-            socials: socials,
-            metadata: metadata,
+            found,
+            address,
+            socials,
+            metadata,
           };
-        } else return { found: false };
+        } else return { found };
       } catch (err) {
-        return { found: false };
+        return { found };
       }
     }
   }
@@ -126,8 +123,12 @@ export class Resolver {
                 name: "",
               };
               domain.name = names[i] + ".algo";
-              if (socials) domain["socials"] = info.socials;
-              if (metadata) domain["metadata"] = info.metadata;
+              if (socials) {
+                domain["socials"] = info.socials;
+              }
+              if (metadata) {
+                domain["metadata"] = info.metadata;
+              }
               details.push(domain);
             }
           } else {
@@ -152,8 +153,11 @@ export class Resolver {
         value: value,
       };
 
-      if (ALLOWED_SOCIALS.includes(key)) socials.push(kvObj);
-      else metadata.push(kvObj);
+      if (ALLOWED_SOCIALS.includes(key)) {
+        socials.push(kvObj);
+      } else {
+        metadata.push(kvObj);
+      }
     }
     if (type === "socials") {
       return socials;
@@ -235,9 +239,7 @@ export class Resolver {
   }
 
   async owner(name: string) {
-    const domainInformation: any = await this.resolveName(
-      name.split(".algo")[0]
-    );
+    const domainInformation: any = await this.resolveName(name);
     if (domainInformation.found === true) {
       return domainInformation.address;
     } else return "Not Registered";
@@ -250,9 +252,7 @@ export class Resolver {
         (social: any) => social.key === key
       );
       if (textRecords.length > 0) {
-        return domainInformation.socials.filter(
-          (social: any) => social.key === key
-        )[0].value;
+        return textRecords[0].value;
       } else {
         return "Property Not Set";
       }
@@ -262,10 +262,9 @@ export class Resolver {
   }
 
   async expiry(name: string) {
-    const domainInformation: any = await this.resolveName(
-      name.split(".algo")[0]
-    );
+    const domainInformation: any = await this.resolveName(name);
     if (domainInformation.found === true) {
+      //Convert milliseconds to seconds by multiplying with 1000
       return new Date(
         domainInformation.metadata.filter(
           (data: any) => data.key === "expiry"
@@ -274,7 +273,26 @@ export class Resolver {
     } else return "Not Registered";
   }
 
-  async content(name:string) {
-    //TODO: Must return the content value
+  async content(name: string): Promise<string> {
+    const domainInformation: any = await this.resolveName(name);
+    if (domainInformation.found === true) {
+      const contentRecords: any[] = domainInformation.metadata.filter(
+        (kv: any) => kv.key === "content"
+      );
+      if (contentRecords.length > 0) {
+        return contentRecords[0].value;
+      } else {
+        const ipAddr: any[] = domainInformation.metadata.filter(
+          (kv: any) => kv.key === "ipaddress"
+        );
+        if (ipAddr.length > 0) {
+          return ipAddr[0].value;
+        } else {
+          return "Content Record and IP Address not set";
+        }
+      }
+    } else {
+      return "Domain not registered";
+    }
   }
 }

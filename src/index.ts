@@ -1,25 +1,21 @@
-import { AddressValidationError, InvalidNameError } from "./errors.js";
-import { isValidAddress, isValidName } from "./validation.js";
+import { AddressValidationError } from "./errors.js";
+import { isValidAddress } from "./validation.js";
 import { Name } from "./name.js";
 import { Address } from "./address.js";
+import algosdk from "algosdk";
+import { normalizeName } from "./validation.js";
 
 export class ANS {
-  private client: any;
-  private indexer: any;
+  private client: algosdk.Algodv2;
+  private indexer: algosdk.Indexer;
 
-  constructor(client: any, indexer: any) {
+  constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer) {
     this.client = client;
     this.indexer = indexer;
   }
 
   name(name: string): Name {
-    if (name.length > 0) {
-      name = name.toLowerCase();
-    }
-    name = name.split(".algo")[0];
-    if (!isValidName(name)) {
-      throw new InvalidNameError();
-    }
+    name = normalizeName(name);
     return new Name({
       client: this.client,
       indexer: this.indexer,

@@ -98,17 +98,17 @@
         return AddressValidationError3;
       }(Error);
       exports2.AddressValidationError = AddressValidationError2;
-      var InvalidNameError2 = function(_super) {
-        __extends(InvalidNameError3, _super);
-        function InvalidNameError3() {
+      var InvalidNameError = function(_super) {
+        __extends(InvalidNameError2, _super);
+        function InvalidNameError2() {
           var _this = _super.call(this, "The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters") || this;
           _this.name = "InvalidNameError";
           _this.type = "InvalidNameError";
           return _this;
         }
-        return InvalidNameError3;
+        return InvalidNameError2;
       }(Error);
-      exports2.InvalidNameError = InvalidNameError2;
+      exports2.InvalidNameError = InvalidNameError;
       var NameNotRegisteredError = function(_super) {
         __extends(NameNotRegisteredError2, _super);
         function NameNotRegisteredError2(name) {
@@ -37174,6 +37174,7 @@
         "reddit",
         "discord"
       ];
+      exports2.ALLOWED_TLDS = ["algo"];
     }
   });
 
@@ -37184,22 +37185,29 @@
       exports2.__esModule = true;
       var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
       var constants_js_1 = require_constants2();
+      var constants_js_2 = require_constants2();
+      var errors_js_1 = require_errors();
       function isValidAddress3(address) {
         return algosdk_1["default"].isValidAddress(address);
       }
       exports2.isValidAddress = isValidAddress3;
-      function isValidName2(name) {
-        name = name.split(".algo")[0];
+      function normalizeName2(name) {
+        var tld = name.split(".").pop();
+        if (constants_js_2.ALLOWED_TLDS.includes(tld)) {
+          name = name.split(".")[0].toLowerCase();
+        } else {
+          throw new Error("TLD not supported");
+        }
         var lengthOfName = name.length;
         for (var i = 0; i < lengthOfName; i++) {
           if (!(name.charCodeAt(i) >= constants_js_1.ASCII_CODES.ASCII_0 && name.charCodeAt(i) <= constants_js_1.ASCII_CODES.ASCII_9)) {
             if (!(name.charCodeAt(i) >= constants_js_1.ASCII_CODES.ASCII_A && name.charCodeAt(i) <= constants_js_1.ASCII_CODES.ASCII_Z))
-              return false;
+              throw new errors_js_1.InvalidNameError();
           }
         }
-        return true;
+        return name;
       }
-      exports2.isValidName = isValidName2;
+      exports2.normalizeName = normalizeName2;
     }
   });
 
@@ -37247,17 +37255,12 @@
         });
       };
       var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+        var _ = { label: 0, sent: function() {
+          if (t[0] & 1)
+            throw t[1];
+          return t[1];
+        }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
           return this;
         }), g;
         function verb(n) {
@@ -37339,29 +37342,22 @@
         }
         Resolver2.prototype.generateLsig = function(name) {
           return __awaiter(this, void 0, void 0, function() {
-            var client, program;
+            var program;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  client = this.algodClient;
-                  return [
-                    4,
-                    client.compile(generateTeal_js_1.generateTeal(name))["do"]()
-                  ];
+                  return [4, this.algodClient.compile(generateTeal_js_1.generateTeal(name))["do"]()];
                 case 1:
                   program = _a.sent();
                   program = new Uint8Array(Buffer.from(program.result, "base64"));
-                  return [
-                    2,
-                    new algosdk_1["default"].LogicSigAccount(program)
-                  ];
+                  return [2, new algosdk_1["default"].LogicSigAccount(program)];
               }
             });
           });
         };
         Resolver2.prototype.resolveName = function(name) {
           return __awaiter(this, void 0, void 0, function() {
-            var indexer, lsig, accountInfo, length_1, owner, found, socials, metadata, i, app, kv, decodedKvPairs, err_1;
+            var indexer, lsig, found, accountInfo, length_1, address, socials, metadata, i, app, kv, decodedKvPairs, err_1;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
@@ -37369,27 +37365,22 @@
                     return [3, 1];
                   throw new errors_js_1.InvalidNameError();
                 case 1:
-                  name = name.split(".algo")[0];
-                  name = name.toLowerCase();
                   return [4, this.indexerClient];
                 case 2:
                   indexer = _a.sent();
                   return [4, this.generateLsig(name)];
                 case 3:
                   lsig = _a.sent();
+                  found = false;
                   _a.label = 4;
                 case 4:
                   _a.trys.push([4, 6, , 7]);
-                  return [
-                    4,
-                    indexer.lookupAccountByID(lsig.address())["do"]()
-                  ];
+                  return [4, indexer.lookupAccountByID(lsig.address())["do"]()];
                 case 5:
                   accountInfo = _a.sent();
                   accountInfo = accountInfo.account["apps-local-state"];
                   length_1 = accountInfo.length;
-                  owner = void 0;
-                  found = false;
+                  address = void 0;
                   socials = [], metadata = [];
                   for (i = 0; i < length_1; i++) {
                     app = accountInfo[i];
@@ -37399,27 +37390,24 @@
                       socials = this.filterKvPairs(decodedKvPairs, "socials");
                       metadata = this.filterKvPairs(decodedKvPairs, "metadata");
                       found = true;
-                      owner = metadata.filter(function(kv2) {
+                      address = metadata.filter(function(kv2) {
                         return kv2.key === "owner";
                       })[0].value;
                     }
                   }
                   if (found) {
-                    return [
-                      2,
-                      {
-                        found: true,
-                        address: owner,
-                        socials,
-                        metadata
-                      }
-                    ];
+                    return [2, {
+                      found,
+                      address,
+                      socials,
+                      metadata
+                    }];
                   } else
-                    return [2, { found: false }];
+                    return [2, { found }];
                   return [3, 7];
                 case 6:
                   err_1 = _a.sent();
-                  return [2, { found: false }];
+                  return [2, { found }];
                 case 7:
                   return [2];
               }
@@ -37452,10 +37440,7 @@
                   _a.label = 5;
                 case 5:
                   _a.trys.push([5, 7, , 8]);
-                  return [
-                    4,
-                    indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(constants_js_1.APP_ID).nextToken(nextToken)["do"]()
-                  ];
+                  return [4, indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(constants_js_1.APP_ID).nextToken(nextToken)["do"]()];
                 case 6:
                   info = _a.sent();
                   txnLength = info.transactions.length;
@@ -37499,10 +37484,12 @@
                         name: ""
                       };
                       domain.name = names[i] + ".algo";
-                      if (socials)
+                      if (socials) {
                         domain["socials"] = info.socials;
-                      if (metadata)
+                      }
+                      if (metadata) {
                         domain["metadata"] = info.metadata;
+                      }
                       details.push(domain);
                     }
                   } else {
@@ -37529,10 +37516,11 @@
               key,
               value
             };
-            if (constants_js_1.ALLOWED_SOCIALS.includes(key))
+            if (constants_js_1.ALLOWED_SOCIALS.includes(key)) {
               socials.push(kvObj);
-            else
+            } else {
               metadata.push(kvObj);
+            }
           }
           if (type === "socials") {
             return socials;
@@ -37591,10 +37579,7 @@
                   if (!(Buffer.from(appArgs[0], "base64").toString() === "accept_transfer"))
                     return [3, 5];
                   lsigAccount = txn["application-transaction"]["accounts"][0];
-                  return [
-                    4,
-                    indexer.lookupAccountByID(lsigAccount)["do"]()
-                  ];
+                  return [4, indexer.lookupAccountByID(lsigAccount)["do"]()];
                 case 4:
                   accountInfo = _a.sent();
                   accountInfo = accountInfo.account["apps-local-state"];
@@ -37631,7 +37616,7 @@
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  return [4, this.resolveName(name.split(".algo")[0])];
+                  return [4, this.resolveName(name)];
                 case 1:
                   domainInformation = _a.sent();
                   if (domainInformation.found === true) {
@@ -37657,12 +37642,7 @@
                       return social.key === key;
                     });
                     if (textRecords.length > 0) {
-                      return [
-                        2,
-                        domainInformation.socials.filter(function(social) {
-                          return social.key === key;
-                        })[0].value
-                      ];
+                      return [2, textRecords[0].value];
                     } else {
                       return [2, "Property Not Set"];
                     }
@@ -37680,16 +37660,13 @@
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  return [4, this.resolveName(name.split(".algo")[0])];
+                  return [4, this.resolveName(name)];
                 case 1:
                   domainInformation = _a.sent();
                   if (domainInformation.found === true) {
-                    return [
-                      2,
-                      new Date(domainInformation.metadata.filter(function(data) {
-                        return data.key === "expiry";
-                      })[0].value * 1e3)
-                    ];
+                    return [2, new Date(domainInformation.metadata.filter(function(data) {
+                      return data.key === "expiry";
+                    })[0].value * 1e3)];
                   } else
                     return [2, "Not Registered"];
                   return [2];
@@ -37697,10 +37674,36 @@
             });
           });
         };
-        Resolver2.prototype.content = function() {
+        Resolver2.prototype.content = function(name) {
           return __awaiter(this, void 0, void 0, function() {
+            var domainInformation, contentRecords, ipAddr;
             return __generator(this, function(_a) {
-              return [2];
+              switch (_a.label) {
+                case 0:
+                  return [4, this.resolveName(name)];
+                case 1:
+                  domainInformation = _a.sent();
+                  if (domainInformation.found === true) {
+                    contentRecords = domainInformation.metadata.filter(function(kv) {
+                      return kv.key === "content";
+                    });
+                    if (contentRecords.length > 0) {
+                      return [2, contentRecords[0].value];
+                    } else {
+                      ipAddr = domainInformation.metadata.filter(function(kv) {
+                        return kv.key === "ipaddress";
+                      });
+                      if (ipAddr.length > 0) {
+                        return [2, ipAddr[0].value];
+                      } else {
+                        return [2, "Content Record and IP Address not set"];
+                      }
+                    }
+                  } else {
+                    return [2, "Domain not registered"];
+                  }
+                  return [2];
+              }
             });
           });
         };
@@ -37825,7 +37828,6 @@
       exports2.__esModule = true;
       var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
       var constants_js_1 = require_constants2();
-      var errors_js_1 = require_errors();
       var generateTeal_js_1 = require_generateTeal();
       var Transactions = function() {
         function Transactions2(client) {
@@ -37833,15 +37835,13 @@
         }
         Transactions2.prototype.generateLsig = function(name) {
           return __awaiter(this, void 0, void 0, function() {
-            var client, program;
+            var program;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  name = name.split(".algo")[0];
-                  client = this.algodClient;
                   return [
                     4,
-                    client.compile(generateTeal_js_1.generateTeal(name))["do"]()
+                    this.algodClient.compile(generateTeal_js_1.generateTeal(name))["do"]()
                   ];
                 case 1:
                   program = _a.sent();
@@ -37856,7 +37856,6 @@
         };
         Transactions2.prototype.calculatePrice = function(name, period) {
           var amount = 0;
-          name = name.split(".algo")[0];
           if (name.length === 3) {
             amount = constants_js_1.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
           } else if (name.length === 4) {
@@ -37873,8 +37872,6 @@
               switch (_a.label) {
                 case 0:
                   algodClient = this.algodClient;
-                  if (name.split(".algo")[0].length < 3)
-                    throw new errors_js_1.InvalidNameError();
                   amount = 0;
                   return [4, this.generateLsig(name)];
                 case 1:
@@ -38021,7 +38018,6 @@
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  name = name.split(".algo")[0];
                   algodClient = this.algodClient;
                   return [4, algodClient.getTransactionParams()["do"]()];
                 case 1:
@@ -38054,7 +38050,6 @@
                   return [4, algodClient.getTransactionParams()["do"]()];
                 case 1:
                   params = _a.sent();
-                  name = name.split(".algo")[0];
                   return [4, this.generateLsig(name)];
                 case 2:
                   lsig = _a.sent();
@@ -38085,7 +38080,6 @@
                   paymentToOwnerTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
                   receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
                   paymentToSmartContractTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, constants_js_1.TRANSFER_FEE, closeToRemaninder, note, params);
-                  name = name.split(".algo")[0];
                   return [4, this.generateLsig(name)];
                 case 2:
                   lsig = _a.sent();
@@ -38331,13 +38325,8 @@
                   return [4, this.getOwner()];
                 case 2:
                   owner = _a.sent();
-                  return [4, validation_js_1.isValidName(this.name)];
-                case 3:
-                  if (!_a.sent()) {
-                    throw new errors_js_1.InvalidNameError();
-                  }
                   return [4, validation_js_1.isValidAddress(sender)];
-                case 4:
+                case 3:
                   if (!_a.sent()) {
                     throw new errors_js_1.AddressValidationError();
                   }
@@ -38618,6 +38607,7 @@
   var import_validation = __toESM(require_validation());
   var import_name = __toESM(require_name());
   var import_address4 = __toESM(require_address());
+  var import_validation2 = __toESM(require_validation());
   var ANS = class {
     client;
     indexer;
@@ -38626,13 +38616,7 @@
       this.indexer = indexer;
     }
     name(name) {
-      if (name.length > 0) {
-        name = name.toLowerCase();
-      }
-      name = name.split(".algo")[0];
-      if (!(0, import_validation.isValidName)(name)) {
-        throw new import_errors.InvalidNameError();
-      }
+      name = (0, import_validation2.normalizeName)(name);
       return new import_name.Name({
         client: this.client,
         indexer: this.indexer,

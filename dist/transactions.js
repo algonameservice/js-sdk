@@ -59,78 +59,7 @@ var require_constants = __commonJS({
       "reddit",
       "discord"
     ];
-  }
-});
-
-// src/errors.js
-var require_errors = __commonJS({
-  "src/errors.js"(exports) {
-    "use strict";
-    init_cjs_shims();
-    var __extends = exports && exports.__extends || function() {
-      var extendStatics = function(d, b) {
-        extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
-          d2.__proto__ = b2;
-        } || function(d2, b2) {
-          for (var p in b2)
-            if (b2.hasOwnProperty(p))
-              d2[p] = b2[p];
-        };
-        return extendStatics(d, b);
-      };
-      return function(d, b) {
-        extendStatics(d, b);
-        function __() {
-          this.constructor = d;
-        }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-      };
-    }();
-    exports.__esModule = true;
-    var AddressValidationError = function(_super) {
-      __extends(AddressValidationError2, _super);
-      function AddressValidationError2() {
-        var _this = _super.call(this, "This is not a valid Algorand address") || this;
-        _this.name = "InvalidAddressError";
-        _this.type = "InvalidAddressError";
-        return _this;
-      }
-      return AddressValidationError2;
-    }(Error);
-    exports.AddressValidationError = AddressValidationError;
-    var InvalidNameError2 = function(_super) {
-      __extends(InvalidNameError3, _super);
-      function InvalidNameError3() {
-        var _this = _super.call(this, "The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters") || this;
-        _this.name = "InvalidNameError";
-        _this.type = "InvalidNameError";
-        return _this;
-      }
-      return InvalidNameError3;
-    }(Error);
-    exports.InvalidNameError = InvalidNameError2;
-    var NameNotRegisteredError = function(_super) {
-      __extends(NameNotRegisteredError2, _super);
-      function NameNotRegisteredError2(name) {
-        var _this = _super.call(this, "Name " + name + " is not registered") || this;
-        _this.name = "NameNotRegisteredError";
-        _this.type = "NameNotRegisteredError";
-        return _this;
-      }
-      return NameNotRegisteredError2;
-    }(Error);
-    exports.NameNotRegisteredError = NameNotRegisteredError;
-    var IncorrectOwnerError = function(_super) {
-      __extends(IncorrectOwnerError2, _super);
-      function IncorrectOwnerError2(name, address) {
-        var _this = _super.call(this, "Name " + name + ".algo is not owned by " + address) || this;
-        _this.name = "IncorrectOwnerError";
-        _this.type = "IncorrectOwnerError";
-        return _this;
-      }
-      return IncorrectOwnerError2;
-    }(Error);
-    exports.IncorrectOwnerError = IncorrectOwnerError;
+    exports.ALLOWED_TLDS = ["algo"];
   }
 });
 
@@ -156,7 +85,6 @@ module.exports = __toCommonJS(transactions_exports);
 init_cjs_shims();
 var import_algosdk = __toESM(require("algosdk"));
 var import_constants = __toESM(require_constants());
-var import_errors = __toESM(require_errors());
 var import_generateTeal = __toESM(require_generateTeal());
 var Transactions = class {
   algodClient;
@@ -164,15 +92,12 @@ var Transactions = class {
     this.algodClient = client;
   }
   async generateLsig(name) {
-    name = name.split(".algo")[0];
-    const client = this.algodClient;
-    let program = await client.compile((0, import_generateTeal.generateTeal)(name)).do();
+    let program = await this.algodClient.compile((0, import_generateTeal.generateTeal)(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
     return new import_algosdk.default.LogicSigAccount(program);
   }
   calculatePrice(name, period) {
     let amount = 0;
-    name = name.split(".algo")[0];
     if (name.length === 3) {
       amount = import_constants.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
     } else if (name.length === 4) {
@@ -184,8 +109,6 @@ var Transactions = class {
   }
   async prepareNameRegistrationTransactions(name, address, period) {
     const algodClient = this.algodClient;
-    if (name.split(".algo")[0].length < 3)
-      throw new import_errors.InvalidNameError();
     let amount = 0;
     const lsig = await this.generateLsig(name);
     const params = await algodClient.getTransactionParams().do();
@@ -265,7 +188,6 @@ var Transactions = class {
     return import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
   }
   async prepareNameRenewalTxns(name, sender, years) {
-    name = name.split(".algo")[0];
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
     const receiver = import_algosdk.default.getApplicationAddress(import_constants.APP_ID);
@@ -284,7 +206,6 @@ var Transactions = class {
     const algodClient = this.algodClient;
     price = import_algosdk.default.algosToMicroalgos(price);
     const params = await algodClient.getTransactionParams().do();
-    name = name.split(".algo")[0];
     const lsig = await this.generateLsig(name);
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
@@ -303,7 +224,6 @@ var Transactions = class {
     const paymentToOwnerTxn = import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
     receiver = import_algosdk.default.getApplicationAddress(import_constants.APP_ID);
     const paymentToSmartContractTxn = import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, import_constants.TRANSFER_FEE, closeToRemaninder, note, params);
-    name = name.split(".algo")[0];
     const lsig = await this.generateLsig(name);
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));

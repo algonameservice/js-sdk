@@ -13,3 +13,4 @@ export declare const ASCII_CODES: {
     ASCII_9: number;
 };
 export declare const ALLOWED_SOCIALS: string[];
+export declare const ALLOWED_TLDS: string[];

@@ -2,7 +2,7 @@ import algosdk from "algosdk";
 export declare class Resolver {
     private algodClient;
     private indexerClient;
-    constructor(client?: any, indexer?: any);
+    constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer);
     generateLsig(name: string): Promise<algosdk.LogicSigAccount>;
     resolveName(name: string): Promise<{
         found: boolean;
