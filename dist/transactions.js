@@ -88,29 +88,31 @@ var import_constants = __toESM(require_constants());
 var import_generateTeal = __toESM(require_generateTeal());
 var Transactions = class {
   algodClient;
-  constructor(client) {
+  name;
+  constructor(client, name) {
     this.algodClient = client;
+    this.name = name;
   }
-  async generateLsig(name) {
-    let program = await this.algodClient.compile((0, import_generateTeal.generateTeal)(name)).do();
+  async generateLsig() {
+    let program = await this.algodClient.compile((0, import_generateTeal.generateTeal)(this.name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
     return new import_algosdk.default.LogicSigAccount(program);
   }
-  calculatePrice(name, period) {
+  calculatePrice(period) {
     let amount = 0;
-    if (name.length === 3) {
+    if (this.name.length === 3) {
       amount = import_constants.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
-    } else if (name.length === 4) {
+    } else if (this.name.length === 4) {
       amount = import_constants.REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
-    } else if (name.length >= 5) {
+    } else if (this.name.length >= 5) {
       amount = import_constants.REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
     }
     return amount;
   }
-  async prepareNameRegistrationTransactions(name, address, period) {
+  async prepareNameRegistrationTransactions(address, period) {
     const algodClient = this.algodClient;
     let amount = 0;
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
     const params = await algodClient.getTransactionParams().do();
     params.fee = 1e3;
     params.flatFee = true;
@@ -119,7 +121,7 @@ var Transactions = class {
     if (period === void 0) {
       period = 1;
     }
-    amount = this.calculatePrice(name, period);
+    amount = this.calculatePrice(period);
     const closeToRemaninder = void 0;
     const note = void 0;
     const txn1 = import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
@@ -143,7 +145,7 @@ var Transactions = class {
     const appArgs = [];
     period++;
     appArgs.push(new Uint8Array(Buffer.from(method)));
-    appArgs.push(new Uint8Array(Buffer.from(name)));
+    appArgs.push(new Uint8Array(Buffer.from(this.name)));
     appArgs.push(import_algosdk.default.encodeUint64(period));
     const txn4 = await import_algosdk.default.makeApplicationNoOpTxn(address, params, import_constants.APP_ID, appArgs, [lsig.address()]);
     groupTxns.push(txn4);
@@ -155,9 +157,9 @@ var Transactions = class {
       unsignedOptinTxn: groupTxns[2]
     };
   }
-  async prepareUpdateNamePropertyTransactions(name, address, editedHandles) {
+  async prepareUpdateNamePropertyTransactions(address, editedHandles) {
     const algodClient = this.algodClient;
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
     const params = await algodClient.getTransactionParams().do();
     params.fee = 1e3;
     params.flatFee = true;
@@ -187,14 +189,14 @@ var Transactions = class {
     const closeToRemaninder = void 0;
     return import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
   }
-  async prepareNameRenewalTxns(name, sender, years) {
+  async prepareNameRenewalTxns(sender, years) {
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
     const receiver = import_algosdk.default.getApplicationAddress(import_constants.APP_ID);
     const closeToRemaninder = void 0;
     const note = void 0;
-    const paymentTxn = import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(name, years), closeToRemaninder, note, params);
-    const lsig = await this.generateLsig(name);
+    const paymentTxn = import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(years), closeToRemaninder, note, params);
+    const lsig = await this.generateLsig();
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("renew_name")));
     appArgs.push(import_algosdk.default.encodeUint64(years));
@@ -202,11 +204,11 @@ var Transactions = class {
     import_algosdk.default.assignGroupID([paymentTxn, applicationTxn]);
     return [paymentTxn, applicationTxn];
   }
-  async prepareInitiateNameTransferTransaction(name, sender, newOwner, price) {
+  async prepareInitiateNameTransferTransaction(sender, newOwner, price) {
     const algodClient = this.algodClient;
     price = import_algosdk.default.algosToMicroalgos(price);
     const params = await algodClient.getTransactionParams().do();
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
     appArgs.push(import_algosdk.default.encodeUint64(price));
@@ -215,7 +217,7 @@ var Transactions = class {
       newOwner
     ]);
   }
-  async prepareAcceptNameTransferTransactions(name, sender, receiver, amt) {
+  async prepareAcceptNameTransferTransactions(sender, receiver, amt) {
     amt = import_algosdk.default.algosToMicroalgos(amt);
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
@@ -224,7 +226,7 @@ var Transactions = class {
     const paymentToOwnerTxn = import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
     receiver = import_algosdk.default.getApplicationAddress(import_constants.APP_ID);
     const paymentToSmartContractTxn = import_algosdk.default.makePaymentTxnWithSuggestedParams(sender, receiver, import_constants.TRANSFER_FEE, closeToRemaninder, note, params);
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
     const applicationTxn = import_algosdk.default.makeApplicationNoOpTxn(sender, params, import_constants.APP_ID, appArgs, [lsig.address()]);

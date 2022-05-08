@@ -296,9 +296,13 @@ var require_resolver = __commonJS({
     var errors_js_1 = require_errors();
     var generateTeal_js_1 = require_generateTeal();
     var Resolver = function() {
-      function Resolver2(client, indexer) {
+      function Resolver2(client, indexer, name) {
         this.algodClient = client;
         this.indexerClient = indexer;
+        if (name) {
+          this.name = name;
+          this.resolveName();
+        }
       }
       Resolver2.prototype.generateLsig = function(name) {
         return __awaiter(this, void 0, void 0, function() {
@@ -306,6 +310,9 @@ var require_resolver = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
+                if (name === void 0) {
+                  name = this.name;
+                }
                 return [4, this.algodClient.compile(generateTeal_js_1.generateTeal(name))["do"]()];
               case 1:
                 program = _a.sent();
@@ -321,22 +328,26 @@ var require_resolver = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                if (!(name.length === 0 || name.length > 64))
-                  return [3, 1];
-                throw new errors_js_1.InvalidNameError();
-              case 1:
+                if (name === void 0 && this.cache !== void 0) {
+                  return [2, this.cache];
+                } else if (name === void 0) {
+                  name = this.name;
+                }
+                if (name.length === 0 || name.length > 64) {
+                  throw new errors_js_1.InvalidNameError();
+                }
                 return [4, this.indexerClient];
-              case 2:
+              case 1:
                 indexer = _a.sent();
                 return [4, this.generateLsig(name)];
-              case 3:
+              case 2:
                 lsig = _a.sent();
                 found = false;
-                _a.label = 4;
-              case 4:
-                _a.trys.push([4, 6, , 7]);
+                _a.label = 3;
+              case 3:
+                _a.trys.push([3, 5, , 6]);
                 return [4, indexer.lookupAccountByID(lsig.address())["do"]()];
-              case 5:
+              case 4:
                 accountInfo = _a.sent();
                 accountInfo = accountInfo.account["apps-local-state"];
                 length_1 = accountInfo.length;
@@ -356,6 +367,14 @@ var require_resolver = __commonJS({
                   }
                 }
                 if (found) {
+                  if (this.cache === void 0 && name === this.name) {
+                    this.cache = {
+                      found,
+                      address,
+                      socials,
+                      metadata
+                    };
+                  }
                   return [2, {
                     found,
                     address,
@@ -364,11 +383,11 @@ var require_resolver = __commonJS({
                   }];
                 } else
                   return [2, { found }];
-                return [3, 7];
-              case 6:
+                return [3, 6];
+              case 5:
                 err_1 = _a.sent();
                 return [2, { found }];
-              case 7:
+              case 6:
                 return [2];
             }
           });
@@ -570,13 +589,13 @@ var require_resolver = __commonJS({
           });
         });
       };
-      Resolver2.prototype.owner = function(name) {
+      Resolver2.prototype.owner = function() {
         return __awaiter(this, void 0, void 0, function() {
           var domainInformation;
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolveName(name)];
+                return [4, this.resolveName()];
               case 1:
                 domainInformation = _a.sent();
                 if (domainInformation.found === true) {
@@ -588,13 +607,13 @@ var require_resolver = __commonJS({
           });
         });
       };
-      Resolver2.prototype.text = function(name, key) {
+      Resolver2.prototype.text = function(key) {
         return __awaiter(this, void 0, void 0, function() {
           var domainInformation, socialRecords, metadataRecords;
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolveName(name)];
+                return [4, this.resolveName()];
               case 1:
                 domainInformation = _a.sent();
                 if (domainInformation.found === true) {
@@ -621,13 +640,13 @@ var require_resolver = __commonJS({
           });
         });
       };
-      Resolver2.prototype.expiry = function(name) {
+      Resolver2.prototype.expiry = function() {
         return __awaiter(this, void 0, void 0, function() {
           var domainInformation;
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolveName(name)];
+                return [4, this.resolveName()];
               case 1:
                 domainInformation = _a.sent();
                 if (domainInformation.found === true) {
@@ -641,13 +660,13 @@ var require_resolver = __commonJS({
           });
         });
       };
-      Resolver2.prototype.content = function(name) {
+      Resolver2.prototype.content = function() {
         return __awaiter(this, void 0, void 0, function() {
           var domainInformation, contentRecords;
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolveName(name)];
+                return [4, this.resolveName()];
               case 1:
                 domainInformation = _a.sent();
                 if (domainInformation.found === true) {
@@ -786,16 +805,17 @@ var require_transactions = __commonJS({
     var constants_js_1 = require_constants();
     var generateTeal_js_1 = require_generateTeal();
     var Transactions = function() {
-      function Transactions2(client) {
+      function Transactions2(client, name) {
         this.algodClient = client;
+        this.name = name;
       }
-      Transactions2.prototype.generateLsig = function(name) {
+      Transactions2.prototype.generateLsig = function() {
         return __awaiter(this, void 0, void 0, function() {
           var program;
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.algodClient.compile(generateTeal_js_1.generateTeal(name))["do"]()];
+                return [4, this.algodClient.compile(generateTeal_js_1.generateTeal(this.name))["do"]()];
               case 1:
                 program = _a.sent();
                 program = new Uint8Array(Buffer.from(program.result, "base64"));
@@ -804,18 +824,18 @@ var require_transactions = __commonJS({
           });
         });
       };
-      Transactions2.prototype.calculatePrice = function(name, period) {
+      Transactions2.prototype.calculatePrice = function(period) {
         var amount = 0;
-        if (name.length === 3) {
+        if (this.name.length === 3) {
           amount = constants_js_1.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
-        } else if (name.length === 4) {
+        } else if (this.name.length === 4) {
           amount = constants_js_1.REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
-        } else if (name.length >= 5) {
+        } else if (this.name.length >= 5) {
           amount = constants_js_1.REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
         }
         return amount;
       };
-      Transactions2.prototype.prepareNameRegistrationTransactions = function(name, address, period) {
+      Transactions2.prototype.prepareNameRegistrationTransactions = function(address, period) {
         return __awaiter(this, void 0, void 0, function() {
           var algodClient, amount, lsig, params, receiver, sender, closeToRemaninder, note, txn1, groupTxns, txn2, txn3, method, appArgs, txn4, signedOptinTxn;
           return __generator(this, function(_a) {
@@ -823,7 +843,7 @@ var require_transactions = __commonJS({
               case 0:
                 algodClient = this.algodClient;
                 amount = 0;
-                return [4, this.generateLsig(name)];
+                return [4, this.generateLsig()];
               case 1:
                 lsig = _a.sent();
                 return [4, algodClient.getTransactionParams()["do"]()];
@@ -836,7 +856,7 @@ var require_transactions = __commonJS({
                 if (period === void 0) {
                   period = 1;
                 }
-                amount = this.calculatePrice(name, period);
+                amount = this.calculatePrice(period);
                 closeToRemaninder = void 0;
                 note = void 0;
                 txn1 = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
@@ -862,7 +882,7 @@ var require_transactions = __commonJS({
                 appArgs = [];
                 period++;
                 appArgs.push(new Uint8Array(Buffer.from(method)));
-                appArgs.push(new Uint8Array(Buffer.from(name)));
+                appArgs.push(new Uint8Array(Buffer.from(this.name)));
                 appArgs.push(algosdk_1["default"].encodeUint64(period));
                 return [4, algosdk_1["default"].makeApplicationNoOpTxn(address, params, constants_js_1.APP_ID, appArgs, [lsig.address()])];
               case 4:
@@ -879,14 +899,14 @@ var require_transactions = __commonJS({
           });
         });
       };
-      Transactions2.prototype.prepareUpdateNamePropertyTransactions = function(name, address, editedHandles) {
+      Transactions2.prototype.prepareUpdateNamePropertyTransactions = function(address, editedHandles) {
         return __awaiter(this, void 0, void 0, function() {
           var algodClient, lsig, params, method, groupTxns, _a, _b, _i, key, appArgs, network, handle, txn;
           return __generator(this, function(_c) {
             switch (_c.label) {
               case 0:
                 algodClient = this.algodClient;
-                return [4, this.generateLsig(name)];
+                return [4, this.generateLsig()];
               case 1:
                 lsig = _c.sent();
                 return [4, algodClient.getTransactionParams()["do"]()];
@@ -947,7 +967,7 @@ var require_transactions = __commonJS({
           });
         });
       };
-      Transactions2.prototype.prepareNameRenewalTxns = function(name, sender, years) {
+      Transactions2.prototype.prepareNameRenewalTxns = function(sender, years) {
         return __awaiter(this, void 0, void 0, function() {
           var algodClient, params, receiver, closeToRemaninder, note, paymentTxn, lsig, appArgs, applicationTxn;
           return __generator(this, function(_a) {
@@ -960,8 +980,8 @@ var require_transactions = __commonJS({
                 receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
                 closeToRemaninder = void 0;
                 note = void 0;
-                paymentTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(name, years), closeToRemaninder, note, params);
-                return [4, this.generateLsig(name)];
+                paymentTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(years), closeToRemaninder, note, params);
+                return [4, this.generateLsig()];
               case 2:
                 lsig = _a.sent();
                 appArgs = [];
@@ -974,7 +994,7 @@ var require_transactions = __commonJS({
           });
         });
       };
-      Transactions2.prototype.prepareInitiateNameTransferTransaction = function(name, sender, newOwner, price) {
+      Transactions2.prototype.prepareInitiateNameTransferTransaction = function(sender, newOwner, price) {
         return __awaiter(this, void 0, void 0, function() {
           var algodClient, params, lsig, appArgs;
           return __generator(this, function(_a) {
@@ -985,7 +1005,7 @@ var require_transactions = __commonJS({
                 return [4, algodClient.getTransactionParams()["do"]()];
               case 1:
                 params = _a.sent();
-                return [4, this.generateLsig(name)];
+                return [4, this.generateLsig()];
               case 2:
                 lsig = _a.sent();
                 appArgs = [];
@@ -999,7 +1019,7 @@ var require_transactions = __commonJS({
           });
         });
       };
-      Transactions2.prototype.prepareAcceptNameTransferTransactions = function(name, sender, receiver, amt) {
+      Transactions2.prototype.prepareAcceptNameTransferTransactions = function(sender, receiver, amt) {
         return __awaiter(this, void 0, void 0, function() {
           var algodClient, params, closeToRemaninder, note, paymentToOwnerTxn, paymentToSmartContractTxn, lsig, appArgs, applicationTxn;
           return __generator(this, function(_a) {
@@ -1015,7 +1035,7 @@ var require_transactions = __commonJS({
                 paymentToOwnerTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
                 receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
                 paymentToSmartContractTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, constants_js_1.TRANSFER_FEE, closeToRemaninder, note, params);
-                return [4, this.generateLsig(name)];
+                return [4, this.generateLsig()];
               case 2:
                 lsig = _a.sent();
                 appArgs = [];
@@ -1152,11 +1172,10 @@ var require_name = __commonJS({
     var validation_js_1 = require_validation();
     var Name2 = function() {
       function Name3(options) {
-        this.name = "";
         var name = options.name, client = options.client, indexer = options.indexer;
         this.name = name;
-        this.resolver = new resolver_js_1.Resolver(client, indexer);
-        this.transactions = new transactions_js_1.Transactions(client);
+        this.resolver = new resolver_js_1.Resolver(client, indexer, name);
+        this.transactions = new transactions_js_1.Transactions(client, name);
       }
       Name3.prototype.isRegistered = function() {
         return __awaiter(this, void 0, void 0, function() {
@@ -1164,7 +1183,7 @@ var require_name = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolver.resolveName(this.name)];
+                return [4, this.resolver.resolveName()];
               case 1:
                 status = _a.sent();
                 return [2, status.found];
@@ -1177,7 +1196,7 @@ var require_name = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolver.owner(this.name)];
+                return [4, this.resolver.owner()];
               case 1:
                 return [2, _a.sent()];
             }
@@ -1189,7 +1208,7 @@ var require_name = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolver.content(this.name)];
+                return [4, this.resolver.content()];
               case 1:
                 return [2, _a.sent()];
             }
@@ -1201,7 +1220,7 @@ var require_name = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolver.text(this.name, key)];
+                return [4, this.resolver.text(key)];
               case 1:
                 return [2, _a.sent()];
             }
@@ -1213,7 +1232,7 @@ var require_name = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolver.resolveName(this.name)];
+                return [4, this.resolver.resolveName()];
               case 1:
                 return [2, _a.sent()];
             }
@@ -1225,7 +1244,7 @@ var require_name = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                return [4, this.resolver.expiry(this.name)];
+                return [4, this.resolver.expiry()];
               case 1:
                 return [2, _a.sent()];
             }
@@ -1292,7 +1311,7 @@ var require_name = __commonJS({
                   return [3, 2];
                 throw new errors_js_1.AddressValidationError();
               case 2:
-                return [4, this.transactions.prepareNameRegistrationTransactions(this.name, address, period)];
+                return [4, this.transactions.prepareNameRegistrationTransactions(address, period)];
               case 3:
                 return [2, _a.sent()];
             }
@@ -1307,7 +1326,7 @@ var require_name = __commonJS({
                 return [4, this.isValidTransaction(address)];
               case 1:
                 _a.sent();
-                return [4, this.transactions.prepareUpdateNamePropertyTransactions(this.name, address, editedHandles)];
+                return [4, this.transactions.prepareUpdateNamePropertyTransactions(address, editedHandles)];
               case 2:
                 return [2, _a.sent()];
             }
@@ -1322,7 +1341,7 @@ var require_name = __commonJS({
                 return [4, this.isValidTransaction(address)];
               case 1:
                 _a.sent();
-                return [4, this.transactions.prepareNameRenewalTxns(this.name, address, years)];
+                return [4, this.transactions.prepareNameRenewalTxns(address, years)];
               case 2:
                 return [2, _a.sent()];
             }
@@ -1337,7 +1356,7 @@ var require_name = __commonJS({
                 return [4, this.isValidTransaction(owner, newOwner, "initiate_transfer")];
               case 1:
                 _a.sent();
-                return [4, this.transactions.prepareInitiateNameTransferTransaction(this.name, owner, newOwner, price)];
+                return [4, this.transactions.prepareInitiateNameTransferTransaction(owner, newOwner, price)];
               case 2:
                 return [2, _a.sent()];
             }
@@ -1352,7 +1371,7 @@ var require_name = __commonJS({
                 return [4, this.isValidTransaction(newOwner, owner, "accept_transfer")];
               case 1:
                 _a.sent();
-                return [4, this.transactions.prepareAcceptNameTransferTransactions(this.name, newOwner, owner, price)];
+                return [4, this.transactions.prepareAcceptNameTransferTransactions(newOwner, owner, price)];
               case 2:
                 return [2, _a.sent()];
             }
@@ -1477,7 +1496,6 @@ var require_address = __commonJS({
     var resolver_js_1 = require_resolver();
     var Address2 = function() {
       function Address3(options) {
-        this.address = "";
         var address = options.address, client = options.client, indexer = options.indexer;
         this.address = address;
         this.resolver = new resolver_js_1.Resolver(client, indexer);

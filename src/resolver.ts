@@ -8,58 +8,84 @@ declare const Buffer: any;
 export class Resolver {
   private algodClient: algosdk.Algodv2;
   private indexerClient: algosdk.Indexer;
+  private cache: any;
+  private name: string | undefined;
 
-  constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer) {
+  constructor(
+    client: algosdk.Algodv2,
+    indexer: algosdk.Indexer,
+    name?: string
+  ) {
     this.algodClient = client;
     this.indexerClient = indexer;
+    if (name) {
+      this.name = name;
+      this.resolveName();
+    }
   }
 
-  async generateLsig(name: string) {
+  async generateLsig(name?: string) {
+    if (name === undefined) {
+      name = this.name;
+    }
     let program = await this.algodClient.compile(generateTeal(name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
     return new algosdk.LogicSigAccount(program);
   }
 
-  async resolveName(name: string) {
+  async resolveName(name?: string) {
+    if (name === undefined && this.cache !== undefined) {
+      return this.cache;
+    } else if (name === undefined) {
+      name = this.name;
+    }
+
     if (name.length === 0 || name.length > 64) {
       throw new InvalidNameError();
-    } else {
-      const indexer = await this.indexerClient;
-      const lsig = await this.generateLsig(name);
-      let found = false;
-      try {
-        let accountInfo = await indexer.lookupAccountByID(lsig.address()).do();
+    }
+    const indexer = await this.indexerClient;
+    const lsig = await this.generateLsig(name);
+    let found = false;
+    try {
+      let accountInfo = await indexer.lookupAccountByID(lsig.address()).do();
 
-        accountInfo = accountInfo.account["apps-local-state"];
+      accountInfo = accountInfo.account["apps-local-state"];
 
-        const length = accountInfo.length;
-        let address;
+      const length = accountInfo.length;
+      let address;
 
-        let socials: any = [],
-          metadata: any = [];
-        for (let i = 0; i < length; i++) {
-          const app = accountInfo[i];
-          if (app.id === APP_ID) {
-            const kv = app["key-value"];
-            const decodedKvPairs = this.decodeKvPairs(kv);
-            socials = this.filterKvPairs(decodedKvPairs, "socials");
-            metadata = this.filterKvPairs(decodedKvPairs, "metadata");
-            found = true;
-            address = metadata.filter((kv: any) => kv.key === "owner")[0].value;
-          }
+      let socials: any = [],
+        metadata: any = [];
+      for (let i = 0; i < length; i++) {
+        const app = accountInfo[i];
+        if (app.id === APP_ID) {
+          const kv = app["key-value"];
+          const decodedKvPairs = this.decodeKvPairs(kv);
+          socials = this.filterKvPairs(decodedKvPairs, "socials");
+          metadata = this.filterKvPairs(decodedKvPairs, "metadata");
+          found = true;
+          address = metadata.filter((kv: any) => kv.key === "owner")[0].value;
         }
+      }
 
-        if (found) {
-          return {
+      if (found) {
+        if (this.cache === undefined && name === this.name) {
+          this.cache = {
             found,
             address,
             socials,
             metadata,
           };
-        } else return { found };
-      } catch (err) {
-        return { found };
-      }
+        }
+        return {
+          found,
+          address,
+          socials,
+          metadata,
+        };
+      } else return { found };
+    } catch (err) {
+      return { found };
     }
   }
 
@@ -238,15 +264,15 @@ export class Resolver {
     return names;
   }
 
-  async owner(name: string) {
-    const domainInformation: any = await this.resolveName(name);
+  async owner() {
+    const domainInformation: any = await this.resolveName();
     if (domainInformation.found === true) {
       return domainInformation.address;
     } else return "Not Registered";
   }
 
-  async text(name: string, key: string) {
-    const domainInformation: any = await this.resolveName(name);
+  async text(key: string) {
+    const domainInformation: any = await this.resolveName();
     if (domainInformation.found === true) {
       const socialRecords = domainInformation.socials.filter(
         (social: any) => social.key === key
@@ -268,8 +294,8 @@ export class Resolver {
     }
   }
 
-  async expiry(name: string) {
-    const domainInformation: any = await this.resolveName(name);
+  async expiry() {
+    const domainInformation: any = await this.resolveName();
     if (domainInformation.found === true) {
       //Convert milliseconds to seconds by multiplying with 1000
       return new Date(
@@ -280,8 +306,8 @@ export class Resolver {
     } else return "Not Registered";
   }
 
-  async content(name: string): Promise<string> {
-    const domainInformation: any = await this.resolveName(name);
+  async content(): Promise<string> {
+    const domainInformation: any = await this.resolveName();
     if (domainInformation.found === true) {
       const contentRecords: any[] = domainInformation.metadata.filter(
         (kv: any) => kv.key === "content"

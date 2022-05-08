@@ -2,7 +2,7 @@ const algosdk: any = require("algosdk");
 import { describe, it, beforeEach } from "mocha";
 const { assert } = require("chai");
 
-let indexerClient: any, algodClient: any, sdk: any;
+let indexerClient: any, algodClient: any, sdk: any, name;
 const { ANS } = require("../src/index.js");
 const APIKEY = require("./api_key");
 
@@ -24,7 +24,8 @@ describe("Testing name resolution methods", function () {
   });
 
   it("Resolves a .algo name", async function () {
-    const address = await sdk.name("lalith.algo").getOwner();
+    name = sdk.name("lalith.algo");
+    const address = await name.getOwner();
     assert.equal(
       address,
       "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
@@ -33,7 +34,7 @@ describe("Testing name resolution methods", function () {
   });
 
   it("Get all information about name", async function () {
-    const information = await sdk.name("lalith.algo").getAllInformation();
+    const information = await name.getAllInformation();
     assert.equal(
       information.address,
       "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
@@ -42,12 +43,12 @@ describe("Testing name resolution methods", function () {
   });
 
   it("Gets a specific text record", async function () {
-    const text = await sdk.name("lalith.algo").getText("discord");
+    const text = await name.getText("discord");
     assert.equal(text, "Lalith Medury#0811", "Could not fetch text record");
   });
 
   it("Gets expiry of domain", async function () {
-    const expiry = await sdk.name("lalith.algo").getExpiry();
+    const expiry = await name.getExpiry();
     assert.notEqual(expiry, null, "Could not fetch expiry of domain");
   });
 

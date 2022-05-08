@@ -14,39 +14,39 @@ import {
 import { isValidAddress } from "./validation.js";
 
 export class Name {
-  private name = "";
+  private name: string;
   private resolver: Resolver;
   private transactions: Transactions;
   constructor(options: NameConstructor) {
     const { name, client, indexer } = options;
     this.name = name;
-    this.resolver = new Resolver(client, indexer);
-    this.transactions = new Transactions(client);
+    this.resolver = new Resolver(client, indexer, name);
+    this.transactions = new Transactions(client, name);
   }
 
   async isRegistered(): Promise<boolean> {
-    const status = await this.resolver.resolveName(this.name);
+    const status = await this.resolver.resolveName();
     return status.found;
   }
 
   async getOwner(): Promise<string> {
-    return await this.resolver.owner(this.name);
+    return await this.resolver.owner();
   }
 
   async getContent(): Promise<string> {
-    return await this.resolver.content(this.name);
+    return await this.resolver.content();
   }
 
   async getText(key: string): Promise<string> {
-    return await this.resolver.text(this.name, key);
+    return await this.resolver.text(key);
   }
 
   async getAllInformation(): Promise<DomainInformation> {
-    return await this.resolver.resolveName(this.name);
+    return await this.resolver.resolveName();
   }
 
   async getExpiry(): Promise<Date | string> {
-    return await this.resolver.expiry(this.name);
+    return await this.resolver.expiry();
   }
 
   async isValidTransaction(
@@ -100,7 +100,6 @@ export class Name {
       throw new AddressValidationError();
     } else {
       return await this.transactions.prepareNameRegistrationTransactions(
-        this.name,
         address,
         period
       );
@@ -110,7 +109,6 @@ export class Name {
   async update(address: string, editedHandles: object[]): Promise<object[]> {
     await this.isValidTransaction(address);
     return await this.transactions.prepareUpdateNamePropertyTransactions(
-      this.name,
       address,
       editedHandles
     );
@@ -118,11 +116,7 @@ export class Name {
 
   async renew(address: string, years: number): Promise<object[]> {
     await this.isValidTransaction(address);
-    return await this.transactions.prepareNameRenewalTxns(
-      this.name,
-      address,
-      years
-    );
+    return await this.transactions.prepareNameRenewalTxns(address, years);
   }
 
   async initTransfer(
@@ -132,7 +126,6 @@ export class Name {
   ): Promise<object> {
     await this.isValidTransaction(owner, newOwner, "initiate_transfer");
     return await this.transactions.prepareInitiateNameTransferTransaction(
-      this.name,
       owner,
       newOwner,
       price
@@ -146,7 +139,6 @@ export class Name {
   ): Promise<object[]> {
     await this.isValidTransaction(newOwner, owner, "accept_transfer");
     return await this.transactions.prepareAcceptNameTransferTransactions(
-      this.name,
       newOwner,
       owner,
       price

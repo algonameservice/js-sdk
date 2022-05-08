@@ -4,40 +4,38 @@ import { generateTeal } from "./generateTeal.js";
 
 export class Transactions {
   private algodClient: algosdk.Algodv2;
+  private name: string;
 
-  constructor(client: algosdk.Algodv2) {
+  constructor(client: algosdk.Algodv2, name: string) {
     this.algodClient = client;
+    this.name = name;
   }
 
-  async generateLsig(name: string) {
-    let program = await this.algodClient.compile(generateTeal(name)).do();
+  async generateLsig() {
+    let program = await this.algodClient.compile(generateTeal(this.name)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
 
     return new algosdk.LogicSigAccount(program);
   }
 
-  calculatePrice(name: string, period: number) {
+  calculatePrice(period: number) {
     let amount = 0;
-    if (name.length === 3) {
+    if (this.name.length === 3) {
       amount = REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
-    } else if (name.length === 4) {
+    } else if (this.name.length === 4) {
       amount = REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
-    } else if (name.length >= 5) {
+    } else if (this.name.length >= 5) {
       amount = REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
     }
     return amount;
   }
 
-  async prepareNameRegistrationTransactions(
-    name: string,
-    address: string,
-    period: number
-  ) {
+  async prepareNameRegistrationTransactions(address: string, period: number) {
     const algodClient = this.algodClient;
     /* 1st Txn - Payment to Smart Contract */
 
     let amount = 0;
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
     const params = await algodClient.getTransactionParams().do();
 
     params.fee = 1000;
@@ -50,7 +48,7 @@ export class Transactions {
       period = 1;
     }
 
-    amount = this.calculatePrice(name, period);
+    amount = this.calculatePrice(period);
 
     const closeToRemaninder = undefined;
     const note = undefined;
@@ -107,7 +105,7 @@ export class Transactions {
     period++;
 
     appArgs.push(new Uint8Array(Buffer.from(method)));
-    appArgs.push(new Uint8Array(Buffer.from(name)));
+    appArgs.push(new Uint8Array(Buffer.from(this.name)));
     appArgs.push(algosdk.encodeUint64(period));
     const txn4 = await algosdk.makeApplicationNoOpTxn(
       address,
@@ -130,13 +128,12 @@ export class Transactions {
   }
 
   async prepareUpdateNamePropertyTransactions(
-    name: string,
     address: string,
     editedHandles: object[]
   ) {
     const algodClient = this.algodClient;
 
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
     const params = await algodClient.getTransactionParams().do();
     params.fee = 1000;
     params.flatFee = true;
@@ -194,7 +191,7 @@ export class Transactions {
     );
   }
 
-  async prepareNameRenewalTxns(name: string, sender: string, years: number) {
+  async prepareNameRenewalTxns(sender: string, years: number) {
     const algodClient = this.algodClient;
     const params = await algodClient.getTransactionParams().do();
     const receiver = algosdk.getApplicationAddress(APP_ID);
@@ -203,13 +200,13 @@ export class Transactions {
     const paymentTxn = algosdk.makePaymentTxnWithSuggestedParams(
       sender,
       receiver,
-      this.calculatePrice(name, years),
+      this.calculatePrice(years),
       closeToRemaninder,
       note,
       params
     );
 
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
 
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("renew_name")));
@@ -229,7 +226,6 @@ export class Transactions {
   }
 
   async prepareInitiateNameTransferTransaction(
-    name: string,
     sender: string,
     newOwner: string,
     price: number
@@ -238,7 +234,7 @@ export class Transactions {
     price = algosdk.algosToMicroalgos(price);
     const params = await algodClient.getTransactionParams().do();
 
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
 
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
@@ -251,7 +247,6 @@ export class Transactions {
   }
 
   async prepareAcceptNameTransferTransactions(
-    name: string,
     sender: string,
     receiver: string,
     amt: number
@@ -281,7 +276,7 @@ export class Transactions {
       note,
       params
     );
-    const lsig = await this.generateLsig(name);
+    const lsig = await this.generateLsig();
 
     const appArgs = [];
     appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));

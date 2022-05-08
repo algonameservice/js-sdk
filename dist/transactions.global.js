@@ -36784,29 +36784,31 @@
   var import_generateTeal = __toESM(require_generateTeal());
   var Transactions = class {
     algodClient;
-    constructor(client) {
+    name;
+    constructor(client, name) {
       this.algodClient = client;
+      this.name = name;
     }
-    async generateLsig(name) {
-      let program = await this.algodClient.compile((0, import_generateTeal.generateTeal)(name)).do();
+    async generateLsig() {
+      let program = await this.algodClient.compile((0, import_generateTeal.generateTeal)(this.name)).do();
       program = new Uint8Array(Buffer.from(program.result, "base64"));
       return new esm_default.LogicSigAccount(program);
     }
-    calculatePrice(name, period) {
+    calculatePrice(period) {
       let amount = 0;
-      if (name.length === 3) {
+      if (this.name.length === 3) {
         amount = import_constants.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
-      } else if (name.length === 4) {
+      } else if (this.name.length === 4) {
         amount = import_constants.REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
-      } else if (name.length >= 5) {
+      } else if (this.name.length >= 5) {
         amount = import_constants.REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
       }
       return amount;
     }
-    async prepareNameRegistrationTransactions(name, address, period) {
+    async prepareNameRegistrationTransactions(address, period) {
       const algodClient = this.algodClient;
       let amount = 0;
-      const lsig = await this.generateLsig(name);
+      const lsig = await this.generateLsig();
       const params = await algodClient.getTransactionParams().do();
       params.fee = 1e3;
       params.flatFee = true;
@@ -36815,7 +36817,7 @@
       if (period === void 0) {
         period = 1;
       }
-      amount = this.calculatePrice(name, period);
+      amount = this.calculatePrice(period);
       const closeToRemaninder = void 0;
       const note = void 0;
       const txn1 = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
@@ -36839,7 +36841,7 @@
       const appArgs = [];
       period++;
       appArgs.push(new Uint8Array(Buffer.from(method2)));
-      appArgs.push(new Uint8Array(Buffer.from(name)));
+      appArgs.push(new Uint8Array(Buffer.from(this.name)));
       appArgs.push(esm_default.encodeUint64(period));
       const txn4 = await esm_default.makeApplicationNoOpTxn(address, params, import_constants.APP_ID, appArgs, [lsig.address()]);
       groupTxns.push(txn4);
@@ -36851,9 +36853,9 @@
         unsignedOptinTxn: groupTxns[2]
       };
     }
-    async prepareUpdateNamePropertyTransactions(name, address, editedHandles) {
+    async prepareUpdateNamePropertyTransactions(address, editedHandles) {
       const algodClient = this.algodClient;
-      const lsig = await this.generateLsig(name);
+      const lsig = await this.generateLsig();
       const params = await algodClient.getTransactionParams().do();
       params.fee = 1e3;
       params.flatFee = true;
@@ -36883,14 +36885,14 @@
       const closeToRemaninder = void 0;
       return esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
     }
-    async prepareNameRenewalTxns(name, sender, years) {
+    async prepareNameRenewalTxns(sender, years) {
       const algodClient = this.algodClient;
       const params = await algodClient.getTransactionParams().do();
       const receiver = esm_default.getApplicationAddress(import_constants.APP_ID);
       const closeToRemaninder = void 0;
       const note = void 0;
-      const paymentTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(name, years), closeToRemaninder, note, params);
-      const lsig = await this.generateLsig(name);
+      const paymentTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(years), closeToRemaninder, note, params);
+      const lsig = await this.generateLsig();
       const appArgs = [];
       appArgs.push(new Uint8Array(Buffer.from("renew_name")));
       appArgs.push(esm_default.encodeUint64(years));
@@ -36898,11 +36900,11 @@
       esm_default.assignGroupID([paymentTxn, applicationTxn]);
       return [paymentTxn, applicationTxn];
     }
-    async prepareInitiateNameTransferTransaction(name, sender, newOwner, price) {
+    async prepareInitiateNameTransferTransaction(sender, newOwner, price) {
       const algodClient = this.algodClient;
       price = esm_default.algosToMicroalgos(price);
       const params = await algodClient.getTransactionParams().do();
-      const lsig = await this.generateLsig(name);
+      const lsig = await this.generateLsig();
       const appArgs = [];
       appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
       appArgs.push(esm_default.encodeUint64(price));
@@ -36911,7 +36913,7 @@
         newOwner
       ]);
     }
-    async prepareAcceptNameTransferTransactions(name, sender, receiver, amt) {
+    async prepareAcceptNameTransferTransactions(sender, receiver, amt) {
       amt = esm_default.algosToMicroalgos(amt);
       const algodClient = this.algodClient;
       const params = await algodClient.getTransactionParams().do();
@@ -36920,7 +36922,7 @@
       const paymentToOwnerTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
       receiver = esm_default.getApplicationAddress(import_constants.APP_ID);
       const paymentToSmartContractTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, import_constants.TRANSFER_FEE, closeToRemaninder, note, params);
-      const lsig = await this.generateLsig(name);
+      const lsig = await this.generateLsig();
       const appArgs = [];
       appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
       const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, import_constants.APP_ID, appArgs, [lsig.address()]);
