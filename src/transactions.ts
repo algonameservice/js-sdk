@@ -129,7 +129,7 @@ export class Transactions {
 
   async prepareUpdateNamePropertyTransactions(
     address: string,
-    editedHandles: object[]
+    editedHandles: object
   ) {
     const algodClient = this.algodClient;
 
@@ -145,11 +145,12 @@ export class Transactions {
     for (const key in editedHandles) {
       const appArgs = [];
       const network = key;
-      const handle = editedHandles[key];
+      const handle: string = editedHandles[key];
+      
 
       appArgs.push(new Uint8Array(Buffer.from(method)));
-      appArgs.push(new Uint8Array(Buffer.from(network)));
-      appArgs.push(new Uint8Array(Buffer.from(handle)));
+      appArgs.push(new Uint8Array(Buffer.from(network as string)));
+      appArgs.push(new Uint8Array(Buffer.from(handle as string)));
 
       const txn = await algosdk.makeApplicationNoOpTxn(
         address,

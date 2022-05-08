@@ -82,8 +82,7 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a list of transactions to set properties", async function () {
     this.timeout(100000);
-    const updatePropertyTxns = await sdk
-      .name("lalith.algo")
+    const updatePropertyTxns = await name
       .update("PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU", {
         discord: "ansdiscord",
         github: "ansgithub",
@@ -108,8 +107,7 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a list of transactions to renew name", async function () {
     this.timeout(100000);
-    const nameRenewalTxns = await sdk
-      .name("lalith.algo")
+    const nameRenewalTxns = await name
       .renew("PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU", 2);
 
     assert.equal(
@@ -121,8 +119,7 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a transaction to initiate name transfer", async function () {
     this.timeout(100000);
-    const nameTransferTxn = await sdk
-      .name("lalith.algo")
+    const nameTransferTxn = await name
       .initTransfer(
         "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
         "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
@@ -137,8 +134,7 @@ describe("Testing name resolution methods", function () {
   });
 
   it("Prepares a transaction to accept name transfer", async function () {
-    const acceptNameTranserTxn = await sdk
-      .name("lalith.algo")
+    const acceptNameTranserTxn = await name
       .acceptTransfer(
         "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
         "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",

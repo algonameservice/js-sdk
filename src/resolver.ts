@@ -24,19 +24,25 @@ export class Resolver {
     }
   }
 
+  isCacheSet(name?: string) : boolean {
+    return !name && this.cache;
+  }
+
   async generateLsig(name?: string) {
     if (name === undefined) {
       name = this.name;
     }
-    let program = await this.algodClient.compile(generateTeal(name)).do();
+    let program = await this.algodClient.compile(generateTeal(name as string)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
     return new algosdk.LogicSigAccount(program);
   }
 
   async resolveName(name?: string) {
-    if (name === undefined && this.cache !== undefined) {
+    if(this.isCacheSet(name)) {
       return this.cache;
-    } else if (name === undefined) {
+    } 
+
+    if(name === undefined) {
       name = this.name;
     }
 
@@ -171,23 +177,24 @@ export class Resolver {
       metadata = [];
 
     for (const i in kvPairs) {
-      const key = kvPairs[i].key;
-      const value = kvPairs[i].value;
+      const {key, value} = kvPairs[i];
 
       const kvObj = {
-        key: key,
-        value: value,
+        key,
+        value,
       };
 
       if (ALLOWED_SOCIALS.includes(key)) {
         socials.push(kvObj);
-      } else {
-        metadata.push(kvObj);
-      }
+        continue;
+      } 
+      metadata.push(kvObj);
+     
     }
     if (type === "socials") {
       return socials;
-    } else if (type === "metadata") {
+    } 
+    if (type === "metadata") {
       return metadata;
     }
   }
@@ -198,10 +205,13 @@ export class Resolver {
         key: "",
         value: "",
       };
-      let key: string = kvPair.key;
+
+      let {key} = kvPair;
+      const {value} = kvPair;
+
       key = Buffer.from(key, "base64").toString();
       decodedKvPair.key = key;
-      const value: any = kvPair.value;
+
       if (key === "owner") {
         decodedKvPair.value = algosdk.encodeAddress(
           new Uint8Array(Buffer.from(value.bytes, "base64"))

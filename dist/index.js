@@ -304,6 +304,9 @@ var require_resolver = __commonJS({
           this.resolveName();
         }
       }
+      Resolver2.prototype.isCacheSet = function(name) {
+        return !name && this.cache;
+      };
       Resolver2.prototype.generateLsig = function(name) {
         return __awaiter(this, void 0, void 0, function() {
           var program;
@@ -328,9 +331,10 @@ var require_resolver = __commonJS({
           return __generator(this, function(_a) {
             switch (_a.label) {
               case 0:
-                if (name === void 0 && this.cache !== void 0) {
+                if (this.isCacheSet(name)) {
                   return [2, this.cache];
-                } else if (name === void 0) {
+                }
+                if (name === void 0) {
                   name = this.name;
                 }
                 if (name.length === 0 || name.length > 64) {
@@ -489,21 +493,21 @@ var require_resolver = __commonJS({
       Resolver2.prototype.filterKvPairs = function(kvPairs, type) {
         var socials = [], metadata = [];
         for (var i in kvPairs) {
-          var key = kvPairs[i].key;
-          var value = kvPairs[i].value;
+          var _a = kvPairs[i], key = _a.key, value = _a.value;
           var kvObj = {
             key,
             value
           };
           if (constants_js_1.ALLOWED_SOCIALS.includes(key)) {
             socials.push(kvObj);
-          } else {
-            metadata.push(kvObj);
+            continue;
           }
+          metadata.push(kvObj);
         }
         if (type === "socials") {
           return socials;
-        } else if (type === "metadata") {
+        }
+        if (type === "metadata") {
           return metadata;
         }
       };
@@ -514,9 +518,9 @@ var require_resolver = __commonJS({
             value: ""
           };
           var key = kvPair.key;
+          var value = kvPair.value;
           key = Buffer.from(key, "base64").toString();
           decodedKvPair.key = key;
-          var value = kvPair.value;
           if (key === "owner") {
             decodedKvPair.value = algosdk_1["default"].encodeAddress(new Uint8Array(Buffer.from(value.bytes, "base64")));
           } else if (value.type === 1) {

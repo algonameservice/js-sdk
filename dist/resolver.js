@@ -172,6 +172,9 @@ var Resolver = class {
       this.resolveName();
     }
   }
+  isCacheSet(name) {
+    return !name && this.cache;
+  }
   async generateLsig(name) {
     if (name === void 0) {
       name = this.name;
@@ -181,9 +184,10 @@ var Resolver = class {
     return new import_algosdk.default.LogicSigAccount(program);
   }
   async resolveName(name) {
-    if (name === void 0 && this.cache !== void 0) {
+    if (this.isCacheSet(name)) {
       return this.cache;
-    } else if (name === void 0) {
+    }
+    if (name === void 0) {
       name = this.name;
     }
     if (name.length === 0 || name.length > 64) {
@@ -290,21 +294,21 @@ var Resolver = class {
   filterKvPairs(kvPairs, type) {
     const socials = [], metadata = [];
     for (const i in kvPairs) {
-      const key = kvPairs[i].key;
-      const value = kvPairs[i].value;
+      const { key, value } = kvPairs[i];
       const kvObj = {
         key,
         value
       };
       if (import_constants.ALLOWED_SOCIALS.includes(key)) {
         socials.push(kvObj);
-      } else {
-        metadata.push(kvObj);
+        continue;
       }
+      metadata.push(kvObj);
     }
     if (type === "socials") {
       return socials;
-    } else if (type === "metadata") {
+    }
+    if (type === "metadata") {
       return metadata;
     }
   }
@@ -314,10 +318,10 @@ var Resolver = class {
         key: "",
         value: ""
       };
-      let key = kvPair.key;
+      let { key } = kvPair;
+      const { value } = kvPair;
       key = Buffer.from(key, "base64").toString();
       decodedKvPair.key = key;
-      const value = kvPair.value;
       if (key === "owner") {
         decodedKvPair.value = import_algosdk.default.encodeAddress(new Uint8Array(Buffer.from(value.bytes, "base64")));
       } else if (value.type === 1) {

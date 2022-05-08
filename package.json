@@ -19,7 +19,7 @@
     "typescript": "^4.6.4"
   },
   "scripts": {
-    "test": "tsc test/test.ts && mocha",
+    "test": " tsc test/test.ts && mocha",
     "build": "rimraf dist && rimraf types && tsup && tsc -p .",
     "clean": "rimraf dist",
     "lint": "eslint --fix src --ext .ts",

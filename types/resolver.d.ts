@@ -2,19 +2,12 @@ import algosdk from "algosdk";
 export declare class Resolver {
     private algodClient;
     private indexerClient;
-    constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer);
-    generateLsig(name: string): Promise<algosdk.LogicSigAccount>;
-    resolveName(name: string): Promise<{
-        found: boolean;
-        address: any;
-        socials: any;
-        metadata: any;
-    } | {
-        found: boolean;
-        address?: undefined;
-        socials?: undefined;
-        metadata?: undefined;
-    }>;
+    private cache;
+    private name;
+    constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer, name?: string);
+    isCacheSet(name?: string): boolean;
+    generateLsig(name?: string): Promise<algosdk.LogicSigAccount>;
+    resolveName(name?: string): Promise<any>;
     getNamesOwnedByAddress(address: string, socials?: boolean, metadata?: boolean, limit?: number): Promise<false | any[] | undefined>;
     filterKvPairs(kvPairs: any, type: string): {
         key: any;
@@ -22,8 +15,8 @@ export declare class Resolver {
     }[] | undefined;
     decodeKvPairs(kvPairs: any): any;
     filterDomainRegistrationTxns(txns: any): Promise<any>;
-    owner(name: string): Promise<any>;
-    text(name: string, key: string): Promise<any>;
-    expiry(name: string): Promise<Date | "Not Registered">;
-    content(name: string): Promise<void>;
+    owner(): Promise<any>;
+    text(key: string): Promise<any>;
+    expiry(): Promise<Date | "Not Registered">;
+    content(): Promise<string>;
 }
