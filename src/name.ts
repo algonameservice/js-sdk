@@ -7,8 +7,8 @@ import {
   NameNotRegisteredError,
 } from "./errors.js";
 import {
-  NameConstructor,
   DomainInformation,
+  NameConstructor,
   RegistrationTxns,
 } from "./interfaces.js";
 import { isValidAddress } from "./validation.js";
@@ -18,10 +18,10 @@ export class Name {
   private resolver: Resolver;
   private transactions: Transactions;
   constructor(options: NameConstructor) {
-    const { name, client, indexer } = options;
+    const { name, rpc, indexer } = options;
     this.name = name;
-    this.resolver = new Resolver(client, indexer, name);
-    this.transactions = new Transactions(client, name);
+    this.resolver = new Resolver(rpc, indexer, name);
+    this.transactions = new Transactions(rpc, indexer, name);
   }
 
   async isRegistered(): Promise<boolean> {

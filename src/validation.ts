@@ -1,14 +1,13 @@
 import algosdk from "algosdk";
-import { ASCII_CODES } from "./constants.js";
-import { ALLOWED_TLDS } from "./constants.js";
+import { ALLOWED_TLDS, ASCII_CODES } from "./constants.js";
 import { InvalidNameError } from "./errors.js";
 
 export function isValidAddress(address: string): boolean {
   return algosdk.isValidAddress(address);
 }
 
-export function normalizeName(name: string): string | InvalidNameError {
-  const tld: string = name.split(".").pop();
+export function normalizeName(name: string): string {
+  const tld: string = name.split(".").pop() as string;
   if (ALLOWED_TLDS.includes(tld)) {
     name = name.split(".")[0].toLowerCase();
   } else {

@@ -1,21 +1,14 @@
 import algosdk from "algosdk";
 import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
-import { generateTeal } from "./generateTeal.js";
+import CachedApi from "./cachedApi.js";
+import { toIntArray } from "./util.js";
 
-export class Transactions {
-  private algodClient: algosdk.Algodv2;
+export class Transactions extends CachedApi {
   private name: string;
 
-  constructor(client: algosdk.Algodv2, name: string) {
-    this.algodClient = client;
+  constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer, name: string) {
+    super(client, indexer);
     this.name = name;
-  }
-
-  async generateLsig() {
-    let program = await this.algodClient.compile(generateTeal(this.name)).do();
-    program = new Uint8Array(Buffer.from(program.result, "base64"));
-
-    return new algosdk.LogicSigAccount(program);
   }
 
   calculatePrice(period: number) {
@@ -31,11 +24,11 @@ export class Transactions {
   }
 
   async prepareNameRegistrationTransactions(address: string, period: number) {
-    const algodClient = this.algodClient;
+    const algodClient = this.rpc;
     /* 1st Txn - Payment to Smart Contract */
 
     let amount = 0;
-    const lsig = await this.generateLsig();
+    const lsig = await this.getTeal(this.name);
     const params = await algodClient.getTransactionParams().do();
 
     params.fee = 1000;
@@ -92,10 +85,6 @@ export class Transactions {
 
     groupTxns.push(txn3);
 
-    sender = lsig.address();
-    receiver = address;
-    amount = 0;
-
     /* 4th Txn - Account registers name */
 
     const method = "register_name";
@@ -104,8 +93,8 @@ export class Transactions {
 
     period++;
 
-    appArgs.push(new Uint8Array(Buffer.from(method)));
-    appArgs.push(new Uint8Array(Buffer.from(this.name)));
+    appArgs.push(toIntArray(method));
+    appArgs.push(toIntArray(this.name));
     appArgs.push(algosdk.encodeUint64(period));
     const txn4 = await algosdk.makeApplicationNoOpTxn(
       address,
@@ -131,10 +120,8 @@ export class Transactions {
     address: string,
     editedHandles: object
   ) {
-    const algodClient = this.algodClient;
-
-    const lsig = await this.generateLsig();
-    const params = await algodClient.getTransactionParams().do();
+    const lsig = await this.getTeal(this.name);
+    const params = await this.rpc.getTransactionParams().do();
     params.fee = 1000;
     params.flatFee = true;
 
@@ -146,11 +133,10 @@ export class Transactions {
       const appArgs = [];
       const network = key;
       const handle: string = editedHandles[key];
-      
 
-      appArgs.push(new Uint8Array(Buffer.from(method)));
-      appArgs.push(new Uint8Array(Buffer.from(network as string)));
-      appArgs.push(new Uint8Array(Buffer.from(handle as string)));
+      appArgs.push(toIntArray(method));
+      appArgs.push(toIntArray(network as string));
+      appArgs.push(toIntArray(handle as string));
 
       const txn = await algosdk.makeApplicationNoOpTxn(
         address,
@@ -175,8 +161,7 @@ export class Transactions {
     amt: number,
     note?: any
   ) {
-    const algodClient = this.algodClient;
-    const params = await algodClient.getTransactionParams().do();
+    const params = await this.rpc.getTransactionParams().do();
     amt = algosdk.algosToMicroalgos(amt);
     const enc = new TextEncoder();
     note = enc.encode(note);
@@ -193,8 +178,7 @@ export class Transactions {
   }
 
   async prepareNameRenewalTxns(sender: string, years: number) {
-    const algodClient = this.algodClient;
-    const params = await algodClient.getTransactionParams().do();
+    const params = await this.rpc.getTransactionParams().do();
     const receiver = algosdk.getApplicationAddress(APP_ID);
     const closeToRemaninder = undefined;
     const note = undefined;
@@ -207,10 +191,10 @@ export class Transactions {
       params
     );
 
-    const lsig = await this.generateLsig();
+    const lsig = await this.getTeal(this.name);
 
     const appArgs = [];
-    appArgs.push(new Uint8Array(Buffer.from("renew_name")));
+    appArgs.push(toIntArray("renew_name"));
     appArgs.push(algosdk.encodeUint64(years));
 
     const applicationTxn = algosdk.makeApplicationNoOpTxn(
@@ -231,14 +215,13 @@ export class Transactions {
     newOwner: string,
     price: number
   ) {
-    const algodClient = this.algodClient;
     price = algosdk.algosToMicroalgos(price);
-    const params = await algodClient.getTransactionParams().do();
+    const params = await this.rpc.getTransactionParams().do();
 
-    const lsig = await this.generateLsig();
+    const lsig = await this.getTeal(this.name);
 
     const appArgs = [];
-    appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
+    appArgs.push(toIntArray("initiate_transfer"));
     appArgs.push(algosdk.encodeUint64(price));
 
     return algosdk.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [
@@ -253,8 +236,7 @@ export class Transactions {
     amt: number
   ) {
     amt = algosdk.algosToMicroalgos(amt);
-    const algodClient = this.algodClient;
-    const params = await algodClient.getTransactionParams().do();
+    const params = await this.rpc.getTransactionParams().do();
 
     const closeToRemaninder = undefined;
     const note = undefined;
@@ -277,10 +259,10 @@ export class Transactions {
       note,
       params
     );
-    const lsig = await this.generateLsig();
+    const lsig = await this.getTeal(this.name);
 
     const appArgs = [];
-    appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
+    appArgs.push(toIntArray("accept_transfer"));
 
     const applicationTxn = algosdk.makeApplicationNoOpTxn(
       sender,

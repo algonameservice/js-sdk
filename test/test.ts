@@ -82,11 +82,13 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a list of transactions to set properties", async function () {
     this.timeout(100000);
-    const updatePropertyTxns = await name
-      .update("PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU", {
+    const updatePropertyTxns = await name.update(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      {
         discord: "ansdiscord",
         github: "ansgithub",
-      });
+      }
+    );
 
     assert.notEqual(
       updatePropertyTxns[0].group,
@@ -107,8 +109,10 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a list of transactions to renew name", async function () {
     this.timeout(100000);
-    const nameRenewalTxns = await name
-      .renew("PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU", 2);
+    const nameRenewalTxns = await name.renew(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      2
+    );
 
     assert.equal(
       nameRenewalTxns.length,
@@ -119,12 +123,11 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a transaction to initiate name transfer", async function () {
     this.timeout(100000);
-    const nameTransferTxn = await name
-      .initTransfer(
-        "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
-        "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
-        1
-      );
+    const nameTransferTxn = await name.initTransfer(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
+      1
+    );
 
     assert.equal(
       nameTransferTxn["type"],
@@ -134,12 +137,11 @@ describe("Testing name resolution methods", function () {
   });
 
   it("Prepares a transaction to accept name transfer", async function () {
-    const acceptNameTranserTxn = await name
-      .acceptTransfer(
-        "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
-        "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
-        1
-      );
+    const acceptNameTranserTxn = await name.acceptTransfer(
+      "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      1
+    );
 
     assert.equal(
       acceptNameTranserTxn.length,

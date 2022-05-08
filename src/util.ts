@@ -388,3 +388,11 @@ export function generateTeal(name: string) {
     main_l31:
     return`;
 }
+
+export function b64toString(data: string): string {
+  return Buffer.from(data, "base64").toString();
+}
+
+export function toIntArray(data: string): Uint8Array {
+  return new Uint8Array(Buffer.from(data));
+}
