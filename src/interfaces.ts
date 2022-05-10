@@ -1,38 +1,44 @@
-import algosdk from "algosdk";
+import {Algodv2, Indexer, Transaction} from "algosdk";
 
-export type NameConstructor = {
-  client: algosdk.Algodv2;
-  indexer: algosdk.Indexer;
+export interface NameConstructor {
+  rpc: Algodv2;
+  indexer: Indexer;
   name: string;
-};
+}
 
-export type AddressConstructor = {
+export interface AddressConstructor {
   address: string;
-  client: algosdk.Algodv2;
-  indexer: algosdk.Indexer;
-};
+  rpc: Algodv2;
+  indexer: Indexer;
+}
 
-export type DomainInformation = {
-  found: boolean;
-  address?: string;
-  socials?: object[] | [];
-  metadata?: object[] | [];
-};
-
-export type DomainOptions = {
+export interface DomainOptions {
   socials?: boolean;
   metadata?: boolean;
   limit?: number;
-};
+}
 
-export type Domains = {
+export interface Domain extends NameResponse {
   name: string;
-  socials?: object[] | [];
-  metadata?: object[] | [];
-};
+}
 
-export type RegistrationTxns = {
-  optinTxn?: object;
-  txns: object[];
-  unsignedOptinTxn?: object;
-};
+export interface RegistrationTxns {
+  optinTxn?: {
+    txID: string,
+    blob: Uint8Array
+  };
+  txns: Transaction[];
+  unsignedOptinTxn?: Transaction;
+}
+
+export interface Record {
+  key: string;
+  value: string;
+}
+
+export interface NameResponse {
+  found: boolean;
+  address?: string;
+  socials?: Record[];
+  metadata?: Record[];
+}

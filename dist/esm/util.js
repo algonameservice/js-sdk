@@ -1,6 +1,4 @@
-(() => {
-  // src/generateTeal.ts
-  function generateTeal(name) {
+export function generateTeal(name) {
     return `#pragma version 4
     byte "${name}"
     len
@@ -389,6 +387,10 @@
     b main_l23
     main_l31:
     return`;
-  }
-})();
-//# sourceMappingURL=generateTeal.global.js.map
+}
+export function b64toString(data) {
+    return Buffer.from(data, "base64").toString();
+}
+export function toIntArray(data) {
+    return new Uint8Array(Buffer.from(data));
+}

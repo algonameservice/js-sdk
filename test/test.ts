@@ -1,10 +1,12 @@
-const algosdk: any = require("algosdk");
+
+import algosdk from "algosdk";
 import { describe, it, beforeEach } from "mocha";
 const { assert } = require("chai");
 
-let indexerClient: any, algodClient: any, sdk: any, name;
 const { ANS } = require("../src/index.js");
 const APIKEY = require("./api_key");
+
+let indexerClient: algosdk.Indexer, algodClient: algosdk.Algodv2, sdk: typeof ANS, name;
 
 describe("Testing name resolution methods", function () {
   beforeEach("Creating Client and Indexer instances", function () {
@@ -32,7 +34,7 @@ describe("Testing name resolution methods", function () {
       "Name resolution failed"
     );
   });
-
+  
   it("Get all information about name", async function () {
     const information = await name.getAllInformation();
     assert.equal(
@@ -41,7 +43,7 @@ describe("Testing name resolution methods", function () {
       "Could not fetch all information"
     );
   });
-
+  
   it("Gets a specific text record", async function () {
     const text = await name.getText("discord");
     assert.equal(text, "Lalith Medury#0811", "Could not fetch text record");
@@ -52,6 +54,7 @@ describe("Testing name resolution methods", function () {
     assert.notEqual(expiry, null, "Could not fetch expiry of domain");
   });
 
+  
   it("Gets the list of .algo names owned by an address", async function () {
     this.timeout(100000);
     const nameInfo = await sdk
@@ -82,11 +85,13 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a list of transactions to set properties", async function () {
     this.timeout(100000);
-    const updatePropertyTxns = await name
-      .update("PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU", {
+    const updatePropertyTxns = await name.update(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      {
         discord: "ansdiscord",
         github: "ansgithub",
-      });
+      }
+    );
 
     assert.notEqual(
       updatePropertyTxns[0].group,
@@ -107,8 +112,10 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a list of transactions to renew name", async function () {
     this.timeout(100000);
-    const nameRenewalTxns = await name
-      .renew("PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU", 2);
+    const nameRenewalTxns = await name.renew(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      2
+    );
 
     assert.equal(
       nameRenewalTxns.length,
@@ -119,12 +126,11 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a transaction to initiate name transfer", async function () {
     this.timeout(100000);
-    const nameTransferTxn = await name
-      .initTransfer(
-        "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
-        "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
-        1
-      );
+    const nameTransferTxn = await name.initTransfer(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
+      1
+    );
 
     assert.equal(
       nameTransferTxn["type"],
@@ -134,12 +140,11 @@ describe("Testing name resolution methods", function () {
   });
 
   it("Prepares a transaction to accept name transfer", async function () {
-    const acceptNameTranserTxn = await name
-      .acceptTransfer(
-        "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
-        "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
-        1
-      );
+    const acceptNameTranserTxn = await name.acceptTransfer(
+      "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      1
+    );
 
     assert.equal(
       acceptNameTranserTxn.length,
@@ -147,4 +152,5 @@ describe("Testing name resolution methods", function () {
       "Not returning 3 transactions for accepting name"
     );
   });
+  
 });

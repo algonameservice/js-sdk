@@ -1,25 +1,22 @@
 import { AddressValidationError } from "./errors.js";
-import { isValidAddress } from "./validation.js";
+import { isValidAddress, normalizeName } from "./validation.js";
 import { Name } from "./name.js";
 import { Address } from "./address.js";
 import algosdk from "algosdk";
-import { normalizeName } from "./validation.js";
+import CachedApi from "./cachedApi.js";
 
-export class ANS {
-  private client: algosdk.Algodv2;
-  private indexer: algosdk.Indexer;
-
+export class ANS extends CachedApi {
   constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer) {
-    this.client = client;
+    super(client, indexer);
     this.indexer = indexer;
   }
 
   name(name: string): Name {
     name = normalizeName(name);
     return new Name({
-      client: this.client,
+      rpc: this.rpc,
       indexer: this.indexer,
-      name: name,
+      name,
     });
   }
 
@@ -28,9 +25,9 @@ export class ANS {
       throw new AddressValidationError();
     }
     return new Address({
-      client: this.client,
+      rpc: this.rpc,
       indexer: this.indexer,
-      address: address,
+      address,
     });
   }
 }

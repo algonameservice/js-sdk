@@ -145,14 +145,13 @@ module.exports = __toCommonJS(validation_exports);
 init_cjs_shims();
 var import_algosdk = __toESM(require("algosdk"));
 var import_constants = __toESM(require_constants());
-var import_constants2 = __toESM(require_constants());
 var import_errors = __toESM(require_errors());
 function isValidAddress(address) {
   return import_algosdk.default.isValidAddress(address);
 }
 function normalizeName(name) {
   const tld = name.split(".").pop();
-  if (import_constants2.ALLOWED_TLDS.includes(tld)) {
+  if (import_constants.ALLOWED_TLDS.includes(tld)) {
     name = name.split(".")[0].toLowerCase();
   } else {
     throw new Error("TLD not supported");

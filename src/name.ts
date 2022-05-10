@@ -7,21 +7,23 @@ import {
   NameNotRegisteredError,
 } from "./errors.js";
 import {
+  NameResponse,
   NameConstructor,
-  DomainInformation,
   RegistrationTxns,
 } from "./interfaces.js";
 import { isValidAddress } from "./validation.js";
+import {Transaction} from "algosdk";
+import { Record } from "./interfaces.js";
 
 export class Name {
   private name: string;
   private resolver: Resolver;
   private transactions: Transactions;
   constructor(options: NameConstructor) {
-    const { name, client, indexer } = options;
+    const { name, rpc, indexer } = options;
     this.name = name;
-    this.resolver = new Resolver(client, indexer, name);
-    this.transactions = new Transactions(client, name);
+    this.resolver = new Resolver(rpc, indexer, name);
+    this.transactions = new Transactions(rpc, indexer, name);
   }
 
   async isRegistered(): Promise<boolean> {
@@ -29,7 +31,7 @@ export class Name {
     return status.found;
   }
 
-  async getOwner(): Promise<string> {
+  async getOwner(): Promise<string | undefined> {
     return await this.resolver.owner();
   }
 
@@ -41,7 +43,7 @@ export class Name {
     return await this.resolver.text(key);
   }
 
-  async getAllInformation(): Promise<DomainInformation> {
+  async getAllInformation(): Promise<NameResponse> {
     return await this.resolver.resolveName();
   }
 
@@ -106,7 +108,7 @@ export class Name {
     }
   }
 
-  async update(address: string, editedHandles: object[]): Promise<object[]> {
+  async update(address: string, editedHandles: Record): Promise<Transaction[]> {
     await this.isValidTransaction(address);
     return await this.transactions.prepareUpdateNamePropertyTransactions(
       address,
@@ -114,7 +116,7 @@ export class Name {
     );
   }
 
-  async renew(address: string, years: number): Promise<object[]> {
+  async renew(address: string, years: number): Promise<Transaction[]> {
     await this.isValidTransaction(address);
     return await this.transactions.prepareNameRenewalTxns(address, years);
   }
@@ -123,7 +125,7 @@ export class Name {
     owner: string,
     newOwner: string,
     price: number
-  ): Promise<object> {
+  ): Promise<Transaction> {
     await this.isValidTransaction(owner, newOwner, "initiate_transfer");
     return await this.transactions.prepareInitiateNameTransferTransaction(
       owner,
@@ -136,7 +138,7 @@ export class Name {
     newOwner: string,
     owner: string,
     price: number
-  ): Promise<object[]> {
+  ): Promise<Transaction[]> {
     await this.isValidTransaction(newOwner, owner, "accept_transfer");
     return await this.transactions.prepareAcceptNameTransferTransactions(
       newOwner,

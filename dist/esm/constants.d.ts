@@ -14,3 +14,4 @@ export declare const ASCII_CODES: {
 };
 export declare const ALLOWED_SOCIALS: string[];
 export declare const ALLOWED_TLDS: string[];
+//# sourceMappingURL=constants.d.ts.map

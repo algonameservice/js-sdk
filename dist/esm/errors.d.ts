@@ -18,3 +18,4 @@ export declare class IncorrectOwnerError extends Error {
     type: string;
     constructor(name: string, address: string);
 }
+//# sourceMappingURL=errors.d.ts.map
