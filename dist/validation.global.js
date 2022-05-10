@@ -36840,14 +36840,13 @@
 
   // src/validation.ts
   var import_constants = __toESM(require_constants2());
-  var import_constants2 = __toESM(require_constants2());
   var import_errors = __toESM(require_errors());
   function isValidAddress2(address) {
     return esm_default.isValidAddress(address);
   }
   function normalizeName(name) {
     const tld = name.split(".").pop();
-    if (import_constants2.ALLOWED_TLDS.includes(tld)) {
+    if (import_constants.ALLOWED_TLDS.includes(tld)) {
       name = name.split(".")[0].toLowerCase();
     } else {
       throw new Error("TLD not supported");

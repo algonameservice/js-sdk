@@ -1,22 +1,15 @@
-import algosdk from "algosdk";
+import {Algodv2, Indexer, Transaction} from "algosdk";
 
 export interface NameConstructor {
-  rpc: algosdk.Algodv2;
-  indexer: algosdk.Indexer;
+  rpc: Algodv2;
+  indexer: Indexer;
   name: string;
 }
 
 export interface AddressConstructor {
   address: string;
-  rpc: algosdk.Algodv2;
-  indexer: algosdk.Indexer;
-}
-
-export interface DomainInformation {
-  found: boolean;
-  address?: string;
-  socials?: object[] | [];
-  metadata?: object[] | [];
+  rpc: Algodv2;
+  indexer: Indexer;
 }
 
 export interface DomainOptions {
@@ -30,9 +23,12 @@ export interface Domain extends NameResponse {
 }
 
 export interface RegistrationTxns {
-  optinTxn?: object;
-  txns: object[];
-  unsignedOptinTxn?: object;
+  optinTxn?: {
+    txID: string,
+    blob: Uint8Array
+  };
+  txns: Transaction[];
+  unsignedOptinTxn?: Transaction;
 }
 
 export interface Record {
@@ -42,7 +38,7 @@ export interface Record {
 
 export interface NameResponse {
   found: boolean;
-  address: string;
+  address?: string;
   socials?: Record[];
   metadata?: Record[];
 }

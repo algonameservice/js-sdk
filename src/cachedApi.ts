@@ -1,5 +1,4 @@
 import algosdk, { LogicSigAccount } from "algosdk";
-import { normalizeName } from "./validation.js";
 import { generateTeal } from "./util.js";
 
 export default class CachedApi {
@@ -18,13 +17,10 @@ export default class CachedApi {
       return this.cache[name];
     }
 
-    name = normalizeName(name);
-
     let program = await this.rpc.compile(generateTeal(name as string)).do();
     program = new Uint8Array(Buffer.from(program.result, "base64"));
 
     this.cache[name] = new algosdk.LogicSigAccount(program);
-
     return this.cache[name];
   }
 }

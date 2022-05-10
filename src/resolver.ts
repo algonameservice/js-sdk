@@ -1,4 +1,4 @@
-import algosdk from "algosdk";
+import algosdk, {Transaction} from "algosdk";
 import { ALLOWED_SOCIALS, APP_ID } from "./constants.js";
 import { AddressValidationError } from "./errors.js";
 import CachedApi from "./cachedApi.js";
@@ -23,7 +23,9 @@ export class Resolver extends CachedApi {
 
   async resolveName(name?: string): Promise<NameResponse> {
     let found = false;
-
+    if(!name) {
+      name = this.name;
+    }
     const error: NameResponse = {
       address: "",
       metadata: [],
@@ -35,23 +37,23 @@ export class Resolver extends CachedApi {
       let accountInfo = await this.indexer
         .lookupAccountByID((await this.getTeal(name as string)).address())
         .do();
-
+      
       accountInfo = accountInfo.account["apps-local-state"];
-
       const length = accountInfo.length;
       let address;
 
-      let socials: any = [],
-        metadata: any = [];
+      let socials: Record[] = [],
+        metadata: Record[] = [];
       for (let i = 0; i < length; i++) {
         const app = accountInfo[i];
+
         if (app.id === APP_ID) {
           const kv = app["key-value"];
           const decodedKvPairs = this.decodeKvPairs(kv);
           socials = this.filterKvPairs(decodedKvPairs, "socials");
           metadata = this.filterKvPairs(decodedKvPairs, "metadata");
           found = true;
-          address = metadata.filter((kv: any) => kv.key === "owner")[0].value;
+          address = metadata.filter((kv: Record) => kv.key === "owner")[0].value;
         }
       }
 
@@ -74,7 +76,7 @@ export class Resolver extends CachedApi {
     address: string,
     socials = false,
     metadata = false,
-    limit: number = 0
+    limit= 10
   ): Promise<Domain[]> {
     if (!(await algosdk.isValidAddress(address))) {
       throw new AddressValidationError();
@@ -105,13 +107,13 @@ export class Resolver extends CachedApi {
       }
     }
 
-    let accountTxns: any = [];
+    let accountTxns: algosdk.Transaction[] = [];
     for (let i = 0; i < txns.length; i++) {
       accountTxns = accountTxns.concat(txns[i]);
     }
 
     txns = accountTxns;
-    const names: any = await this.filterDomainRegistrationTxns(txns);
+    const names: string[] = await this.filterDomainRegistrationTxns(txns);
 
     if (names.length > 0) {
       const details = [];
@@ -121,7 +123,7 @@ export class Resolver extends CachedApi {
           break;
         }
 
-        const info: any = await this.resolveName(names[i]);
+        const info: NameResponse = await this.resolveName(names[i]);
         if (info.found && info.address === address) {
           const domain: Domain = {
             address: "",
@@ -147,7 +149,7 @@ export class Resolver extends CachedApi {
     return [];
   }
 
-  filterKvPairs(kvPairs: any, type: string): Record[] {
+  filterKvPairs(kvPairs: Record[], type: string): Record[] {
     const socials = [],
       metadata = [];
 
@@ -212,13 +214,12 @@ export class Resolver extends CachedApi {
     });
   }
 
-  async filterDomainRegistrationTxns(txns: any) {
-    const names: any = [];
+  async filterDomainRegistrationTxns(txns: Transaction[]): Promise<string[]> {
+    const names: string[] = [];
     try {
       for (let i = 0; i < txns.length; i++) {
-        const txn = txns[i];
-
-        if (txn["tx-type"] === "appl") {
+        const txn: Transaction = txns[i];
+        if (txn["tx-type" as keyof Transaction] === "appl") {
           if (txn["application-transaction"]["application-id"] === APP_ID) {
             const appArgs = txn["application-transaction"]["application-args"];
 
@@ -260,8 +261,8 @@ export class Resolver extends CachedApi {
     return names;
   }
 
-  async owner(): Promise<string> {
-    const domainInformation = await this.resolveName();
+  async owner(): Promise<string|undefined> {
+    const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       return domainInformation.address;
     }
@@ -269,19 +270,19 @@ export class Resolver extends CachedApi {
     return "Not Registered";
   }
 
-  async text(key: string) {
-    const domainInformation: any = await this.resolveName();
+  async text(key: string): Promise<string> {
+    const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
-      const socialRecords = domainInformation.socials.filter(
-        (social: any) => social.key === key
+      const socialRecords: Record[]|undefined = domainInformation.socials?.filter(
+        (social: Record) => social.key === key
       );
-      if (socialRecords.length > 0) {
+      if (socialRecords && socialRecords.length > 0) {
         return socialRecords[0].value;
       } else {
-        const metadataRecords = domainInformation.metadata.filter(
-          (metadata: any) => metadata.key === key
+        const metadataRecords = domainInformation.metadata?.filter(
+          (metadata: Record) => metadata.key === key
         );
-        if (metadataRecords.length > 0) {
+        if (metadataRecords && metadataRecords.length > 0) {
           return metadataRecords[0].value;
         } else {
           return "Property not set";
@@ -292,8 +293,8 @@ export class Resolver extends CachedApi {
     return "Not Registered";
   }
 
-  async expiry() {
-    const domainInformation = await this.resolveName();
+  async expiry(): Promise<Date|string> {
+    const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       //Convert milliseconds to seconds by multiplying with 1000
       return new Date(
@@ -311,7 +312,7 @@ export class Resolver extends CachedApi {
   async content(): Promise<string> {
     const domainInformation = await this.resolveName();
     if (domainInformation.found) {
-      const contentRecords: any[] = domainInformation?.metadata!.filter(
+      const contentRecords: Record[] = domainInformation?.metadata!.filter(
         (kv: Record) => kv.key === "content"
       );
       if (contentRecords.length > 0) {

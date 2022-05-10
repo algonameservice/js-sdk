@@ -37185,7 +37185,6 @@
       exports2.__esModule = true;
       var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
       var constants_js_1 = require_constants2();
-      var constants_js_2 = require_constants2();
       var errors_js_1 = require_errors();
       function isValidAddress3(address) {
         return algosdk_1["default"].isValidAddress(address);
@@ -37193,7 +37192,7 @@
       exports2.isValidAddress = isValidAddress3;
       function normalizeName2(name) {
         var tld = name.split(".").pop();
-        if (constants_js_2.ALLOWED_TLDS.includes(tld)) {
+        if (constants_js_1.ALLOWED_TLDS.includes(tld)) {
           name = name.split(".")[0].toLowerCase();
         } else {
           throw new Error("TLD not supported");
@@ -37211,15 +37210,164 @@
     }
   });
 
-  // src/generateTeal.js
-  var require_generateTeal = __commonJS({
-    "src/generateTeal.js"(exports2) {
+  // src/util.js
+  var require_util = __commonJS({
+    "src/util.js"(exports2) {
       "use strict";
       exports2.__esModule = true;
       function generateTeal(name) {
         return '#pragma version 4\n    byte "' + name + '"\n    len\n    int 3\n    ==\n    bnz main_l22\n    byte "' + name + '"\n    len\n    int 4\n    ==\n    bnz main_l13\n    byte "' + name + '"\n    len\n    int 5\n    >=\n    bnz main_l4\n    err\n    main_l4:\n    gtxn 0 Amount\n    int 5000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l5:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l12\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l11\n    global GroupSize\n    int 4\n    ==\n    bnz main_l10\n    int 0\n    return\n    main_l9:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l10:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l11:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l12:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l5\n    main_l13:\n    gtxn 0 Amount\n    int 50000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l14:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l21\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l20\n    global GroupSize\n    int 4\n    ==\n    bnz main_l19\n    int 0\n    return\n    main_l18:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l19:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l20:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l21:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l14\n    main_l22:\n    gtxn 0 Amount\n    int 150000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l23:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l30\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l29\n    global GroupSize\n    int 4\n    ==\n    bnz main_l28\n    int 0\n    return\n    main_l27:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l28:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l29:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l30:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l23\n    main_l31:\n    return';
       }
       exports2.generateTeal = generateTeal;
+      function b64toString(data) {
+        return Buffer.from(data, "base64").toString();
+      }
+      exports2.b64toString = b64toString;
+      function toIntArray(data) {
+        return new Uint8Array(Buffer.from(data));
+      }
+      exports2.toIntArray = toIntArray;
+    }
+  });
+
+  // src/cachedApi.js
+  var require_cachedApi = __commonJS({
+    "src/cachedApi.js"(exports2) {
+      "use strict";
+      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+        function adopt(value) {
+          return value instanceof P ? value : new P(function(resolve) {
+            resolve(value);
+          });
+        }
+        return new (P || (P = Promise))(function(resolve, reject) {
+          function fulfilled(value) {
+            try {
+              step(generator.next(value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function rejected(value) {
+            try {
+              step(generator["throw"](value));
+            } catch (e) {
+              reject(e);
+            }
+          }
+          function step(result) {
+            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+          }
+          step((generator = generator.apply(thisArg, _arguments || [])).next());
+        });
+      };
+      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
+        var _ = { label: 0, sent: function() {
+          if (t[0] & 1)
+            throw t[1];
+          return t[1];
+        }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+          return this;
+        }), g;
+        function verb(n) {
+          return function(v) {
+            return step([n, v]);
+          };
+        }
+        function step(op) {
+          if (f)
+            throw new TypeError("Generator is already executing.");
+          while (_)
+            try {
+              if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
+                return t;
+              if (y = 0, t)
+                op = [op[0] & 2, t.value];
+              switch (op[0]) {
+                case 0:
+                case 1:
+                  t = op;
+                  break;
+                case 4:
+                  _.label++;
+                  return { value: op[1], done: false };
+                case 5:
+                  _.label++;
+                  y = op[1];
+                  op = [0];
+                  continue;
+                case 7:
+                  op = _.ops.pop();
+                  _.trys.pop();
+                  continue;
+                default:
+                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                    _ = 0;
+                    continue;
+                  }
+                  if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                    _.label = op[1];
+                    break;
+                  }
+                  if (op[0] === 6 && _.label < t[1]) {
+                    _.label = t[1];
+                    t = op;
+                    break;
+                  }
+                  if (t && _.label < t[2]) {
+                    _.label = t[2];
+                    _.ops.push(op);
+                    break;
+                  }
+                  if (t[2])
+                    _.ops.pop();
+                  _.trys.pop();
+                  continue;
+              }
+              op = body.call(thisArg, _);
+            } catch (e) {
+              op = [6, e];
+              y = 0;
+            } finally {
+              f = t = 0;
+            }
+          if (op[0] & 5)
+            throw op[1];
+          return { value: op[0] ? op[1] : void 0, done: true };
+        }
+      };
+      exports2.__esModule = true;
+      var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
+      var util_js_1 = require_util();
+      var CachedApi2 = function() {
+        function CachedApi3(client, indexer) {
+          this.cache = {};
+          this.rpc = client;
+          this.indexer = indexer;
+        }
+        CachedApi3.prototype.getTeal = function(name) {
+          return __awaiter(this, void 0, void 0, function() {
+            var program;
+            return __generator(this, function(_a) {
+              switch (_a.label) {
+                case 0:
+                  if (name in this.cache) {
+                    return [2, this.cache[name]];
+                  }
+                  return [4, this.rpc.compile(util_js_1.generateTeal(name))["do"]()];
+                case 1:
+                  program = _a.sent();
+                  program = new Uint8Array(Buffer.from(program.result, "base64"));
+                  this.cache[name] = new algosdk_1["default"].LogicSigAccount(program);
+                  return [2, this.cache[name]];
+              }
+            });
+          });
+        };
+        return CachedApi3;
+      }();
+      exports2["default"] = CachedApi2;
     }
   });
 
@@ -37227,6 +37375,25 @@
   var require_resolver = __commonJS({
     "src/resolver.js"(exports2) {
       "use strict";
+      var __extends = exports2 && exports2.__extends || function() {
+        var extendStatics = function(d, b) {
+          extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
+            d2.__proto__ = b2;
+          } || function(d2, b2) {
+            for (var p in b2)
+              if (b2.hasOwnProperty(p))
+                d2[p] = b2[p];
+          };
+          return extendStatics(d, b);
+        };
+        return function(d, b) {
+          extendStatics(d, b);
+          function __() {
+            this.constructor = d;
+          }
+          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+      }();
       var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
         function adopt(value) {
           return value instanceof P ? value : new P(function(resolve) {
@@ -37334,65 +37501,42 @@
       var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
       var constants_js_1 = require_constants2();
       var errors_js_1 = require_errors();
-      var generateTeal_js_1 = require_generateTeal();
-      var Resolver = function() {
+      var cachedApi_js_1 = require_cachedApi();
+      var util_js_1 = require_util();
+      var Resolver = function(_super) {
+        __extends(Resolver2, _super);
         function Resolver2(client, indexer, name) {
-          this.algodClient = client;
-          this.indexerClient = indexer;
-          if (name) {
-            this.name = name;
-            this.resolveName();
-          }
+          var _this = _super.call(this, client, indexer) || this;
+          _this.rpc = client;
+          _this.indexer = indexer;
+          _this.name = name;
+          return _this;
         }
-        Resolver2.prototype.isCacheSet = function(name) {
-          return !name && this.cache;
-        };
-        Resolver2.prototype.generateLsig = function(name) {
-          return __awaiter(this, void 0, void 0, function() {
-            var program;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  if (name === void 0) {
-                    name = this.name;
-                  }
-                  return [4, this.algodClient.compile(generateTeal_js_1.generateTeal(name))["do"]()];
-                case 1:
-                  program = _a.sent();
-                  program = new Uint8Array(Buffer.from(program.result, "base64"));
-                  return [2, new algosdk_1["default"].LogicSigAccount(program)];
-              }
-            });
-          });
-        };
         Resolver2.prototype.resolveName = function(name) {
           return __awaiter(this, void 0, void 0, function() {
-            var indexer, lsig, found, accountInfo, length_1, address, socials, metadata, i, app, kv, decodedKvPairs, err_1;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
+            var found, error, accountInfo, _a, _b, length_1, address, socials, metadata, i, app, kv, decodedKvPairs, err_1;
+            return __generator(this, function(_c) {
+              switch (_c.label) {
                 case 0:
-                  if (this.isCacheSet(name)) {
-                    return [2, this.cache];
-                  }
-                  if (name === void 0) {
+                  found = false;
+                  if (!name) {
                     name = this.name;
                   }
-                  if (name.length === 0 || name.length > 64) {
-                    throw new errors_js_1.InvalidNameError();
-                  }
-                  return [4, this.indexerClient];
+                  error = {
+                    address: "",
+                    metadata: [],
+                    socials: [],
+                    found: false
+                  };
+                  _c.label = 1;
                 case 1:
-                  indexer = _a.sent();
-                  return [4, this.generateLsig(name)];
+                  _c.trys.push([1, 4, , 5]);
+                  _b = (_a = this.indexer).lookupAccountByID;
+                  return [4, this.getTeal(name)];
                 case 2:
-                  lsig = _a.sent();
-                  found = false;
-                  _a.label = 3;
+                  return [4, _b.apply(_a, [_c.sent().address()])["do"]()];
                 case 3:
-                  _a.trys.push([3, 5, , 6]);
-                  return [4, indexer.lookupAccountByID(lsig.address())["do"]()];
-                case 4:
-                  accountInfo = _a.sent();
+                  accountInfo = _c.sent();
                   accountInfo = accountInfo.account["apps-local-state"];
                   length_1 = accountInfo.length;
                   address = void 0;
@@ -37411,121 +37555,115 @@
                     }
                   }
                   if (found) {
-                    if (this.cache === void 0 && name === this.name) {
-                      this.cache = {
-                        found,
-                        address,
-                        socials,
-                        metadata
-                      };
-                    }
                     return [2, {
                       found,
                       address,
                       socials,
                       metadata
                     }];
-                  } else
-                    return [2, { found }];
-                  return [3, 6];
+                  }
+                  return [2, error];
+                case 4:
+                  err_1 = _c.sent();
+                  return [2, error];
                 case 5:
-                  err_1 = _a.sent();
-                  return [2, { found }];
-                case 6:
                   return [2];
               }
             });
           });
         };
         Resolver2.prototype.getNamesOwnedByAddress = function(address, socials, metadata, limit) {
+          if (socials === void 0) {
+            socials = false;
+          }
+          if (metadata === void 0) {
+            metadata = false;
+          }
+          if (limit === void 0) {
+            limit = 10;
+          }
           return __awaiter(this, void 0, void 0, function() {
-            var isValidAddress3, indexer, nextToken, txnLength, txns, info, err_2, accountTxns, i, names, details, i, info, domain;
+            var nextToken, txnLength, txns, info, err_2, accountTxns, i, names, details, i, info, domain;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, algosdk_1["default"].isValidAddress(address)];
                 case 1:
-                  isValidAddress3 = _a.sent();
-                  if (!!isValidAddress3)
-                    return [3, 2];
-                  throw new errors_js_1.AddressValidationError();
-                case 2:
-                  return [4, this.indexerClient];
-                case 3:
-                  indexer = _a.sent();
+                  if (!_a.sent()) {
+                    throw new errors_js_1.AddressValidationError();
+                  }
                   nextToken = "";
                   txnLength = 1;
                   txns = [];
-                  _a.label = 4;
-                case 4:
+                  _a.label = 2;
+                case 2:
                   if (!(txnLength > 0))
-                    return [3, 9];
-                  _a.label = 5;
-                case 5:
-                  _a.trys.push([5, 7, , 8]);
-                  return [4, indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(constants_js_1.APP_ID).nextToken(nextToken)["do"]()];
-                case 6:
+                    return [3, 7];
+                  _a.label = 3;
+                case 3:
+                  _a.trys.push([3, 5, , 6]);
+                  return [4, this.indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(constants_js_1.APP_ID).nextToken(nextToken)["do"]()];
+                case 4:
                   info = _a.sent();
                   txnLength = info.transactions.length;
                   if (txnLength > 0) {
                     nextToken = info["next-token"];
                     txns.push(info.transactions);
                   }
-                  return [3, 8];
-                case 7:
+                  return [3, 6];
+                case 5:
                   err_2 = _a.sent();
-                  return [2, false];
-                case 8:
-                  return [3, 4];
-                case 9:
+                  return [2, []];
+                case 6:
+                  return [3, 2];
+                case 7:
                   accountTxns = [];
                   for (i = 0; i < txns.length; i++) {
                     accountTxns = accountTxns.concat(txns[i]);
                   }
                   txns = accountTxns;
                   return [4, this.filterDomainRegistrationTxns(txns)];
-                case 10:
+                case 8:
                   names = _a.sent();
                   if (!(names.length > 0))
-                    return [3, 15];
+                    return [3, 13];
                   details = [];
                   i = 0;
-                  _a.label = 11;
-                case 11:
+                  _a.label = 9;
+                case 9:
                   if (!(i < names.length))
-                    return [3, 14];
-                  if (limit !== void 0) {
-                    if (details.length >= limit)
-                      return [3, 14];
+                    return [3, 12];
+                  if (details.length && details.length >= limit) {
+                    return [3, 12];
                   }
                   return [4, this.resolveName(names[i])];
-                case 12:
+                case 10:
                   info = _a.sent();
-                  if (info.found && info.address !== void 0) {
-                    if (info.address === address) {
-                      domain = {
-                        name: ""
-                      };
-                      domain.name = names[i] + ".algo";
-                      if (socials) {
-                        domain["socials"] = info.socials;
-                      }
-                      if (metadata) {
-                        domain["metadata"] = info.metadata;
-                      }
-                      details.push(domain);
+                  if (info.found && info.address === address) {
+                    domain = {
+                      address: "",
+                      found: true,
+                      name: ""
+                    };
+                    domain.name = names[i] + ".algo";
+                    if (socials) {
+                      domain.socials = info.socials;
                     }
-                  } else {
-                    i = i - 1;
+                    if (metadata) {
+                      domain.metadata = info.metadata;
+                    }
+                    details.push(domain);
+                    return [3, 11];
                   }
-                  _a.label = 13;
-                case 13:
+                  i--;
+                  _a.label = 11;
+                case 11:
                   i++;
-                  return [3, 11];
-                case 14:
+                  return [3, 9];
+                case 12:
                   return [2, details];
-                case 15:
-                  return [2];
+                case 13:
+                  return [2, []];
               }
             });
           });
@@ -37550,6 +37688,7 @@
           if (type === "metadata") {
             return metadata;
           }
+          return [];
         };
         Resolver2.prototype.decodeKvPairs = function(kvPairs) {
           return kvPairs.map(function(kvPair) {
@@ -37563,9 +37702,12 @@
             decodedKvPair.key = key;
             if (key === "owner") {
               decodedKvPair.value = algosdk_1["default"].encodeAddress(new Uint8Array(Buffer.from(value.bytes, "base64")));
-            } else if (value.type === 1) {
+              return decodedKvPair;
+            }
+            if (value.type === 1) {
               decodedKvPair.value = Buffer.from(value.bytes, "base64").toString();
-            } else if (value.type === 2) {
+            }
+            if (value.type === 2) {
               decodedKvPair.value = value.uint;
             }
             return decodedKvPair;
@@ -37573,12 +37715,11 @@
         };
         Resolver2.prototype.filterDomainRegistrationTxns = function(txns) {
           return __awaiter(this, void 0, void 0, function() {
-            var names, indexer, i, txn, appArgs, lsigAccount, accountInfo, length_2, i_1, kvPairs, domainInfo, err_3;
+            var names, i, txn, appArgs, decodedName, lsigAccount, accountInfo, length_2, i_1, kvPairs, domainInfo, err_3;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   names = [];
-                  indexer = this.indexerClient;
                   _a.label = 1;
                 case 1:
                   _a.trys.push([1, 7, , 8]);
@@ -37595,14 +37736,16 @@
                   appArgs = txn["application-transaction"]["application-args"];
                   if (!(Buffer.from(appArgs[0], "base64").toString() === "register_name"))
                     return [3, 3];
-                  if (!names.includes(Buffer.from(appArgs[1], "base64").toString()))
-                    names.push(Buffer.from(appArgs[1], "base64").toString());
+                  decodedName = util_js_1.b64toString(appArgs[1]);
+                  if (!names.includes(decodedName)) {
+                    names.push(decodedName);
+                  }
                   return [3, 5];
                 case 3:
-                  if (!(Buffer.from(appArgs[0], "base64").toString() === "accept_transfer"))
+                  if (!(util_js_1.b64toString(appArgs[0]) === "accept_transfer"))
                     return [3, 5];
                   lsigAccount = txn["application-transaction"]["accounts"][0];
-                  return [4, indexer.lookupAccountByID(lsigAccount)["do"]()];
+                  return [4, this.indexer.lookupAccountByID(lsigAccount)["do"]()];
                 case 4:
                   accountInfo = _a.sent();
                   accountInfo = accountInfo.account["apps-local-state"];
@@ -37642,44 +37785,42 @@
                   return [4, this.resolveName()];
                 case 1:
                   domainInformation = _a.sent();
-                  if (domainInformation.found === true) {
+                  if (domainInformation.found) {
                     return [2, domainInformation.address];
-                  } else
-                    return [2, "Not Registered"];
-                  return [2];
+                  }
+                  return [2, "Not Registered"];
               }
             });
           });
         };
         Resolver2.prototype.text = function(key) {
+          var _a, _b;
           return __awaiter(this, void 0, void 0, function() {
             var domainInformation, socialRecords, metadataRecords;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
+            return __generator(this, function(_c) {
+              switch (_c.label) {
                 case 0:
                   return [4, this.resolveName()];
                 case 1:
-                  domainInformation = _a.sent();
-                  if (domainInformation.found === true) {
-                    socialRecords = domainInformation.socials.filter(function(social) {
+                  domainInformation = _c.sent();
+                  if (domainInformation.found) {
+                    socialRecords = (_a = domainInformation.socials) === null || _a === void 0 ? void 0 : _a.filter(function(social) {
                       return social.key === key;
                     });
-                    if (socialRecords.length > 0) {
+                    if (socialRecords && socialRecords.length > 0) {
                       return [2, socialRecords[0].value];
                     } else {
-                      metadataRecords = domainInformation.metadata.filter(function(metadata) {
+                      metadataRecords = (_b = domainInformation.metadata) === null || _b === void 0 ? void 0 : _b.filter(function(metadata) {
                         return metadata.key === key;
                       });
-                      if (metadataRecords.length > 0) {
+                      if (metadataRecords && metadataRecords.length > 0) {
                         return [2, metadataRecords[0].value];
                       } else {
                         return [2, "Property not set"];
                       }
                     }
-                  } else {
-                    return [2, "Not Registered"];
                   }
-                  return [2];
+                  return [2, "Not Registered"];
               }
             });
           });
@@ -37693,13 +37834,12 @@
                   return [4, this.resolveName()];
                 case 1:
                   domainInformation = _a.sent();
-                  if (domainInformation.found === true) {
-                    return [2, new Date(domainInformation.metadata.filter(function(data) {
+                  if (domainInformation.found) {
+                    return [2, new Date(parseInt((domainInformation === null || domainInformation === void 0 ? void 0 : domainInformation.metadata).filter(function(data) {
                       return data.key === "expiry";
-                    })[0].value * 1e3)];
-                  } else
-                    return [2, "Not Registered"];
-                  return [2];
+                    })[0].value) * 1e3)];
+                  }
+                  return [2, "Not Registered"];
               }
             });
           });
@@ -37713,25 +37853,22 @@
                   return [4, this.resolveName()];
                 case 1:
                   domainInformation = _a.sent();
-                  if (domainInformation.found === true) {
-                    contentRecords = domainInformation.metadata.filter(function(kv) {
+                  if (domainInformation.found) {
+                    contentRecords = (domainInformation === null || domainInformation === void 0 ? void 0 : domainInformation.metadata).filter(function(kv) {
                       return kv.key === "content";
                     });
                     if (contentRecords.length > 0) {
                       return [2, contentRecords[0].value];
-                    } else {
-                      return [2, "Content field is not set"];
                     }
-                  } else {
-                    return [2, "Domain not registered"];
+                    return [2, "Content field is not set"];
                   }
-                  return [2];
+                  return [2, "Domain not registered"];
               }
             });
           });
         };
         return Resolver2;
-      }();
+      }(cachedApi_js_1["default"]);
       exports2.Resolver = Resolver;
     }
   });
@@ -37740,6 +37877,25 @@
   var require_transactions = __commonJS({
     "src/transactions.js"(exports2) {
       "use strict";
+      var __extends = exports2 && exports2.__extends || function() {
+        var extendStatics = function(d, b) {
+          extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
+            d2.__proto__ = b2;
+          } || function(d2, b2) {
+            for (var p in b2)
+              if (b2.hasOwnProperty(p))
+                d2[p] = b2[p];
+          };
+          return extendStatics(d, b);
+        };
+        return function(d, b) {
+          extendStatics(d, b);
+          function __() {
+            this.constructor = d;
+          }
+          d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+        };
+      }();
       var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
         function adopt(value) {
           return value instanceof P ? value : new P(function(resolve) {
@@ -37846,27 +38002,15 @@
       exports2.__esModule = true;
       var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
       var constants_js_1 = require_constants2();
-      var generateTeal_js_1 = require_generateTeal();
-      var Transactions = function() {
-        function Transactions2(client, name) {
-          this.algodClient = client;
-          this.name = name;
+      var cachedApi_js_1 = require_cachedApi();
+      var util_js_1 = require_util();
+      var Transactions = function(_super) {
+        __extends(Transactions2, _super);
+        function Transactions2(client, indexer, name) {
+          var _this = _super.call(this, client, indexer) || this;
+          _this.name = name;
+          return _this;
         }
-        Transactions2.prototype.generateLsig = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            var program;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [4, this.algodClient.compile(generateTeal_js_1.generateTeal(this.name))["do"]()];
-                case 1:
-                  program = _a.sent();
-                  program = new Uint8Array(Buffer.from(program.result, "base64"));
-                  return [2, new algosdk_1["default"].LogicSigAccount(program)];
-              }
-            });
-          });
-        };
         Transactions2.prototype.calculatePrice = function(period) {
           var amount = 0;
           if (this.name.length === 3) {
@@ -37884,9 +38028,9 @@
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  algodClient = this.algodClient;
+                  algodClient = this.rpc;
                   amount = 0;
-                  return [4, this.generateLsig()];
+                  return [4, this.getTeal(this.name)];
                 case 1:
                   lsig = _a.sent();
                   return [4, algodClient.getTransactionParams()["do"]()];
@@ -37918,14 +38062,11 @@
                 case 3:
                   txn3 = _a.sent();
                   groupTxns.push(txn3);
-                  sender = lsig.address();
-                  receiver = address;
-                  amount = 0;
                   method2 = "register_name";
                   appArgs = [];
                   period++;
-                  appArgs.push(new Uint8Array(Buffer.from(method2)));
-                  appArgs.push(new Uint8Array(Buffer.from(this.name)));
+                  appArgs.push(util_js_1.toIntArray(method2));
+                  appArgs.push(util_js_1.toIntArray(this.name));
                   appArgs.push(algosdk_1["default"].encodeUint64(period));
                   return [4, algosdk_1["default"].makeApplicationNoOpTxn(address, params, constants_js_1.APP_ID, appArgs, [lsig.address()])];
                 case 4:
@@ -37944,15 +38085,14 @@
         };
         Transactions2.prototype.prepareUpdateNamePropertyTransactions = function(address, editedHandles) {
           return __awaiter(this, void 0, void 0, function() {
-            var algodClient, lsig, params, method2, groupTxns, _a, _b, _i, key, appArgs, network, handle, txn;
+            var lsig, params, method2, groupTxns, _a, _b, _i, key, appArgs, network, handle, txn;
             return __generator(this, function(_c) {
               switch (_c.label) {
                 case 0:
-                  algodClient = this.algodClient;
-                  return [4, this.generateLsig()];
+                  return [4, this.getTeal(this.name)];
                 case 1:
                   lsig = _c.sent();
-                  return [4, algodClient.getTransactionParams()["do"]()];
+                  return [4, this.rpc.getTransactionParams()["do"]()];
                 case 2:
                   params = _c.sent();
                   params.fee = 1e3;
@@ -37971,9 +38111,9 @@
                   appArgs = [];
                   network = key;
                   handle = editedHandles[key];
-                  appArgs.push(new Uint8Array(Buffer.from(method2)));
-                  appArgs.push(new Uint8Array(Buffer.from(network)));
-                  appArgs.push(new Uint8Array(Buffer.from(handle)));
+                  appArgs.push(util_js_1.toIntArray(method2));
+                  appArgs.push(util_js_1.toIntArray(network));
+                  appArgs.push(util_js_1.toIntArray(handle));
                   return [4, algosdk_1["default"].makeApplicationNoOpTxn(address, params, constants_js_1.APP_ID, appArgs, [lsig.address()])];
                 case 4:
                   txn = _c.sent();
@@ -37991,44 +38131,24 @@
             });
           });
         };
-        Transactions2.prototype.preparePaymentTxn = function(sender, receiver, amt, note) {
-          return __awaiter(this, void 0, void 0, function() {
-            var algodClient, params, enc, closeToRemaninder;
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  algodClient = this.algodClient;
-                  return [4, algodClient.getTransactionParams()["do"]()];
-                case 1:
-                  params = _a.sent();
-                  amt = algosdk_1["default"].algosToMicroalgos(amt);
-                  enc = new TextEncoder();
-                  note = enc.encode(note);
-                  closeToRemaninder = void 0;
-                  return [2, algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params)];
-              }
-            });
-          });
-        };
         Transactions2.prototype.prepareNameRenewalTxns = function(sender, years) {
           return __awaiter(this, void 0, void 0, function() {
-            var algodClient, params, receiver, closeToRemaninder, note, paymentTxn, lsig, appArgs, applicationTxn;
+            var params, receiver, closeToRemaninder, note, paymentTxn, lsig, appArgs, applicationTxn;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  algodClient = this.algodClient;
-                  return [4, algodClient.getTransactionParams()["do"]()];
+                  return [4, this.rpc.getTransactionParams()["do"]()];
                 case 1:
                   params = _a.sent();
                   receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
                   closeToRemaninder = void 0;
                   note = void 0;
                   paymentTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(years), closeToRemaninder, note, params);
-                  return [4, this.generateLsig()];
+                  return [4, this.getTeal(this.name)];
                 case 2:
                   lsig = _a.sent();
                   appArgs = [];
-                  appArgs.push(new Uint8Array(Buffer.from("renew_name")));
+                  appArgs.push(util_js_1.toIntArray("renew_name"));
                   appArgs.push(algosdk_1["default"].encodeUint64(years));
                   applicationTxn = algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [lsig.address()]);
                   algosdk_1["default"].assignGroupID([paymentTxn, applicationTxn]);
@@ -38039,20 +38159,19 @@
         };
         Transactions2.prototype.prepareInitiateNameTransferTransaction = function(sender, newOwner, price) {
           return __awaiter(this, void 0, void 0, function() {
-            var algodClient, params, lsig, appArgs;
+            var params, lsig, appArgs;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  algodClient = this.algodClient;
                   price = algosdk_1["default"].algosToMicroalgos(price);
-                  return [4, algodClient.getTransactionParams()["do"]()];
+                  return [4, this.rpc.getTransactionParams()["do"]()];
                 case 1:
                   params = _a.sent();
-                  return [4, this.generateLsig()];
+                  return [4, this.getTeal(this.name)];
                 case 2:
                   lsig = _a.sent();
                   appArgs = [];
-                  appArgs.push(new Uint8Array(Buffer.from("initiate_transfer")));
+                  appArgs.push(util_js_1.toIntArray("initiate_transfer"));
                   appArgs.push(algosdk_1["default"].encodeUint64(price));
                   return [2, algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [
                     lsig.address(),
@@ -38064,13 +38183,12 @@
         };
         Transactions2.prototype.prepareAcceptNameTransferTransactions = function(sender, receiver, amt) {
           return __awaiter(this, void 0, void 0, function() {
-            var algodClient, params, closeToRemaninder, note, paymentToOwnerTxn, paymentToSmartContractTxn, lsig, appArgs, applicationTxn;
+            var params, closeToRemaninder, note, paymentToOwnerTxn, paymentToSmartContractTxn, lsig, appArgs, applicationTxn;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   amt = algosdk_1["default"].algosToMicroalgos(amt);
-                  algodClient = this.algodClient;
-                  return [4, algodClient.getTransactionParams()["do"]()];
+                  return [4, this.rpc.getTransactionParams()["do"]()];
                 case 1:
                   params = _a.sent();
                   closeToRemaninder = void 0;
@@ -38078,11 +38196,11 @@
                   paymentToOwnerTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
                   receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
                   paymentToSmartContractTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, constants_js_1.TRANSFER_FEE, closeToRemaninder, note, params);
-                  return [4, this.generateLsig()];
+                  return [4, this.getTeal(this.name)];
                 case 2:
                   lsig = _a.sent();
                   appArgs = [];
-                  appArgs.push(new Uint8Array(Buffer.from("accept_transfer")));
+                  appArgs.push(util_js_1.toIntArray("accept_transfer"));
                   applicationTxn = algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [lsig.address()]);
                   algosdk_1["default"].assignGroupID([
                     paymentToOwnerTxn,
@@ -38095,7 +38213,7 @@
           });
         };
         return Transactions2;
-      }();
+      }(cachedApi_js_1["default"]);
       exports2.Transactions = Transactions;
     }
   });
@@ -38214,10 +38332,10 @@
       var validation_js_1 = require_validation();
       var Name2 = function() {
         function Name3(options) {
-          var name = options.name, client = options.client, indexer = options.indexer;
+          var name = options.name, rpc = options.rpc, indexer = options.indexer;
           this.name = name;
-          this.resolver = new resolver_js_1.Resolver(client, indexer, name);
-          this.transactions = new transactions_js_1.Transactions(client, name);
+          this.resolver = new resolver_js_1.Resolver(rpc, indexer, name);
+          this.transactions = new transactions_js_1.Transactions(rpc, indexer, name);
         }
         Name3.prototype.isRegistered = function() {
           return __awaiter(this, void 0, void 0, function() {
@@ -38537,18 +38655,16 @@
       var resolver_js_1 = require_resolver();
       var Address2 = function() {
         function Address3(options) {
-          var address = options.address, client = options.client, indexer = options.indexer;
+          var address = options.address, rpc = options.rpc, indexer = options.indexer;
           this.address = address;
-          this.resolver = new resolver_js_1.Resolver(client, indexer);
+          this.resolver = new resolver_js_1.Resolver(rpc, indexer);
         }
         Address3.prototype.getNames = function(options) {
           return __awaiter(this, void 0, void 0, function() {
-            var socials, metadata, limit;
             return __generator(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  socials = (options === null || options === void 0 ? void 0 : options.socials) || false, metadata = (options === null || options === void 0 ? void 0 : options.metadata) || false, limit = options === null || options === void 0 ? void 0 : options.metadata;
-                  return [4, this.resolver.getNamesOwnedByAddress(this.address, socials, metadata, limit)];
+                  return [4, this.resolver.getNamesOwnedByAddress(this.address, options === null || options === void 0 ? void 0 : options.socials, options === null || options === void 0 ? void 0 : options.metadata, options === null || options === void 0 ? void 0 : options.limit)];
                 case 1:
                   return [2, _a.sent()];
               }
@@ -38566,18 +38682,16 @@
   var import_validation = __toESM(require_validation());
   var import_name = __toESM(require_name());
   var import_address4 = __toESM(require_address());
-  var import_validation2 = __toESM(require_validation());
-  var ANS = class {
-    client;
-    indexer;
+  var import_cachedApi = __toESM(require_cachedApi());
+  var ANS = class extends import_cachedApi.default {
     constructor(client, indexer) {
-      this.client = client;
+      super(client, indexer);
       this.indexer = indexer;
     }
     name(name) {
-      name = (0, import_validation2.normalizeName)(name);
+      name = (0, import_validation.normalizeName)(name);
       return new import_name.Name({
-        client: this.client,
+        rpc: this.rpc,
         indexer: this.indexer,
         name
       });
@@ -38587,7 +38701,7 @@
         throw new import_errors.AddressValidationError();
       }
       return new import_address4.Address({
-        client: this.client,
+        rpc: this.rpc,
         indexer: this.indexer,
         address
       });

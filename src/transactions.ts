@@ -1,7 +1,9 @@
-import algosdk from "algosdk";
+import algosdk, {Transaction} from "algosdk";
 import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
 import CachedApi from "./cachedApi.js";
 import { toIntArray } from "./util.js";
+import { RegistrationTxns } from "./interfaces.js";
+import { Record } from "./interfaces.js";
 
 export class Transactions extends CachedApi {
   private name: string;
@@ -11,7 +13,7 @@ export class Transactions extends CachedApi {
     this.name = name;
   }
 
-  calculatePrice(period: number) {
+  calculatePrice(period: number): number {
     let amount = 0;
     if (this.name.length === 3) {
       amount = REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
@@ -23,7 +25,7 @@ export class Transactions extends CachedApi {
     return amount;
   }
 
-  async prepareNameRegistrationTransactions(address: string, period: number) {
+  async prepareNameRegistrationTransactions(address: string, period: number): Promise<RegistrationTxns> {
     const algodClient = this.rpc;
     /* 1st Txn - Payment to Smart Contract */
 
@@ -118,8 +120,8 @@ export class Transactions extends CachedApi {
 
   async prepareUpdateNamePropertyTransactions(
     address: string,
-    editedHandles: object
-  ) {
+    editedHandles: Record
+  ): Promise<Transaction[]> {
     const lsig = await this.getTeal(this.name);
     const params = await this.rpc.getTransactionParams().do();
     params.fee = 1000;
@@ -132,7 +134,7 @@ export class Transactions extends CachedApi {
     for (const key in editedHandles) {
       const appArgs = [];
       const network = key;
-      const handle: string = editedHandles[key];
+      const handle: string = editedHandles[key as keyof Record];
 
       appArgs.push(toIntArray(method));
       appArgs.push(toIntArray(network as string));
@@ -155,29 +157,7 @@ export class Transactions extends CachedApi {
     return groupTxns;
   }
 
-  async preparePaymentTxn(
-    sender: string,
-    receiver: string,
-    amt: number,
-    note?: any
-  ) {
-    const params = await this.rpc.getTransactionParams().do();
-    amt = algosdk.algosToMicroalgos(amt);
-    const enc = new TextEncoder();
-    note = enc.encode(note);
-    const closeToRemaninder = undefined;
-
-    return algosdk.makePaymentTxnWithSuggestedParams(
-      sender,
-      receiver,
-      amt,
-      closeToRemaninder,
-      note,
-      params
-    );
-  }
-
-  async prepareNameRenewalTxns(sender: string, years: number) {
+  async prepareNameRenewalTxns(sender: string, years: number): Promise<Transaction[]> {
     const params = await this.rpc.getTransactionParams().do();
     const receiver = algosdk.getApplicationAddress(APP_ID);
     const closeToRemaninder = undefined;
@@ -214,7 +194,7 @@ export class Transactions extends CachedApi {
     sender: string,
     newOwner: string,
     price: number
-  ) {
+  ) : Promise<Transaction> {
     price = algosdk.algosToMicroalgos(price);
     const params = await this.rpc.getTransactionParams().do();
 
@@ -234,7 +214,7 @@ export class Transactions extends CachedApi {
     sender: string,
     receiver: string,
     amt: number
-  ) {
+  ) : Promise<Transaction[]>{
     amt = algosdk.algosToMicroalgos(amt);
     const params = await this.rpc.getTransactionParams().do();
 
