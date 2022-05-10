@@ -12,7 +12,7 @@ import {
   RegistrationTxns,
 } from "./interfaces.js";
 import { isValidAddress } from "./validation.js";
-import {Transaction} from "algosdk";
+import { Transaction } from "algosdk";
 import { Record } from "./interfaces.js";
 
 export class Name {
@@ -27,7 +27,7 @@ export class Name {
   }
 
   async isRegistered(): Promise<boolean> {
-    const status = await this.resolver.resolveName();
+    const status: NameResponse = await this.resolver.resolveName();
     return status.found;
   }
 

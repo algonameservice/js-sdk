@@ -1,4 +1,4 @@
-import algosdk, {Transaction} from "algosdk";
+import algosdk, { Transaction } from "algosdk";
 import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
 import CachedApi from "./cachedApi.js";
 import { toIntArray } from "./util.js";
@@ -25,7 +25,10 @@ export class Transactions extends CachedApi {
     return amount;
   }
 
-  async prepareNameRegistrationTransactions(address: string, period: number): Promise<RegistrationTxns> {
+  async prepareNameRegistrationTransactions(
+    address: string,
+    period: number
+  ): Promise<RegistrationTxns> {
     const algodClient = this.rpc;
     /* 1st Txn - Payment to Smart Contract */
 
@@ -157,7 +160,10 @@ export class Transactions extends CachedApi {
     return groupTxns;
   }
 
-  async prepareNameRenewalTxns(sender: string, years: number): Promise<Transaction[]> {
+  async prepareNameRenewalTxns(
+    sender: string,
+    years: number
+  ): Promise<Transaction[]> {
     const params = await this.rpc.getTransactionParams().do();
     const receiver = algosdk.getApplicationAddress(APP_ID);
     const closeToRemaninder = undefined;
@@ -194,7 +200,7 @@ export class Transactions extends CachedApi {
     sender: string,
     newOwner: string,
     price: number
-  ) : Promise<Transaction> {
+  ): Promise<Transaction> {
     price = algosdk.algosToMicroalgos(price);
     const params = await this.rpc.getTransactionParams().do();
 
@@ -214,7 +220,7 @@ export class Transactions extends CachedApi {
     sender: string,
     receiver: string,
     amt: number
-  ) : Promise<Transaction[]>{
+  ): Promise<Transaction[]> {
     amt = algosdk.algosToMicroalgos(amt);
     const params = await this.rpc.getTransactionParams().do();
 

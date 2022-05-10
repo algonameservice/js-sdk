@@ -1,4 +1,4 @@
-import algosdk, {Transaction} from "algosdk";
+import algosdk, { Transaction } from "algosdk";
 import { ALLOWED_SOCIALS, APP_ID } from "./constants.js";
 import { AddressValidationError } from "./errors.js";
 import CachedApi from "./cachedApi.js";
@@ -23,13 +23,10 @@ export class Resolver extends CachedApi {
 
   async resolveName(name?: string): Promise<NameResponse> {
     let found = false;
-    if(!name) {
+    if (!name) {
       name = this.name;
     }
     const error: NameResponse = {
-      address: "",
-      metadata: [],
-      socials: [],
       found: false,
     };
 
@@ -37,7 +34,7 @@ export class Resolver extends CachedApi {
       let accountInfo = await this.indexer
         .lookupAccountByID((await this.getTeal(name as string)).address())
         .do();
-      
+
       accountInfo = accountInfo.account["apps-local-state"];
       const length = accountInfo.length;
       let address;
@@ -53,7 +50,8 @@ export class Resolver extends CachedApi {
           socials = this.filterKvPairs(decodedKvPairs, "socials");
           metadata = this.filterKvPairs(decodedKvPairs, "metadata");
           found = true;
-          address = metadata.filter((kv: Record) => kv.key === "owner")[0].value;
+          address = metadata.filter((kv: Record) => kv.key === "owner")[0]
+            .value;
         }
       }
 
@@ -76,7 +74,7 @@ export class Resolver extends CachedApi {
     address: string,
     socials = false,
     metadata = false,
-    limit= 10
+    limit = 10
   ): Promise<Domain[]> {
     if (!(await algosdk.isValidAddress(address))) {
       throw new AddressValidationError();
@@ -150,8 +148,8 @@ export class Resolver extends CachedApi {
   }
 
   filterKvPairs(kvPairs: Record[], type: string): Record[] {
-    const socials = [],
-      metadata = [];
+    const socials: Record[] = [],
+      metadata: Record[] = [];
 
     for (const i in kvPairs) {
       const { key, value } = kvPairs[i];
@@ -261,7 +259,7 @@ export class Resolver extends CachedApi {
     return names;
   }
 
-  async owner(): Promise<string|undefined> {
+  async owner(): Promise<string | undefined> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       return domainInformation.address;
@@ -273,9 +271,10 @@ export class Resolver extends CachedApi {
   async text(key: string): Promise<string> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
-      const socialRecords: Record[]|undefined = domainInformation.socials?.filter(
-        (social: Record) => social.key === key
-      );
+      const socialRecords: Record[] | undefined =
+        domainInformation.socials?.filter(
+          (social: Record) => social.key === key
+        );
       if (socialRecords && socialRecords.length > 0) {
         return socialRecords[0].value;
       } else {
@@ -293,7 +292,7 @@ export class Resolver extends CachedApi {
     return "Not Registered";
   }
 
-  async expiry(): Promise<Date|string> {
+  async expiry(): Promise<Date | string> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       //Convert milliseconds to seconds by multiplying with 1000

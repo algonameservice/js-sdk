@@ -1,4 +1,4 @@
-import {Algodv2, Indexer, Transaction} from "algosdk";
+import { Algodv2, Indexer, Transaction } from "algosdk";
 
 export interface NameConstructor {
   rpc: Algodv2;
@@ -24,8 +24,8 @@ export interface Domain extends NameResponse {
 
 export interface RegistrationTxns {
   optinTxn?: {
-    txID: string,
-    blob: Uint8Array
+    txID: string;
+    blob: Uint8Array;
   };
   txns: Transaction[];
   unsignedOptinTxn?: Transaction;
