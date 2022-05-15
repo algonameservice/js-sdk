@@ -9,13 +9,13 @@ Install Package
 **`npm`**
 
 ```
-npm i anssdk
+npm i @ans/sdk
 ```
 
 **`yarn`**
 
 ```
-yarn add anssdk
+yarn add @ans/sdk
 ```
 
 ### Import
@@ -23,13 +23,13 @@ yarn add anssdk
 **`ESM`** import
 
 ```
-import {AnsResolver} from 'anssdk'
+import {AnsResolver} from '@ans/sdk'
 ```
 
 **`CJS`** require
 
 ```
-const {AnsResolver} = require('anssdk')
+const {AnsResolver} = require('@ans/sdk')
 ```
 
 ### Setup
@@ -40,7 +40,7 @@ const algodIndexer = "" // set up your algod indexer
 
 //indexer and client must point to mainnet
 
-let sdk = AnsResolver(client, indexer)
+let sdk = new AnsResolver(client, indexer)
 ```
 
 ## Resolve .algo name
@@ -48,15 +48,25 @@ let sdk = AnsResolver(client, indexer)
 Resolve .algo name to get the address of the owner.
 
 ```
-let name = "ans.algo"
-
-let nameInfo = await sdk.resolveName(name)
+let nameInfo = await sdk.name("ans.algo").getOwner()
 
 if(nameInfo["found"]){
     let address = nameInfo["address"];
 }
 else {
     //Name is not registered yet
+}
+```
+
+## Get text record
+
+Resolve .algo name to get the address of the owner.
+
+```
+let text = await sdk.name("ans.algo").getText("discord")
+
+if(text) {
+    console.log(text) //Discord handle if it is set
 }
 ```
 
@@ -70,7 +80,7 @@ let getSocials = true; // get socials with .algo name
 let getMetadata = true; // get metadata like expiry, avatar with .algo name;
 let limit = 1; // number of names to be retrieved
 
-let names = await sdk.getNamesOwnedByAddress(address, getSocials, getMetadata, limit);
+let names = await sdk.address(address).getNames(socials, metadata, limit)
 
 // Returns an array of names owned by the address
 // Names appear in a reverse chronological order (names[0] returns recently purchased name)
@@ -95,18 +105,18 @@ let address = ''; // owner's algorand wallet address
 let period = 0; // duration of registration
 
 try{
-    let nameRegistrationTxns = await sdk.prepareNameRegistrationTransactions(nameToRegister, address, period);
+    let nameRegistrationTxns = await sdk.name(nameToRegister).register(address, period);
 
-    if(nameRegistrationTxns.length === 2) {
+    if(nameRegistrationTxns.txns.length === 2) {
 
         // Lsig account previous opted in (name expired)
         // Sign both transactions
         // Send all to network
 
-    } else if(nameRegistrationTxns.length === 4) {
+    } else if(nameRegistrationTxns.txns.length === 4) {
 
-        // nameRegistrationsTxns[2] is signed by the sdk
-        // Sign nameRegistrationTxns index 0,1,3
+        // nameRegistrationsTxns.txns[2] is signed by the sdk
+        // Sign nameRegistrationTxns.txns index 0,1,3
         // Submit transactions as a group
 
         const signedGroupTxns = [];
@@ -138,7 +148,7 @@ try{
         github: ''
     }
 
-    const updateNamePropertyTxns = await sdk.prepareUpdateNamePropertyTransactions(name, address, editedHandles);
+    const updateNamePropertyTxns = await sdk.name(name).update(address, editedHandles);
 
     // Returns an array of transactions
     // Sign each and send to network
@@ -159,7 +169,7 @@ try{
     let owner = '' // owner address
     let period = 0 // period for renewal
 
-    const nameRenewalTxns = await sdk.prepareNameRenewalTransactions(name, owner, period);
+    const nameRenewalTxns = await sdk.name(name).renew(owner, period);
 
     // Returns an array of transactions
     // Sign each and send to network
@@ -180,7 +190,7 @@ try{
     let newOwner = '' // new owner's address
     let price = 0 // price at which the seller is willing to sell this name
 
-    const nameTransferTransaction = await sdk.prepareInitiateNameTransferTransaction(name, owner, newOwner, price);
+    const nameTransferTransaction = await sdk.name(name).initTransfer(owner, newOwner, price);
 
     // Returns a transaction to be signed by `owner`
     // Sign and send to network
@@ -201,7 +211,7 @@ try{
     let newOwner = '' // new owner's address
     let price = 0 // price set in the previous transaction
 
-    const acceptNameTransferTxns = await sdk.prepareAcceptNameTransferTransactions(name, newOwner, owner, price);
+    const acceptNameTransferTxns = await sdk.name(name).acceptTransfer(newOwner, owner, price);
 
     // Returns an array of transactions to be signed by `newOwner`
     // Sign each and send to network

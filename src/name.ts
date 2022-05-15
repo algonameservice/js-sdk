@@ -16,14 +16,19 @@ import { Transaction } from "algosdk";
 import { Record } from "./interfaces.js";
 
 export class Name {
-  private name: string;
   private resolver: Resolver;
   private transactions: Transactions;
+  private _name: string;
+
   constructor(options: NameConstructor) {
     const { name, rpc, indexer } = options;
-    this.name = name;
-    this.resolver = new Resolver(rpc, indexer, name);
-    this.transactions = new Transactions(rpc, indexer, name);
+    this._name = name;
+    this.resolver = new Resolver(rpc, indexer, this);
+    this.transactions = new Transactions(rpc, indexer, this);
+  }
+
+  get name(): string {
+    return this._name;
   }
 
   async isRegistered(): Promise<boolean> {
@@ -63,7 +68,7 @@ export class Name {
     | NameNotRegisteredError
   > {
     if (!(await this.isRegistered())) {
-      throw new NameNotRegisteredError(this.name);
+      throw new NameNotRegisteredError(this._name);
     }
     if (!isValidAddress(sender)) {
       throw new AddressValidationError();
@@ -78,16 +83,16 @@ export class Name {
     }
     if (!receiver && !method) {
       if (owner !== sender) {
-        throw new IncorrectOwnerError(this.name, sender);
+        throw new IncorrectOwnerError(this._name, sender);
       }
     } else if (sender && receiver) {
       if (method === "initiate_transfer") {
         if (owner !== sender) {
-          throw new IncorrectOwnerError(this.name, sender);
+          throw new IncorrectOwnerError(this._name, sender);
         }
       } else if (method === "accept_transfer") {
         if (owner !== receiver) {
-          throw new IncorrectOwnerError(this.name, receiver);
+          throw new IncorrectOwnerError(this._name, receiver);
         }
       }
     }

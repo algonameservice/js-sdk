@@ -4,17 +4,16 @@ import { AddressValidationError, NameNotRegisteredError } from "./errors.js";
 import CachedApi from "./cachedApi.js";
 import { Domain, NameResponse, Record } from "./interfaces.js";
 import { b64toString } from "./util.js";
+import { Name } from "./name.js";
 
 declare const Buffer: any;
 
 export class Resolver extends CachedApi {
-  private name?: string;
+  private name?: Name;
+  // @ts-ignore
+  private resolvedData?: Record<string, any>;
 
-  constructor(
-    client: algosdk.Algodv2,
-    indexer: algosdk.Indexer,
-    name: string
-  ) {
+  constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer, name?: Name) {
     super(client, indexer);
     this.rpc = client;
     this.indexer = indexer;
@@ -24,7 +23,7 @@ export class Resolver extends CachedApi {
   async resolveName(name?: string): Promise<NameResponse> {
     let found = false;
     if (!name) {
-      name = this.name;
+      name = this.name?.name;
     }
     const error: NameResponse = {
       found: false,
@@ -34,9 +33,13 @@ export class Resolver extends CachedApi {
     };
 
     try {
-      let accountInfo = await this.indexer
-        .lookupAccountByID((await this.getTeal(name as string)).address())
-        .do();
+      if (!this.resolvedData) {
+        this.resolvedData = await this.indexer
+          .lookupAccountByID((await this.getTeal(name as string)).address())
+          .do();
+      }
+
+      let accountInfo = this.resolvedData;
 
       accountInfo = accountInfo.account["apps-local-state"];
       const length = accountInfo.length;

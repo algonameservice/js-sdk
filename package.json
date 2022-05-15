@@ -1,5 +1,5 @@
 {
-  "name": "anssdk",
+  "name": "@ans/sdk",
   "version": "0.1.2",
   "description": "JavaScript SDK to resolve ANS .algo names",
   "main": "src/index.js",
