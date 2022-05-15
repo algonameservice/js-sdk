@@ -4,9 +4,10 @@ import CachedApi from "./cachedApi.js";
 import { toIntArray } from "./util.js";
 import { RegistrationTxns } from "./interfaces.js";
 import { Record } from "./interfaces.js";
+import { Name } from "./name.js";
 
 export class Transactions extends CachedApi {
-  private name: string;
+  private name: Name;
 
   constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer, name: string) {
     super(client, indexer);
