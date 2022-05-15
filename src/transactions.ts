@@ -7,11 +7,19 @@ import { Record } from "./interfaces.js";
 import { Name } from "./name.js";
 
 export class Transactions extends CachedApi {
-  private name: Name;
+  private name: string;
 
-  constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer, name: string) {
+  constructor(
+    client: algosdk.Algodv2,
+    indexer: algosdk.Indexer,
+    name: Name | string
+  ) {
     super(client, indexer);
-    this.name = name;
+    if (name instanceof Name) {
+      this.name = name.name;
+    } else {
+      this.name = name;
+    }
   }
 
   calculatePrice(period: number): number {
