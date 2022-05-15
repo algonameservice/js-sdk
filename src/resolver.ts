@@ -29,11 +29,11 @@ export class Resolver extends CachedApi {
       found: false,
       socials: [],
       metadata: [],
-      address: 'Not Registered'
+      address: "Not Registered",
     };
 
     try {
-      if (!this.resolvedData) {
+      if (!this.resolvedData || name !== this.name?.name) {
         this.resolvedData = await this.indexer
           .lookupAccountByID((await this.getTeal(name as string)).address())
           .do();
@@ -126,7 +126,6 @@ export class Resolver extends CachedApi {
         if (details.length && details.length >= limit) {
           break;
         }
-
         const info: NameResponse = await this.resolveName(names[i]);
         if (info.found && info.address === address) {
           const domain: Domain = {
@@ -135,6 +134,7 @@ export class Resolver extends CachedApi {
             name: "",
           };
           domain.name = names[i] + ".algo";
+          domain.address = info.address;
           if (socials) {
             domain.socials = info.socials;
           }
@@ -143,9 +143,9 @@ export class Resolver extends CachedApi {
           }
           details.push(domain);
           continue;
+        } else if (info.found === false) {
+          i--;
         }
-
-        i--;
       }
       return details;
     }
@@ -276,13 +276,13 @@ export class Resolver extends CachedApi {
     }
 
     // @ts-ignore
-    throw new NameNotRegisteredError(this.name);
+    throw new NameNotRegisteredError(this.name.name);
   }
 
   async text(key: string): Promise<string | NameNotRegisteredError> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
-      const socialRecords: Record[] | undefined  =
+      const socialRecords: Record[] | undefined =
         domainInformation.socials?.filter(
           (social: Record) => social.key === key
         );
@@ -301,7 +301,7 @@ export class Resolver extends CachedApi {
     }
 
     // @ts-ignore
-    throw new NameNotRegisteredError(this.name);
+    throw new NameNotRegisteredError(this.name.name);
   }
 
   async expiry(): Promise<Date | NameNotRegisteredError> {
@@ -318,7 +318,7 @@ export class Resolver extends CachedApi {
     }
 
     // @ts-ignore
-    throw new NameNotRegisteredError(this.name);
+    throw new NameNotRegisteredError(this.name.name);
   }
 
   async content(): Promise<string | NameNotRegisteredError> {
@@ -334,6 +334,6 @@ export class Resolver extends CachedApi {
     }
 
     // @ts-ignore
-    throw new NameNotRegisteredError(this.name) ;
+    throw new NameNotRegisteredError(this._name);
   }
 }

@@ -14,7 +14,7 @@ export function normalizeName(name: string): string {
     throw new Error("TLD not supported");
   }
   const lengthOfName = name.length;
-  if(lengthOfName > 64) {
+  if (lengthOfName > 64) {
     throw new InvalidNameError();
   }
   for (let i = 0; i < lengthOfName; i++) {

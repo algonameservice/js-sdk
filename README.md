@@ -1,4 +1,4 @@
-# anssdk
+# @algonameservice/sdk
 
 A javscript sdk to resolve .algo names and perform name operations on ANS .algo names.
 
@@ -9,13 +9,13 @@ Install Package
 **`npm`**
 
 ```
-npm i @ans/sdk
+npm i @algonameservice/sdk
 ```
 
 **`yarn`**
 
 ```
-yarn add @ans/sdk
+yarn add @algonameservice/sdk
 ```
 
 ### Import
@@ -23,13 +23,13 @@ yarn add @ans/sdk
 **`ESM`** import
 
 ```
-import {AnsResolver} from '@ans/sdk'
+import {ANS} from '@algonameservice/sdk'
 ```
 
 **`CJS`** require
 
 ```
-const {AnsResolver} = require('@ans/sdk')
+const {ANS} = require('@algonameservice/sdk')
 ```
 
 ### Setup
@@ -40,7 +40,7 @@ const algodIndexer = "" // set up your algod indexer
 
 //indexer and client must point to mainnet
 
-let sdk = new AnsResolver(client, indexer)
+let sdk = new ANS(client, indexer)
 ```
 
 ## Resolve .algo name
@@ -75,12 +75,14 @@ if(text) {
 This method gets all the names owned by an Algorand address in reverse chronological order of registration.
 
 ```
-let address="" // provide an algorand wallet address here
-let getSocials = true; // get socials with .algo name
-let getMetadata = true; // get metadata like expiry, avatar with .algo name;
-let limit = 1; // number of names to be retrieved
 
-let names = await sdk.address(address).getNames(socials, metadata, limit)
+const options = {
+    socials: false, // get socials with .algo name
+    metadata: false, // // get metadata like expiry, avatar with .algo name;
+    limit: 1 // number of names to be retrieved
+}
+
+let names = await sdk.address(address).getNames(options)
 
 // Returns an array of names owned by the address
 // Names appear in a reverse chronological order (names[0] returns recently purchased name)

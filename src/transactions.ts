@@ -105,8 +105,6 @@ export class Transactions extends CachedApi {
 
     const appArgs = [];
 
-    period++;
-
     appArgs.push(toIntArray(method));
     appArgs.push(toIntArray(this.name));
     appArgs.push(algosdk.encodeUint64(period));
