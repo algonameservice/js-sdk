@@ -1,6 +1,6 @@
 import algosdk, { Transaction } from "algosdk";
 import { ALLOWED_SOCIALS, APP_ID } from "./constants.js";
-import { AddressValidationError } from "./errors.js";
+import { AddressValidationError, NameNotRegisteredError } from "./errors.js";
 import CachedApi from "./cachedApi.js";
 import { Domain, NameResponse, Record } from "./interfaces.js";
 import { b64toString } from "./util.js";
@@ -13,7 +13,7 @@ export class Resolver extends CachedApi {
   constructor(
     client: algosdk.Algodv2,
     indexer: algosdk.Indexer,
-    name?: string
+    name: string
   ) {
     super(client, indexer);
     this.rpc = client;
@@ -28,6 +28,9 @@ export class Resolver extends CachedApi {
     }
     const error: NameResponse = {
       found: false,
+      socials: [],
+      metadata: [],
+      address: 'Not Registered'
     };
 
     try {
@@ -218,7 +221,9 @@ export class Resolver extends CachedApi {
       for (let i = 0; i < txns.length; i++) {
         const txn: Transaction = txns[i];
         if (txn["tx-type" as keyof Transaction] === "appl") {
+          // @ts-ignore
           if (txn["application-transaction"]["application-id"] === APP_ID) {
+            // @ts-ignore
             const appArgs = txn["application-transaction"]["application-args"];
 
             if (
@@ -229,6 +234,7 @@ export class Resolver extends CachedApi {
                 names.push(decodedName);
               }
             } else if (b64toString(appArgs[0]) === "accept_transfer") {
+              // @ts-ignore
               const lsigAccount = txn["application-transaction"]["accounts"][0];
               let accountInfo = await this.indexer
                 .lookupAccountByID(lsigAccount)
@@ -259,19 +265,21 @@ export class Resolver extends CachedApi {
     return names;
   }
 
-  async owner(): Promise<string | undefined> {
+  async owner(): Promise<string | NameNotRegisteredError> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
+      // @ts-ignore
       return domainInformation.address;
     }
 
-    return "Not Registered";
+    // @ts-ignore
+    throw new NameNotRegisteredError(this.name);
   }
 
-  async text(key: string): Promise<string> {
+  async text(key: string): Promise<string | NameNotRegisteredError> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
-      const socialRecords: Record[] | undefined =
+      const socialRecords: Record[] | undefined  =
         domainInformation.socials?.filter(
           (social: Record) => social.key === key
         );
@@ -289,10 +297,11 @@ export class Resolver extends CachedApi {
       }
     }
 
-    return "Not Registered";
+    // @ts-ignore
+    throw new NameNotRegisteredError(this.name);
   }
 
-  async expiry(): Promise<Date | string> {
+  async expiry(): Promise<Date | NameNotRegisteredError> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       //Convert milliseconds to seconds by multiplying with 1000
@@ -305,10 +314,11 @@ export class Resolver extends CachedApi {
       );
     }
 
-    return "Not Registered";
+    // @ts-ignore
+    throw new NameNotRegisteredError(this.name);
   }
 
-  async content(): Promise<string> {
+  async content(): Promise<string | NameNotRegisteredError> {
     const domainInformation = await this.resolveName();
     if (domainInformation.found) {
       const contentRecords: Record[] = domainInformation?.metadata!.filter(
@@ -319,6 +329,8 @@ export class Resolver extends CachedApi {
       }
       return "Content field is not set";
     }
-    return "Domain not registered";
+
+    // @ts-ignore
+    throw new NameNotRegisteredError(this.name) ;
   }
 }

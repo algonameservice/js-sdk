@@ -24,7 +24,7 @@ export class NameNotRegisteredError extends Error {
   name: string;
   type: string;
   constructor(name: string) {
-    super(`Name ${name} is not registered`);
+    super(`Name ${name}.algo is not registered`);
     this.name = "NameNotRegisteredError";
     this.type = "NameNotRegisteredError";
   }

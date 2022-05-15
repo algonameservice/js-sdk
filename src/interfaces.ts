@@ -20,6 +20,9 @@ export interface DomainOptions {
 
 export interface Domain extends NameResponse {
   name: string;
+  socials?: Record[],
+  metadata?: Record[],
+  address: string;
 }
 
 export interface RegistrationTxns {

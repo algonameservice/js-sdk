@@ -31,15 +31,15 @@ export class Name {
     return status.found;
   }
 
-  async getOwner(): Promise<string | undefined> {
+  async getOwner(): Promise<string | NameNotRegisteredError> {
     return await this.resolver.owner();
   }
 
-  async getContent(): Promise<string> {
+  async getContent(): Promise<string | NameNotRegisteredError> {
     return await this.resolver.content();
   }
 
-  async getText(key: string): Promise<string> {
+  async getText(key: string): Promise<string | NameNotRegisteredError> {
     return await this.resolver.text(key);
   }
 
@@ -47,7 +47,7 @@ export class Name {
     return await this.resolver.resolveName();
   }
 
-  async getExpiry(): Promise<Date | string> {
+  async getExpiry(): Promise<Date | NameNotRegisteredError> {
     return await this.resolver.expiry();
   }
 
@@ -71,7 +71,7 @@ export class Name {
     if (receiver) {
       if (!isValidAddress(receiver)) throw new AddressValidationError();
     }
-    const owner: string = await this.getOwner();
+    const owner: string | NameNotRegisteredError = await this.getOwner();
 
     if (!(await isValidAddress(sender))) {
       throw new AddressValidationError();
