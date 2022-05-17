@@ -58,10 +58,15 @@ describe("Testing name resolution methods", function () {
 
   it("Gets the list of .algo names owned by an address", async function () {
     this.timeout(100000);
+    const options = {
+      socials: false,
+      metadata: false,
+      limit: 1
+    }
     const nameInfo = await sdk
-      .address("PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU")
-      .getNames();
-
+      .address("WYWRYK42XADLY3O62N52BOLT27DMPRA3WNBT2OBRT65N6OEZQWD4OSH6PI")
+      .getNames(options);
+    console.log(nameInfo);
     assert.isAtLeast(
       nameInfo.length,
       1,
