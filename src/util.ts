@@ -1,7 +1,5 @@
-
-export function generateTeal(name:string) {
-    
-    const tealCode = `#pragma version 4
+export function generateTeal(name: string) {
+  return `#pragma version 4
     byte "${name}"
     len
     int 3
@@ -388,8 +386,13 @@ export function generateTeal(name:string) {
     store 0
     b main_l23
     main_l31:
-    return`
+    return`;
+}
 
-    return tealCode;
+export function b64toString(data: string): string {
+  return Buffer.from(data, "base64").toString();
+}
 
+export function toIntArray(data: string): Uint8Array {
+  return new Uint8Array(Buffer.from(data));
 }

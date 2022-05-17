@@ -1,2 +1,6 @@
 node_modules/
 test/api_key.js
+src/**/*.js
+test/*.js
+types/**/*.js
+.npmignore

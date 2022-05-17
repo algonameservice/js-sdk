@@ -1,114 +1,162 @@
+import algosdk from "algosdk";
+import { describe, it, beforeEach } from "mocha";
+const { assert } = require("chai");
 
-const algosdk: any = require('algosdk');
-import {CONSTANTS} from '../src/constants.js';
-import {describe, it, before, beforeEach} from 'mocha';
-const {assert} = require('chai')
+const { ANS } = require("../src/index.js");
+const APIKEY = require("./api_key");
 
-const APP_ID = CONSTANTS.APP_ID
-let indexerClient:any, algodClient:any, resolverObj:any;
-const {ansResolver} = require('../src/index.js')
-const APIKEY = require('./api_key');
+let indexerClient: algosdk.Indexer,
+  algodClient: algosdk.Algodv2,
+  sdk: typeof ANS,
+  name;
 
-describe('Testing name resolution methods', function() {
+describe("Testing name resolution methods", function () {
+  beforeEach("Creating Client and Indexer instances", function () {
+    algodClient = new algosdk.Algodv2(
+      { "X-API-KEY": APIKEY },
+      "https://mainnet-algorand.api.purestake.io/ps2",
+      ""
+    );
 
-    beforeEach('Creating Client and Indexer instances', function(){
+    indexerClient = new algosdk.Indexer(
+      { "X-API-KEY": APIKEY },
+      "https://mainnet-algorand.api.purestake.io/idx2",
+      ""
+    );
 
-        algodClient = new algosdk.Algodv2({'X-API-KEY': APIKEY},
-        'https://mainnet-algorand.api.purestake.io/ps2', 
-        '');
+    sdk = new ANS(algodClient, indexerClient);
+  });
 
-        indexerClient = new algosdk.Indexer({'X-API-KEY': APIKEY},
-        'https://mainnet-algorand.api.purestake.io/idx2', 
-        '');
+  it("Resolves a .algo name", async function () {
+    name = sdk.name("lalith.algo");
+    const address = await name.getOwner();
+    assert.equal(
+      address,
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      "Name resolution failed"
+    );
+  });
 
-        resolverObj = new ansResolver(algodClient, indexerClient);
-    });
-    
-    it('Resolves a .algo name', async function(){
+  it("Get all information about name", async function () {
+    const information = await name.getAllInformation();
+    assert.equal(
+      information.address,
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      "Could not fetch all information"
+    );
+  });
 
-        const nameInfo = await resolverObj.resolveName('lalith.algo');
-        
-        assert.equal(nameInfo.found, true, "Error: Name does not appear to be registered");
-        assert.equal(nameInfo.address, 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU', "Error: Name does not appear to point to the right owner");
-    })
-    
-    /*
-    it('Gets the list of .algo names owned by an address', async function(){
+  it("Gets a specific text record", async function () {
+    const text = await name.getText("discord");
+    assert.equal(text, "Lalith Medury#0811", "Could not fetch text record");
+  });
 
-        this.timeout(100000);
-        const nameInfo = await resolverObj.getNamesOwnedByAddress('PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU');
-        assert.isAtLeast(nameInfo.length, 1, "Error: Doesn't retrieve the names owned by the address");
-    
-    })
-    */
-    
-    it('Prepares a list of transactions to register a name', async function(){
-        const nameRegistrationTxns = await resolverObj.prepareNameRegistrationTransactions(
-            'ans.algo',
-            'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
-            1
-            );
-        
-        assert.isAtLeast(nameRegistrationTxns.txns.length, 2, "Not returning transactions for name registration");
-    })
+  it("Gets expiry of domain", async function () {
+    const expiry = await name.getExpiry();
+    assert.notEqual(expiry, null, "Could not fetch expiry of domain");
+  });
 
-    it('Prepares a list of transactions to set properties', async function(){
-        const updatePropertyTxns = await resolverObj.prepareUpdateNamePropertyTransactions(
-            'ans.algo',
-            'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
-            {
-                'discord': 'ansdiscord',
-                'github' : 'ansgithub'
-            }
-            );
-        assert.notEqual(updatePropertyTxns[0].group, undefined, "Group is not assigned");
-        assert.notEqual(updatePropertyTxns[1].group, undefined, "Group is not assigned");
-        assert.equal(updatePropertyTxns.length, 2, "Not returning 2 transactions for updating properties");
-    })
+  it("Gets the list of .algo names owned by an address", async function () {
+    this.timeout(100000);
+    const options = {
+      socials: false,
+      metadata: false,
+      limit: 1
+    }
+    const nameInfo = await sdk
+      .address("WYWRYK42XADLY3O62N52BOLT27DMPRA3WNBT2OBRT65N6OEZQWD4OSH6PI")
+      .getNames(options);
+    console.log(nameInfo);
+    assert.isAtLeast(
+      nameInfo.length,
+      1,
+      "Error: Doesn't retrieve the names owned by the address"
+    );
+  });
 
-    it('Prepares a transaction to transfer funds', async function(){
-        const nameInfo = await resolverObj.preparePaymentTxn(
-            'RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE',
-            'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
-            1,
-            'Test Note'
-            );
-        
-        assert.equal(nameInfo["type"], "pay", "Not returning the payment transaction");
-    })
+  it("Prepares a list of transactions to register a name", async function () {
+    this.timeout(100000);
+    const nameRegistrationTxns = await sdk
+      .name("ansone.algo")
+      .register(
+        "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+        1
+      );
 
-    it('Prepares a list of transactions to renew name', async function(){
-        const nameRenewalTxns = await resolverObj.prepareNameRenewalTxns(
-                'ans.algo',
-                'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
-                2,
-                10
-            );
-        
-        assert.equal(nameRenewalTxns.length, 2, "Not returning 2 transactions for renewing name");
-    })
+    assert.isAtLeast(
+      nameRegistrationTxns.txns.length,
+      2,
+      "Not returning transactions for name registration"
+    );
+  });
 
-    it('Prepares a transaction to initiate name transfer', async function(){
-        const nameTransferTxn = await resolverObj.prepareInitiateNameTransferTransaction(
-            'lalith.algo',
-            'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
-            'RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE',
-            1
-        );
-        
-        assert.equal(nameTransferTxn["type"], "appl", "Not returning the name transfer transaction");
-    })
+  it("Prepares a list of transactions to set properties", async function () {
+    this.timeout(100000);
+    const updatePropertyTxns = await name.update(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      {
+        discord: "ansdiscord",
+        github: "ansgithub",
+      }
+    );
 
-    it('Prepares a transaction to accept name transfer', async function(){
-        const acceptNameTranserTxn = await resolverObj.prepareAcceptNameTransferTransactions(
-            'lalith.algo',
-            'RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE',
-            'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU',
-            1
-        );
-        
-        assert.equal(acceptNameTranserTxn.length, 3, "Not returning 3 transactions for accepting name");
-    })
-    
+    assert.notEqual(
+      updatePropertyTxns[0].group,
+      undefined,
+      "Group is not assigned"
+    );
+    assert.notEqual(
+      updatePropertyTxns[1].group,
+      undefined,
+      "Group is not assigned"
+    );
+    assert.equal(
+      updatePropertyTxns.length,
+      2,
+      "Not returning 2 transactions for updating properties"
+    );
+  });
 
+  it("Prepares a list of transactions to renew name", async function () {
+    this.timeout(100000);
+    const nameRenewalTxns = await name.renew(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      2
+    );
+
+    assert.equal(
+      nameRenewalTxns.length,
+      2,
+      "Not returning 2 transactions for renewing name"
+    );
+  });
+
+  it("Prepares a transaction to initiate name transfer", async function () {
+    this.timeout(100000);
+    const nameTransferTxn = await name.initTransfer(
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
+      1
+    );
+
+    assert.equal(
+      nameTransferTxn["type"],
+      "appl",
+      "Not returning the name transfer transaction"
+    );
+  });
+
+  it("Prepares a transaction to accept name transfer", async function () {
+    const acceptNameTranserTxn = await name.acceptTransfer(
+      "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
+      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      1
+    );
+
+    assert.equal(
+      acceptNameTranserTxn.length,
+      3,
+      "Not returning 3 transactions for accepting name"
+    );
+  });
 });
