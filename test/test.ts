@@ -66,7 +66,6 @@ describe("Testing name resolution methods", function () {
     const nameInfo = await sdk
       .address("WYWRYK42XADLY3O62N52BOLT27DMPRA3WNBT2OBRT65N6OEZQWD4OSH6PI")
       .getNames(options);
-    console.log(nameInfo);
     assert.isAtLeast(
       nameInfo.length,
       1,
