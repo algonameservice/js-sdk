@@ -50,8 +50,8 @@ Resolve .algo name to get the address of the owner.
 ```
 let nameInfo = await sdk.name("ans.algo").getOwner()
 
-if(nameInfo["found"]){
-    let address = nameInfo["address"];
+if(nameInfo.found){
+    let address = nameInfo.address;
 }
 else {
     //Name is not registered yet

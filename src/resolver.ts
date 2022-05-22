@@ -26,6 +26,7 @@ export class Resolver extends CachedApi {
 
   private checkName(name?: string) : string {
     if(!name){
+      // @ts-ignore
       name = this?.name.name;
     }
     if(!name) {
@@ -139,6 +140,10 @@ export class Resolver extends CachedApi {
           break;
         }
         const info: NameResponse = await this.resolveName(names[i]);
+        if(!info.found) {
+          i--;
+          continue;
+        }
         if (info.found && info.address === address) {
           const domain: Domain = {
             address: "",
@@ -154,10 +159,7 @@ export class Resolver extends CachedApi {
             domain.metadata = info.metadata;
           }
           details.push(domain);
-          continue;
-        } else if (info.found === false) {
-          i--;
-        }
+        } 
       }
       return details;
     }
@@ -300,16 +302,16 @@ export class Resolver extends CachedApi {
         );
       if (socialRecords && socialRecords.length > 0) {
         return socialRecords[0].value;
-      } else {
-        const metadataRecords = domainInformation.metadata?.filter(
-          (metadata: Record) => metadata.key === key
-        );
-        if (metadataRecords && metadataRecords.length > 0) {
-          return metadataRecords[0].value;
-        } else {
-          throw new PropertyNotSetError(key);
-        }
-      }
+      } 
+      const metadataRecords = domainInformation.metadata?.filter(
+        (metadata: Record) => metadata.key === key
+      );
+      if (metadataRecords && metadataRecords.length > 0) {
+        return metadataRecords[0].value;
+      } 
+      
+      throw new PropertyNotSetError(key);
+      
     }
 
     // @ts-ignore

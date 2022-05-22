@@ -20,7 +20,7 @@
     "typescript": "^4.6.4"
   },
   "scripts": {
-    "test": "mocha dist/esm/test/test.js",
+    "test": "mocha --trace-warnings  'test/test.ts'",
     "build": "rimraf dist && tsup && tsc",
     "clean": "rimraf dist",
     "lint": "eslint --fix src --ext .ts",
@@ -36,6 +36,7 @@
     "eslint-config-prettier": "^8.5.0",
     "mocha": "^9.2.1",
     "prettier": "^2.6.2",
+    "ts-node": "^10.8.0",
     "tsup": "^5.12.6"
   }
 }

@@ -105,12 +105,13 @@ export class Name {
     }
     if (!isValidAddress(address)) {
       throw new AddressValidationError();
-    } else {
-      return await this.transactions.prepareNameRegistrationTransactions(
-        address,
-        period
-      );
-    }
+    } 
+    
+    return await this.transactions.prepareNameRegistrationTransactions(
+      address,
+      period
+    );
+    
   }
 
   async update(address: string, editedHandles: Record): Promise<Transaction[]> {

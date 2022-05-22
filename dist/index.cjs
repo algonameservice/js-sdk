@@ -649,6 +649,10 @@ var Resolver = class extends CachedApi {
           break;
         }
         const info = await this.resolveName(names[i]);
+        if (!info.found) {
+          i--;
+          continue;
+        }
         if (info.found && info.address === address) {
           const domain = {
             address: "",
@@ -664,9 +668,6 @@ var Resolver = class extends CachedApi {
             domain.metadata = info.metadata;
           }
           details.push(domain);
-          continue;
-        } else if (info.found === false) {
-          i--;
         }
       }
       return details;

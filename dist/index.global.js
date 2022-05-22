@@ -37343,6 +37343,10 @@
             break;
           }
           const info = await this.resolveName(names[i]);
+          if (!info.found) {
+            i--;
+            continue;
+          }
           if (info.found && info.address === address) {
             const domain = {
               address: "",
@@ -37358,9 +37362,6 @@
               domain.metadata = info.metadata;
             }
             details.push(domain);
-            continue;
-          } else if (info.found === false) {
-            i--;
           }
         }
         return details;

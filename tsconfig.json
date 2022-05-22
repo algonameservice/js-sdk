@@ -5,7 +5,7 @@
     "module": "esnext",
     "target": "esnext",
     "esModuleInterop": true,
-    "sourceMap": false,
+    "sourceMap": true,
     "outDir": "dist/esm",
     "typeRoots": ["node_modules/@types"],
     "moduleResolution": "node",
@@ -14,5 +14,5 @@
     "emitDeclarationOnly": false,
     "allowJs": true
   },
-  "include": ["src", "test"]
+  "include": ["src"]
 }
