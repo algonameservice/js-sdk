@@ -1,6 +1,6 @@
 import algosdk from "algosdk";
 import { ALLOWED_SOCIALS, APP_ID } from "./constants.js";
-import { AddressValidationError, NameNotRegisteredError, PropertyNotSetError } from "./errors.js";
+import { AddressValidationError, NameNotRegisteredError, PropertyNotSetError, } from "./errors.js";
 import CachedApi from "./cachedApi.js";
 import { b64toString } from "./util.js";
 export class Resolver extends CachedApi {

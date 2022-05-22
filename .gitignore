@@ -4,3 +4,4 @@ src/**/*.js
 test/*.js
 types/**/*.js
 .npmignore
+api_key.txt

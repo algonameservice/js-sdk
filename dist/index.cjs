@@ -27,7 +27,9 @@ __export(src_exports, {
   IncorrectOwnerError: () => IncorrectOwnerError,
   InvalidNameError: () => InvalidNameError,
   NameNotRegisteredError: () => NameNotRegisteredError,
-  PropertyNotSetError: () => PropertyNotSetError
+  PropertyNotSetError: () => PropertyNotSetError,
+  Resolver: () => Resolver,
+  Transactions: () => Transactions
 });
 module.exports = __toCommonJS(src_exports);
 
@@ -1061,6 +1063,8 @@ var ANS = class extends CachedApi {
   IncorrectOwnerError,
   InvalidNameError,
   NameNotRegisteredError,
-  PropertyNotSetError
+  PropertyNotSetError,
+  Resolver,
+  Transactions
 });
 //# sourceMappingURL=index.cjs.map

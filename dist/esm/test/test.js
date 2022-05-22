@@ -1,7 +1,7 @@
 import algosdk from "algosdk";
 import { describe, it, beforeEach } from "mocha";
 import { assert } from "chai";
-import { ANS } from '../src/index.js';
+import { ANS } from "../src/index.js";
 import API_KEY from "./api_key.js";
 let indexerClient, algodClient, sdk, name;
 describe("Testing name resolution methods", function () {
@@ -32,7 +32,7 @@ describe("Testing name resolution methods", function () {
         const options = {
             socials: false,
             metadata: false,
-            limit: 1
+            limit: 1,
         };
         const nameInfo = await sdk
             .address("WYWRYK42XADLY3O62N52BOLT27DMPRA3WNBT2OBRT65N6OEZQWD4OSH6PI")
