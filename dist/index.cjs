@@ -22,14 +22,14 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
-  ANS: () => ANS,
   AddressValidationError: () => AddressValidationError,
   IncorrectOwnerError: () => IncorrectOwnerError,
   InvalidNameError: () => InvalidNameError,
   NameNotRegisteredError: () => NameNotRegisteredError,
   PropertyNotSetError: () => PropertyNotSetError,
   Resolver: () => Resolver,
-  Transactions: () => Transactions
+  Transactions: () => Transactions,
+  default: () => ANS
 });
 module.exports = __toCommonJS(src_exports);
 
@@ -113,11 +113,10 @@ function isValidAddress(address) {
 }
 function normalizeName(name) {
   const tld = name.split(".").pop();
-  if (ALLOWED_TLDS.includes(tld)) {
-    name = name.split(".")[0].toLowerCase();
-  } else {
+  if (!ALLOWED_TLDS.includes(tld)) {
     throw new Error("TLD not supported");
   }
+  name = name.split(".")[0].toLowerCase();
   const lengthOfName = name.length;
   if (lengthOfName > 64) {
     throw new InvalidNameError();
@@ -769,14 +768,12 @@ var Resolver = class extends CachedApi {
       const socialRecords = (_a = domainInformation.socials) == null ? void 0 : _a.filter((social) => social.key === key);
       if (socialRecords && socialRecords.length > 0) {
         return socialRecords[0].value;
-      } else {
-        const metadataRecords = (_b = domainInformation.metadata) == null ? void 0 : _b.filter((metadata) => metadata.key === key);
-        if (metadataRecords && metadataRecords.length > 0) {
-          return metadataRecords[0].value;
-        } else {
-          throw new PropertyNotSetError(key);
-        }
       }
+      const metadataRecords = (_b = domainInformation.metadata) == null ? void 0 : _b.filter((metadata) => metadata.key === key);
+      if (metadataRecords && metadataRecords.length > 0) {
+        return metadataRecords[0].value;
+      }
+      throw new PropertyNotSetError(key);
     }
     throw new NameNotRegisteredError(this.name.name);
   }
@@ -1005,9 +1002,8 @@ var Name = class {
     }
     if (!isValidAddress(address)) {
       throw new AddressValidationError();
-    } else {
-      return await this.transactions.prepareNameRegistrationTransactions(address, period);
     }
+    return await this.transactions.prepareNameRegistrationTransactions(address, period);
   }
   async update(address, editedHandles) {
     await this.isValidTransaction(address);
@@ -1064,7 +1060,6 @@ var ANS = class extends CachedApi {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  ANS,
   AddressValidationError,
   IncorrectOwnerError,
   InvalidNameError,

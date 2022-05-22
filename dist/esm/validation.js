@@ -6,12 +6,10 @@ export function isValidAddress(address) {
 }
 export function normalizeName(name) {
     const tld = name.split(".").pop();
-    if (ALLOWED_TLDS.includes(tld)) {
-        name = name.split(".")[0].toLowerCase();
-    }
-    else {
+    if (!ALLOWED_TLDS.includes(tld)) {
         throw new Error("TLD not supported");
     }
+    name = name.split(".")[0].toLowerCase();
     const lengthOfName = name.length;
     if (lengthOfName > 64) {
         throw new InvalidNameError();

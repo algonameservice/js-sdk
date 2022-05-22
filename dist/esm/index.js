@@ -6,7 +6,7 @@ import CachedApi from "./cachedApi.js";
 export { Resolver } from "./resolver.js";
 export { Transactions } from "./transactions.js";
 export * from "./errors.js";
-export class ANS extends CachedApi {
+export default class ANS extends CachedApi {
     name(name) {
         name = normalizeName(name);
         return new Name({

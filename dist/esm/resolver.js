@@ -245,15 +245,11 @@ export class Resolver extends CachedApi {
             if (socialRecords && socialRecords.length > 0) {
                 return socialRecords[0].value;
             }
-            else {
-                const metadataRecords = domainInformation.metadata?.filter((metadata) => metadata.key === key);
-                if (metadataRecords && metadataRecords.length > 0) {
-                    return metadataRecords[0].value;
-                }
-                else {
-                    throw new PropertyNotSetError(key);
-                }
+            const metadataRecords = domainInformation.metadata?.filter((metadata) => metadata.key === key);
+            if (metadataRecords && metadataRecords.length > 0) {
+                return metadataRecords[0].value;
             }
+            throw new PropertyNotSetError(key);
         }
         // @ts-ignore
         throw new NameNotRegisteredError(this.name.name);

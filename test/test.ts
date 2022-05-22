@@ -1,7 +1,7 @@
 import algosdk from "algosdk";
 import { describe, it, beforeEach } from "mocha";
 import { assert } from "chai";
-import { ANS } from "../src/index.js";
+import ANS from "../src/index.js";
 import API_KEY from "./api_key.js";
 
 let indexerClient: algosdk.Indexer,

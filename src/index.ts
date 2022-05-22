@@ -8,7 +8,7 @@ export { Resolver } from "./resolver.js";
 export { Transactions } from "./transactions.js";
 export * from "./errors.js";
 
-export class ANS extends CachedApi {
+export default class ANS extends CachedApi {
   name(name: string): Name {
     name = normalizeName(name);
     return new Name({
