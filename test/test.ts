@@ -1,25 +1,24 @@
 import algosdk from "algosdk";
 import { describe, it, beforeEach } from "mocha";
-const { assert } = require("chai");
-
-const { ANS } = require("../src/index.js");
-const APIKEY = require("./api_key");
+import { assert } from "chai";
+import ANS from "../src/index.js";
+import API_KEY from "./api_key.js";
 
 let indexerClient: algosdk.Indexer,
   algodClient: algosdk.Algodv2,
-  sdk: typeof ANS,
-  name;
+  sdk: ANS,
+  name: any;
 
 describe("Testing name resolution methods", function () {
   beforeEach("Creating Client and Indexer instances", function () {
     algodClient = new algosdk.Algodv2(
-      { "X-API-KEY": APIKEY },
+      { "X-API-KEY": API_KEY },
       "https://mainnet-algorand.api.purestake.io/ps2",
       ""
     );
 
     indexerClient = new algosdk.Indexer(
-      { "X-API-KEY": APIKEY },
+      { "X-API-KEY": API_KEY },
       "https://mainnet-algorand.api.purestake.io/idx2",
       ""
     );
@@ -61,8 +60,8 @@ describe("Testing name resolution methods", function () {
     const options = {
       socials: false,
       metadata: false,
-      limit: 1
-    }
+      limit: 1,
+    };
     const nameInfo = await sdk
       .address("WYWRYK42XADLY3O62N52BOLT27DMPRA3WNBT2OBRT65N6OEZQWD4OSH6PI")
       .getNames(options);

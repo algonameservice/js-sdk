@@ -23,24 +23,31 @@ yarn add @algonameservice/sdk
 **`ESM`** import
 
 ```
-import {ANS} from '@algonameservice/sdk'
+import ANS from '@algonameservice/sdk'
 ```
 
 **`CJS`** require
 
 ```
-const {ANS} = require('@algonameservice/sdk')
+const ANS = require('@algonameservice/sdk/dist/index.cjs').default
 ```
 
 ### Setup
 
 ```
-const algodClient = "" // set up your algodV2 client
-const algodIndexer = "" // set up your algod indexer
+//Example setup of client and indexer 
+
+const client = new algosdk.Algodv2({'X-API-KEY': 'xGdsgkThisDoesntWorka32sasfd'},
+        'https://mainnet-algorand.api.purestake.io/ps2', 
+        '');
+
+const indexer = new algosdk.Indexer({'X-API-KEY': 'xGdsgkThisDoesntWorksa32sasfd'},
+        'https://mainnet-algorand.api.purestake.io/idx2', 
+        '');
 
 //indexer and client must point to mainnet
 
-let sdk = new ANS(client, indexer)
+const sdk = new ANS(client, indexer)
 ```
 
 ## Resolve .algo name
@@ -48,10 +55,10 @@ let sdk = new ANS(client, indexer)
 Resolve .algo name to get the address of the owner.
 
 ```
-let nameInfo = await sdk.name("ans.algo").getOwner()
+let nameOwner = await sdk.name("ans.algo").getOwner()
 
-if(nameInfo["found"]){
-    let address = nameInfo["address"];
+if(nameOwner){
+    console.log(nameOwner);
 }
 else {
     //Name is not registered yet

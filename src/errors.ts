@@ -39,3 +39,13 @@ export class IncorrectOwnerError extends Error {
     this.type = "IncorrectOwnerError";
   }
 }
+
+export class PropertyNotSetError extends Error {
+  name: string;
+  type: string;
+  constructor(property: string) {
+    super(`Property ${property} is not set`);
+    this.name = "PropertyNotSetError";
+    this.type = "PropertyNotSetError";
+  }
+}

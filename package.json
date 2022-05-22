@@ -1,9 +1,10 @@
 {
   "name": "@algonameservice/sdk",
-  "version": "0.2.1",
+  "version": "0.3.1",
   "description": "JavaScript SDK to resolve ANS .algo names",
-  "main": "src/index.js",
-  "types": "lib",
+  "main": "dist/esm/index.js",
+  "types": "dist/esm",
+  "type": "module",
   "author": "Algorand Name Service",
   "license": "MIT",
   "keywords": [
@@ -19,14 +20,14 @@
     "typescript": "^4.6.4"
   },
   "scripts": {
-    "test": " tsc test/test.ts && mocha",
-    "build": "rimraf dist && rimraf types && tsup && tsc -p .",
+    "test": "mocha --trace-warnings  'test/test.ts'",
+    "build": "rimraf dist && tsup && tsc",
     "clean": "rimraf dist",
     "lint": "eslint --fix src --ext .ts",
-    "format": "prettier -w .",
-    "tsup-build": "tsup src/index.ts src/constants.ts src/errors.ts src/generateTeal.ts src/resolver.ts src/transactions.ts src/interfaces.ts src/validation.ts"
+    "format": "prettier -w ."
   },
   "devDependencies": {
+    "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.0",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.21.0",
@@ -35,6 +36,7 @@
     "eslint-config-prettier": "^8.5.0",
     "mocha": "^9.2.1",
     "prettier": "^2.6.2",
+    "ts-node": "^10.8.0",
     "tsup": "^5.12.6"
   }
 }

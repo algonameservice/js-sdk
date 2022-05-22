@@ -1,6 +1,10 @@
 import algosdk, { Transaction } from "algosdk";
 import { ALLOWED_SOCIALS, APP_ID } from "./constants.js";
-import { AddressValidationError, NameNotRegisteredError } from "./errors.js";
+import {
+  AddressValidationError,
+  NameNotRegisteredError,
+  PropertyNotSetError,
+} from "./errors.js";
 import CachedApi from "./cachedApi.js";
 import { Domain, NameResponse, Record } from "./interfaces.js";
 import { b64toString } from "./util.js";
@@ -20,11 +24,20 @@ export class Resolver extends CachedApi {
     this.name = name;
   }
 
-  async resolveName(name?: string): Promise<NameResponse> {
-    let found = false;
-    if (!name) {
-      name = this.name?.name;
+  private checkName(name?: string) : string {
+    if(!name){
+      // @ts-ignore
+      name = this?.name.name;
     }
+    if(!name) {
+      throw new Error('A name must be provided');
+    }
+    return name;
+  }
+
+  async resolveName(name?: string): Promise<NameResponse> {
+    name = this.checkName(name);
+    let found = false;
     const error: NameResponse = {
       found: false,
       socials: [],
@@ -127,6 +140,10 @@ export class Resolver extends CachedApi {
           break;
         }
         const info: NameResponse = await this.resolveName(names[i]);
+        if(!info.found) {
+          i--;
+          continue;
+        }
         if (info.found && info.address === address) {
           const domain: Domain = {
             address: "",
@@ -142,10 +159,7 @@ export class Resolver extends CachedApi {
             domain.metadata = info.metadata;
           }
           details.push(domain);
-          continue;
-        } else if (info.found === false) {
-          i--;
-        }
+        } 
       }
       return details;
     }
@@ -268,7 +282,7 @@ export class Resolver extends CachedApi {
     return names;
   }
 
-  async owner(): Promise<string | NameNotRegisteredError> {
+  async owner(): Promise<string> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       // @ts-ignore
@@ -279,7 +293,7 @@ export class Resolver extends CachedApi {
     throw new NameNotRegisteredError(this.name.name);
   }
 
-  async text(key: string): Promise<string | NameNotRegisteredError> {
+  async text(key: string): Promise<string> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       const socialRecords: Record[] | undefined =
@@ -288,23 +302,23 @@ export class Resolver extends CachedApi {
         );
       if (socialRecords && socialRecords.length > 0) {
         return socialRecords[0].value;
-      } else {
-        const metadataRecords = domainInformation.metadata?.filter(
-          (metadata: Record) => metadata.key === key
-        );
-        if (metadataRecords && metadataRecords.length > 0) {
-          return metadataRecords[0].value;
-        } else {
-          return "Property not set";
-        }
-      }
+      } 
+      const metadataRecords = domainInformation.metadata?.filter(
+        (metadata: Record) => metadata.key === key
+      );
+      if (metadataRecords && metadataRecords.length > 0) {
+        return metadataRecords[0].value;
+      } 
+      
+      throw new PropertyNotSetError(key);
+      
     }
 
     // @ts-ignore
     throw new NameNotRegisteredError(this.name.name);
   }
 
-  async expiry(): Promise<Date | NameNotRegisteredError> {
+  async expiry(): Promise<Date> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       //Convert milliseconds to seconds by multiplying with 1000
@@ -321,7 +335,7 @@ export class Resolver extends CachedApi {
     throw new NameNotRegisteredError(this.name.name);
   }
 
-  async content(): Promise<string | NameNotRegisteredError> {
+  async content(): Promise<string> {
     const domainInformation = await this.resolveName();
     if (domainInformation.found) {
       const contentRecords: Record[] = domainInformation?.metadata!.filter(
