@@ -18,4 +18,9 @@ export declare class IncorrectOwnerError extends Error {
     type: string;
     constructor(name: string, address: string);
 }
+export declare class PropertyNotSetError extends Error {
+    name: string;
+    type: string;
+    constructor(property: string);
+}
 //# sourceMappingURL=errors.d.ts.map

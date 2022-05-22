@@ -3,6 +3,7 @@
   "version": "0.2.1",
   "description": "JavaScript SDK to resolve ANS .algo names",
   "main": "dist/esm/index.js",
+  "types": "dist/esm",
   "type": "module",
   "author": "Algorand Name Service",
   "license": "MIT",
@@ -19,13 +20,14 @@
     "typescript": "^4.6.4"
   },
   "scripts": {
-    "test": " tsc test/test.ts && mocha",
-    "build": "tsup && tsc",
+    "test": "mocha dist/esm/test/test.js",
+    "build": "rimraf dist && tsup && tsc",
     "clean": "rimraf dist",
     "lint": "eslint --fix src --ext .ts",
     "format": "prettier -w ."
   },
   "devDependencies": {
+    "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.0",
     "@typescript-eslint/eslint-plugin": "^5.21.0",
     "@typescript-eslint/parser": "^5.21.0",

@@ -2,12 +2,12 @@ import algosdk from "algosdk";
 import { describe, it, beforeEach } from "mocha";
 import { assert } from "chai";
 import { ANS } from '../src/index.js';
-import API_KEY from "./api_key";
+import API_KEY from "./api_key.js";
 
 let indexerClient: algosdk.Indexer,
   algodClient: algosdk.Algodv2,
-  sdk: typeof ANS,
-  name;
+  sdk: ANS,
+  name: any;
 
 describe("Testing name resolution methods", function () {
   beforeEach("Creating Client and Indexer instances", function () {
