@@ -24,11 +24,19 @@ export class Resolver extends CachedApi {
     this.name = name;
   }
 
-  async resolveName(name?: string): Promise<NameResponse> {
-    let found = false;
-    if (!name) {
-      name = this.name?.name;
+  private checkName(name?: string) : string {
+    if(!name){
+      name = this?.name.name;
     }
+    if(!name) {
+      throw new Error('A name must be provided');
+    }
+    return name;
+  }
+
+  async resolveName(name?: string): Promise<NameResponse> {
+    name = this.checkName(name);
+    let found = false;
     const error: NameResponse = {
       found: false,
       socials: [],
@@ -272,7 +280,7 @@ export class Resolver extends CachedApi {
     return names;
   }
 
-  async owner(): Promise<string | NameNotRegisteredError> {
+  async owner(): Promise<string> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       // @ts-ignore
@@ -283,7 +291,7 @@ export class Resolver extends CachedApi {
     throw new NameNotRegisteredError(this.name.name);
   }
 
-  async text(key: string): Promise<string | NameNotRegisteredError> {
+  async text(key: string): Promise<string> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       const socialRecords: Record[] | undefined =
@@ -308,7 +316,7 @@ export class Resolver extends CachedApi {
     throw new NameNotRegisteredError(this.name.name);
   }
 
-  async expiry(): Promise<Date | NameNotRegisteredError> {
+  async expiry(): Promise<Date> {
     const domainInformation: NameResponse = await this.resolveName();
     if (domainInformation.found) {
       //Convert milliseconds to seconds by multiplying with 1000
@@ -325,7 +333,7 @@ export class Resolver extends CachedApi {
     throw new NameNotRegisteredError(this.name.name);
   }
 
-  async content(): Promise<string | NameNotRegisteredError> {
+  async content(): Promise<string> {
     const domainInformation = await this.resolveName();
     if (domainInformation.found) {
       const contentRecords: Record[] = domainInformation?.metadata!.filter(

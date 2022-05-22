@@ -36,15 +36,15 @@ export class Name {
     return status.found;
   }
 
-  async getOwner(): Promise<string | NameNotRegisteredError> {
+  async getOwner(): Promise<string> {
     return await this.resolver.owner();
   }
 
-  async getContent(): Promise<string | NameNotRegisteredError> {
+  async getContent(): Promise<string> {
     return await this.resolver.content();
   }
 
-  async getText(key: string): Promise<string | NameNotRegisteredError> {
+  async getText(key: string): Promise<string> {
     return await this.resolver.text(key);
   }
 
@@ -52,7 +52,7 @@ export class Name {
     return await this.resolver.resolveName();
   }
 
-  async getExpiry(): Promise<Date | NameNotRegisteredError> {
+  async getExpiry(): Promise<Date> {
     return await this.resolver.expiry();
   }
 

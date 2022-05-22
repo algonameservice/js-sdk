@@ -565,12 +565,19 @@ var Resolver = class extends CachedApi {
     this.indexer = indexer;
     this.name = name;
   }
-  async resolveName(name) {
-    var _a, _b;
-    let found = false;
+  checkName(name) {
     if (!name) {
-      name = (_a = this.name) == null ? void 0 : _a.name;
+      name = this == null ? void 0 : this.name.name;
     }
+    if (!name) {
+      throw new Error("A name must be provided");
+    }
+    return name;
+  }
+  async resolveName(name) {
+    var _a;
+    name = this.checkName(name);
+    let found = false;
     const error = {
       found: false,
       socials: [],
@@ -578,7 +585,7 @@ var Resolver = class extends CachedApi {
       address: "Not Registered"
     };
     try {
-      if (!this.resolvedData || name !== ((_b = this.name) == null ? void 0 : _b.name)) {
+      if (!this.resolvedData || name !== ((_a = this.name) == null ? void 0 : _a.name)) {
         this.resolvedData = await this.indexer.lookupAccountByID((await this.getTeal(name)).address()).do();
       }
       let accountInfo = this.resolvedData;
@@ -805,15 +812,13 @@ var Transactions = class extends CachedApi {
     }
   }
   calculatePrice(period) {
-    let amount = 0;
-    if (this.name.length === 3) {
-      amount = REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
-    } else if (this.name.length === 4) {
-      amount = REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
-    } else if (this.name.length >= 5) {
-      amount = REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
-    }
-    return amount;
+    const amounts = {
+      3: REGISTRATION_PRICE.CHAR_3_AMOUNT,
+      4: REGISTRATION_PRICE.CHAR_4_AMOUNT,
+      5: REGISTRATION_PRICE.CHAR_5_AMOUNT
+    };
+    const len = this.name.length >= 5 ? 5 : this.name.length;
+    return amounts[len] * period;
   }
   async prepareNameRegistrationTransactions(address, period) {
     const algodClient = this.rpc;

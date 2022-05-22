@@ -13,11 +13,18 @@ export class Resolver extends CachedApi {
         this.indexer = indexer;
         this.name = name;
     }
-    async resolveName(name) {
-        let found = false;
+    checkName(name) {
         if (!name) {
-            name = this.name?.name;
+            name = this?.name.name;
         }
+        if (!name) {
+            throw new Error('A name must be provided');
+        }
+        return name;
+    }
+    async resolveName(name) {
+        name = this.checkName(name);
+        let found = false;
         const error = {
             found: false,
             socials: [],

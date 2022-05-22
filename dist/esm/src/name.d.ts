@@ -9,11 +9,11 @@ export declare class Name {
     constructor(options: NameConstructor);
     get name(): string;
     isRegistered(): Promise<boolean>;
-    getOwner(): Promise<string | NameNotRegisteredError>;
-    getContent(): Promise<string | NameNotRegisteredError>;
-    getText(key: string): Promise<string | NameNotRegisteredError>;
+    getOwner(): Promise<string>;
+    getContent(): Promise<string>;
+    getText(key: string): Promise<string>;
     getAllInformation(): Promise<NameResponse>;
-    getExpiry(): Promise<Date | NameNotRegisteredError>;
+    getExpiry(): Promise<Date>;
     isValidTransaction(sender: string, receiver?: string, method?: string): Promise<boolean | IncorrectOwnerError | InvalidNameError | AddressValidationError | NameNotRegisteredError>;
     register(address: string, period: number): Promise<RegistrationTxns>;
     update(address: string, editedHandles: Record): Promise<Transaction[]>;

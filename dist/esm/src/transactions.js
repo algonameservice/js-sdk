@@ -15,17 +15,13 @@ export class Transactions extends CachedApi {
         }
     }
     calculatePrice(period) {
-        let amount = 0;
-        if (this.name.length === 3) {
-            amount = REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
-        }
-        else if (this.name.length === 4) {
-            amount = REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
-        }
-        else if (this.name.length >= 5) {
-            amount = REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
-        }
-        return amount;
+        const amounts = {
+            3: REGISTRATION_PRICE.CHAR_3_AMOUNT,
+            4: REGISTRATION_PRICE.CHAR_4_AMOUNT,
+            5: REGISTRATION_PRICE.CHAR_5_AMOUNT,
+        };
+        const len = this.name.length >= 5 ? 5 : this.name.length;
+        return amounts[len] * period;
     }
     async prepareNameRegistrationTransactions(address, period) {
         const algodClient = this.rpc;
