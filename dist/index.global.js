@@ -64,21 +64,25 @@
   var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
   // src/errors.js
-  var require_errors = __commonJS({
-    "src/errors.js"(exports2) {
+  var errors_exports = {};
+  var __extends, AddressValidationError, InvalidNameError, NameNotRegisteredError, IncorrectOwnerError;
+  var init_errors = __esm({
+    "src/errors.js"() {
       "use strict";
-      var __extends = exports2 && exports2.__extends || function() {
+      __extends = function() {
         var extendStatics = function(d, b) {
           extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
             d2.__proto__ = b2;
           } || function(d2, b2) {
             for (var p in b2)
-              if (b2.hasOwnProperty(p))
+              if (Object.prototype.hasOwnProperty.call(b2, p))
                 d2[p] = b2[p];
           };
           return extendStatics(d, b);
         };
         return function(d, b) {
+          if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
           extendStatics(d, b);
           function __() {
             this.constructor = d;
@@ -86,8 +90,9 @@
           d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
       }();
-      exports2.__esModule = true;
-      var AddressValidationError2 = function(_super) {
+      exports.__esModule = true;
+      exports.IncorrectOwnerError = exports.NameNotRegisteredError = exports.InvalidNameError = exports.AddressValidationError = void 0;
+      AddressValidationError = function(_super) {
         __extends(AddressValidationError3, _super);
         function AddressValidationError3() {
           var _this = _super.call(this, "This is not a valid Algorand address") || this;
@@ -97,8 +102,8 @@
         }
         return AddressValidationError3;
       }(Error);
-      exports2.AddressValidationError = AddressValidationError2;
-      var InvalidNameError = function(_super) {
+      exports.AddressValidationError = AddressValidationError;
+      InvalidNameError = function(_super) {
         __extends(InvalidNameError2, _super);
         function InvalidNameError2() {
           var _this = _super.call(this, "The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters") || this;
@@ -108,29 +113,29 @@
         }
         return InvalidNameError2;
       }(Error);
-      exports2.InvalidNameError = InvalidNameError;
-      var NameNotRegisteredError = function(_super) {
+      exports.InvalidNameError = InvalidNameError;
+      NameNotRegisteredError = function(_super) {
         __extends(NameNotRegisteredError2, _super);
         function NameNotRegisteredError2(name) {
-          var _this = _super.call(this, "Name " + name + ".algo is not registered") || this;
+          var _this = _super.call(this, "Name ".concat(name, ".algo is not registered")) || this;
           _this.name = "NameNotRegisteredError";
           _this.type = "NameNotRegisteredError";
           return _this;
         }
         return NameNotRegisteredError2;
       }(Error);
-      exports2.NameNotRegisteredError = NameNotRegisteredError;
-      var IncorrectOwnerError = function(_super) {
+      exports.NameNotRegisteredError = NameNotRegisteredError;
+      IncorrectOwnerError = function(_super) {
         __extends(IncorrectOwnerError2, _super);
         function IncorrectOwnerError2(name, address) {
-          var _this = _super.call(this, "Name " + name + ".algo is not owned by " + address) || this;
+          var _this = _super.call(this, "Name ".concat(name, ".algo is not owned by ").concat(address)) || this;
           _this.name = "IncorrectOwnerError";
           _this.type = "IncorrectOwnerError";
           return _this;
         }
         return IncorrectOwnerError2;
       }(Error);
-      exports2.IncorrectOwnerError = IncorrectOwnerError;
+      exports.IncorrectOwnerError = IncorrectOwnerError;
     }
   });
 
@@ -37148,25 +37153,27 @@
   });
 
   // src/constants.js
-  var require_constants2 = __commonJS({
-    "src/constants.js"(exports2) {
+  var constants_exports = {};
+  var init_constants = __esm({
+    "src/constants.js"() {
       "use strict";
-      exports2.__esModule = true;
-      exports2.APP_ID = 628095415;
-      exports2.REGISTRATION_PRICE = {
+      exports.__esModule = true;
+      exports.ALLOWED_TLDS = exports.ALLOWED_SOCIALS = exports.ASCII_CODES = exports.IPFS_LINK = exports.TRANSFER_FEE = exports.REGISTRATION_PRICE = exports.APP_ID = void 0;
+      exports.APP_ID = 628095415;
+      exports.REGISTRATION_PRICE = {
         CHAR_3_AMOUNT: 15e7,
         CHAR_4_AMOUNT: 5e7,
         CHAR_5_AMOUNT: 5e6
       };
-      exports2.TRANSFER_FEE = 2e6;
-      exports2.IPFS_LINK = "https://ipfs.infura.io/ipfs/";
-      exports2.ASCII_CODES = {
+      exports.TRANSFER_FEE = 2e6;
+      exports.IPFS_LINK = "https://ipfs.infura.io/ipfs/";
+      exports.ASCII_CODES = {
         ASCII_A: 97,
         ASCII_Z: 122,
         ASCII_0: 48,
         ASCII_9: 57
       };
-      exports2.ALLOWED_SOCIALS = [
+      exports.ALLOWED_SOCIALS = [
         "github",
         "twitter",
         "telegram",
@@ -37174,70 +37181,77 @@
         "reddit",
         "discord"
       ];
-      exports2.ALLOWED_TLDS = ["algo"];
+      exports.ALLOWED_TLDS = ["algo"];
     }
   });
 
   // src/validation.js
-  var require_validation = __commonJS({
-    "src/validation.js"(exports2) {
-      "use strict";
-      exports2.__esModule = true;
-      var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
-      var constants_js_1 = require_constants2();
-      var errors_js_1 = require_errors();
-      function isValidAddress3(address) {
-        return algosdk_1["default"].isValidAddress(address);
-      }
-      exports2.isValidAddress = isValidAddress3;
-      function normalizeName2(name) {
-        var tld = name.split(".").pop();
-        if (constants_js_1.ALLOWED_TLDS.includes(tld)) {
-          name = name.split(".")[0].toLowerCase();
-        } else {
-          throw new Error("TLD not supported");
-        }
-        var lengthOfName = name.length;
-        if (lengthOfName > 64) {
+  var validation_exports = {};
+  function isValidAddress2(address) {
+    return algosdk_1["default"].isValidAddress(address);
+  }
+  function normalizeName(name) {
+    var tld = name.split(".").pop();
+    if (constants_js_1.ALLOWED_TLDS.includes(tld)) {
+      name = name.split(".")[0].toLowerCase();
+    } else {
+      throw new Error("TLD not supported");
+    }
+    var lengthOfName = name.length;
+    if (lengthOfName > 64) {
+      throw new errors_js_1.InvalidNameError();
+    }
+    for (var i = 0; i < lengthOfName; i++) {
+      if (!(name.charCodeAt(i) >= constants_js_1.ASCII_CODES.ASCII_0 && name.charCodeAt(i) <= constants_js_1.ASCII_CODES.ASCII_9)) {
+        if (!(name.charCodeAt(i) >= constants_js_1.ASCII_CODES.ASCII_A && name.charCodeAt(i) <= constants_js_1.ASCII_CODES.ASCII_Z))
           throw new errors_js_1.InvalidNameError();
-        }
-        for (var i = 0; i < lengthOfName; i++) {
-          if (!(name.charCodeAt(i) >= constants_js_1.ASCII_CODES.ASCII_0 && name.charCodeAt(i) <= constants_js_1.ASCII_CODES.ASCII_9)) {
-            if (!(name.charCodeAt(i) >= constants_js_1.ASCII_CODES.ASCII_A && name.charCodeAt(i) <= constants_js_1.ASCII_CODES.ASCII_Z))
-              throw new errors_js_1.InvalidNameError();
-          }
-        }
-        return name;
       }
-      exports2.normalizeName = normalizeName2;
+    }
+    return name;
+  }
+  var algosdk_1, constants_js_1, errors_js_1;
+  var init_validation = __esm({
+    "src/validation.js"() {
+      "use strict";
+      exports.__esModule = true;
+      exports.normalizeName = exports.isValidAddress = void 0;
+      algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
+      constants_js_1 = (init_constants(), __toCommonJS(constants_exports));
+      errors_js_1 = (init_errors(), __toCommonJS(errors_exports));
+      exports.isValidAddress = isValidAddress2;
+      exports.normalizeName = normalizeName;
     }
   });
 
   // src/util.js
-  var require_util = __commonJS({
-    "src/util.js"(exports2) {
+  var util_exports = {};
+  function generateTeal(name) {
+    return '#pragma version 4\n    byte "'.concat(name, '"\n    len\n    int 3\n    ==\n    bnz main_l22\n    byte "').concat(name, '"\n    len\n    int 4\n    ==\n    bnz main_l13\n    byte "').concat(name, '"\n    len\n    int 5\n    >=\n    bnz main_l4\n    err\n    main_l4:\n    gtxn 0 Amount\n    int 5000000\n    >=\n    assert\n    byte "').concat(name, '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l5:\n    load 0\n    byte "').concat(name, '"\n    len\n    <\n    bnz main_l12\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l11\n    global GroupSize\n    int 4\n    ==\n    bnz main_l10\n    int 0\n    return\n    main_l9:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l10:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "').concat(name, '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l11:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "').concat(name, '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l12:\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l5\n    main_l13:\n    gtxn 0 Amount\n    int 50000000\n    >=\n    assert\n    byte "').concat(name, '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l14:\n    load 0\n    byte "').concat(name, '"\n    len\n    <\n    bnz main_l21\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l20\n    global GroupSize\n    int 4\n    ==\n    bnz main_l19\n    int 0\n    return\n    main_l18:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l19:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "').concat(name, '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l20:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "').concat(name, '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l21:\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l14\n    main_l22:\n    gtxn 0 Amount\n    int 150000000\n    >=\n    assert\n    byte "').concat(name, '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l23:\n    load 0\n    byte "').concat(name, '"\n    len\n    <\n    bnz main_l30\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l29\n    global GroupSize\n    int 4\n    ==\n    bnz main_l28\n    int 0\n    return\n    main_l27:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l28:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "').concat(name, '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l29:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "').concat(name, '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l30:\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "').concat(name, '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l23\n    main_l31:\n    return');
+  }
+  function b64toString(data) {
+    return Buffer.from(data, "base64").toString();
+  }
+  function toIntArray(data) {
+    return new Uint8Array(Buffer.from(data));
+  }
+  var init_util = __esm({
+    "src/util.js"() {
       "use strict";
-      exports2.__esModule = true;
-      function generateTeal(name) {
-        return '#pragma version 4\n    byte "' + name + '"\n    len\n    int 3\n    ==\n    bnz main_l22\n    byte "' + name + '"\n    len\n    int 4\n    ==\n    bnz main_l13\n    byte "' + name + '"\n    len\n    int 5\n    >=\n    bnz main_l4\n    err\n    main_l4:\n    gtxn 0 Amount\n    int 5000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l5:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l12\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l11\n    global GroupSize\n    int 4\n    ==\n    bnz main_l10\n    int 0\n    return\n    main_l9:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l10:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l11:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l9\n    main_l12:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l5\n    main_l13:\n    gtxn 0 Amount\n    int 50000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l14:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l21\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l20\n    global GroupSize\n    int 4\n    ==\n    bnz main_l19\n    int 0\n    return\n    main_l18:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l19:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l20:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l18\n    main_l21:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l14\n    main_l22:\n    gtxn 0 Amount\n    int 150000000\n    >=\n    assert\n    byte "' + name + '"\n    len\n    int 64\n    <=\n    assert\n    int 0\n    store 0\n    main_l23:\n    load 0\n    byte "' + name + '"\n    len\n    <\n    bnz main_l30\n    global GroupSize\n    int 2\n    ==\n    global GroupSize\n    int 4\n    ==\n    ||\n    assert\n    gtxn 0 Sender\n    gtxn 1 Sender\n    ==\n    assert\n    gtxn 0 Receiver\n    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4\n    ==\n    assert\n    global GroupSize\n    int 2\n    ==\n    bnz main_l29\n    global GroupSize\n    int 4\n    ==\n    bnz main_l28\n    int 0\n    return\n    main_l27:\n    int 1\n    assert\n    int 1\n    b main_l31\n    main_l28:\n    gtxn 1 Receiver\n    gtxn 2 Sender\n    ==\n    gtxn 2 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 2 OnCompletion\n    int OptIn\n    ==\n    &&\n    gtxn 3 ApplicationID\n    int 628095415\n    ==\n    &&\n    gtxn 3 Sender\n    gtxn 0 Sender\n    ==\n    &&\n    gtxna 3 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 3 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l29:\n    gtxn 1 ApplicationID\n    int 628095415\n    ==\n    gtxna 1 ApplicationArgs 0\n    byte "register_name"\n    ==\n    &&\n    gtxna 1 ApplicationArgs 1\n    byte "' + name + '"\n    ==\n    &&\n    assert\n    b main_l27\n    main_l30:\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 97\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 122\n    <=\n    &&\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 48\n    >=\n    byte "' + name + '"\n    load 0\n    getbyte\n    int 57\n    <=\n    &&\n    ||\n    assert\n    load 0\n    int 1\n    +\n    store 0\n    b main_l23\n    main_l31:\n    return';
-      }
-      exports2.generateTeal = generateTeal;
-      function b64toString(data) {
-        return Buffer.from(data, "base64").toString();
-      }
-      exports2.b64toString = b64toString;
-      function toIntArray(data) {
-        return new Uint8Array(Buffer.from(data));
-      }
-      exports2.toIntArray = toIntArray;
+      exports.__esModule = true;
+      exports.toIntArray = exports.b64toString = exports.generateTeal = void 0;
+      exports.generateTeal = generateTeal;
+      exports.b64toString = b64toString;
+      exports.toIntArray = toIntArray;
     }
   });
 
   // src/cachedApi.js
-  var require_cachedApi = __commonJS({
-    "src/cachedApi.js"(exports2) {
+  var cachedApi_exports = {};
+  var __awaiter, __generator, algosdk_12, util_js_1, CachedApi;
+  var init_cachedApi = __esm({
+    "src/cachedApi.js"() {
       "use strict";
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      __awaiter = function(thisArg, _arguments, P, generator) {
         function adopt(value) {
           return value instanceof P ? value : new P(function(resolve) {
             resolve(value);
@@ -37264,18 +37278,13 @@
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
       };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+      __generator = function(thisArg, body) {
+        var _ = { label: 0, sent: function() {
+          if (t[0] & 1)
+            throw t[1];
+          return t[1];
+        }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
           return this;
         }), g;
         function verb(n) {
@@ -37345,10 +37354,10 @@
           return { value: op[0] ? op[1] : void 0, done: true };
         }
       };
-      exports2.__esModule = true;
-      var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
-      var util_js_1 = require_util();
-      var CachedApi2 = function() {
+      exports.__esModule = true;
+      algosdk_12 = (init_esm(), __toCommonJS(esm_exports));
+      util_js_1 = (init_util(), __toCommonJS(util_exports));
+      CachedApi = function() {
         function CachedApi3(client, indexer) {
           this.cache = {};
           this.rpc = client;
@@ -37363,14 +37372,11 @@
                   if (name in this.cache) {
                     return [2, this.cache[name]];
                   }
-                  return [
-                    4,
-                    this.rpc.compile(util_js_1.generateTeal(name))["do"]()
-                  ];
+                  return [4, this.rpc.compile((0, util_js_1.generateTeal)(name))["do"]()];
                 case 1:
                   program = _a.sent();
                   program = new Uint8Array(Buffer.from(program.result, "base64"));
-                  this.cache[name] = new algosdk_1["default"].LogicSigAccount(program);
+                  this.cache[name] = new algosdk_12["default"].LogicSigAccount(program);
                   return [2, this.cache[name]];
               }
             });
@@ -37378,26 +37384,30 @@
         };
         return CachedApi3;
       }();
-      exports2["default"] = CachedApi2;
+      exports["default"] = CachedApi;
     }
   });
 
   // src/resolver.js
-  var require_resolver = __commonJS({
-    "src/resolver.js"(exports2) {
+  var resolver_exports = {};
+  var __extends2, __awaiter2, __generator2, algosdk_13, constants_js_12, errors_js_12, cachedApi_js_1, util_js_12, Resolver;
+  var init_resolver = __esm({
+    "src/resolver.js"() {
       "use strict";
-      var __extends = exports2 && exports2.__extends || function() {
+      __extends2 = function() {
         var extendStatics = function(d, b) {
           extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
             d2.__proto__ = b2;
           } || function(d2, b2) {
             for (var p in b2)
-              if (b2.hasOwnProperty(p))
+              if (Object.prototype.hasOwnProperty.call(b2, p))
                 d2[p] = b2[p];
           };
           return extendStatics(d, b);
         };
         return function(d, b) {
+          if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
           extendStatics(d, b);
           function __() {
             this.constructor = d;
@@ -37405,7 +37415,7 @@
           d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
       }();
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      __awaiter2 = function(thisArg, _arguments, P, generator) {
         function adopt(value) {
           return value instanceof P ? value : new P(function(resolve) {
             resolve(value);
@@ -37432,18 +37442,13 @@
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
       };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+      __generator2 = function(thisArg, body) {
+        var _ = { label: 0, sent: function() {
+          if (t[0] & 1)
+            throw t[1];
+          return t[1];
+        }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
           return this;
         }), g;
         function verb(n) {
@@ -37513,14 +37518,15 @@
           return { value: op[0] ? op[1] : void 0, done: true };
         }
       };
-      exports2.__esModule = true;
-      var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
-      var constants_js_1 = require_constants2();
-      var errors_js_1 = require_errors();
-      var cachedApi_js_1 = require_cachedApi();
-      var util_js_1 = require_util();
-      var Resolver = function(_super) {
-        __extends(Resolver2, _super);
+      exports.__esModule = true;
+      exports.Resolver = void 0;
+      algosdk_13 = (init_esm(), __toCommonJS(esm_exports));
+      constants_js_12 = (init_constants(), __toCommonJS(constants_exports));
+      errors_js_12 = (init_errors(), __toCommonJS(errors_exports));
+      cachedApi_js_1 = (init_cachedApi(), __toCommonJS(cachedApi_exports));
+      util_js_12 = (init_util(), __toCommonJS(util_exports));
+      Resolver = function(_super) {
+        __extends2(Resolver2, _super);
         function Resolver2(client, indexer, name) {
           var _this = _super.call(this, client, indexer) || this;
           _this.rpc = client;
@@ -37530,9 +37536,9 @@
         }
         Resolver2.prototype.resolveName = function(name) {
           var _a, _b;
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter2(this, void 0, void 0, function() {
             var found, error, _c, _d, _e, accountInfo, length_1, address, socials, metadata, i, app, kv, decodedKvPairs, err_1;
-            return __generator(this, function(_f) {
+            return __generator2(this, function(_f) {
               switch (_f.label) {
                 case 0:
                   found = false;
@@ -37566,7 +37572,7 @@
                   socials = [], metadata = [];
                   for (i = 0; i < length_1; i++) {
                     app = accountInfo[i];
-                    if (app.id === constants_js_1.APP_ID) {
+                    if (app.id === constants_js_12.APP_ID) {
                       kv = app["key-value"];
                       decodedKvPairs = this.decodeKvPairs(kv);
                       socials = this.filterKvPairs(decodedKvPairs, "socials");
@@ -37578,15 +37584,12 @@
                     }
                   }
                   if (found) {
-                    return [
-                      2,
-                      {
-                        found,
-                        address,
-                        socials,
-                        metadata
-                      }
-                    ];
+                    return [2, {
+                      found,
+                      address,
+                      socials,
+                      metadata
+                    }];
                   }
                   return [2, error];
                 case 5:
@@ -37608,15 +37611,15 @@
           if (limit === void 0) {
             limit = 10;
           }
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter2(this, void 0, void 0, function() {
             var nextToken, txnLength, txns, info, err_2, accountTxns, i, names, details, i, info, domain;
-            return __generator(this, function(_a) {
+            return __generator2(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  return [4, algosdk_1["default"].isValidAddress(address)];
+                  return [4, algosdk_13["default"].isValidAddress(address)];
                 case 1:
                   if (!_a.sent()) {
-                    throw new errors_js_1.AddressValidationError();
+                    throw new errors_js_12.AddressValidationError();
                   }
                   nextToken = "";
                   txnLength = 1;
@@ -37628,10 +37631,7 @@
                   _a.label = 3;
                 case 3:
                   _a.trys.push([3, 5, , 6]);
-                  return [
-                    4,
-                    this.indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(constants_js_1.APP_ID).nextToken(nextToken)["do"]()
-                  ];
+                  return [4, this.indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(constants_js_12.APP_ID).nextToken(nextToken)["do"]()];
                 case 4:
                   info = _a.sent();
                   txnLength = info.transactions.length;
@@ -37707,7 +37707,7 @@
               key,
               value
             };
-            if (constants_js_1.ALLOWED_SOCIALS.includes(key)) {
+            if (constants_js_12.ALLOWED_SOCIALS.includes(key)) {
               socials.push(kvObj);
               continue;
             }
@@ -37732,7 +37732,7 @@
             key = Buffer.from(key, "base64").toString();
             decodedKvPair.key = key;
             if (key === "owner") {
-              decodedKvPair.value = algosdk_1["default"].encodeAddress(new Uint8Array(Buffer.from(value.bytes, "base64")));
+              decodedKvPair.value = algosdk_13["default"].encodeAddress(new Uint8Array(Buffer.from(value.bytes, "base64")));
               return decodedKvPair;
             }
             if (value.type === 1) {
@@ -37745,9 +37745,9 @@
           });
         };
         Resolver2.prototype.filterDomainRegistrationTxns = function(txns) {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter2(this, void 0, void 0, function() {
             var names, i, txn, appArgs, decodedName, lsigAccount, accountInfo, length_2, i_1, kvPairs, domainInfo, err_3;
-            return __generator(this, function(_a) {
+            return __generator2(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   names = [];
@@ -37762,30 +37762,27 @@
                   txn = txns[i];
                   if (!(txn["tx-type"] === "appl"))
                     return [3, 5];
-                  if (!(txn["application-transaction"]["application-id"] === constants_js_1.APP_ID))
+                  if (!(txn["application-transaction"]["application-id"] === constants_js_12.APP_ID))
                     return [3, 5];
                   appArgs = txn["application-transaction"]["application-args"];
                   if (!(Buffer.from(appArgs[0], "base64").toString() === "register_name"))
                     return [3, 3];
-                  decodedName = util_js_1.b64toString(appArgs[1]);
+                  decodedName = (0, util_js_12.b64toString)(appArgs[1]);
                   if (!names.includes(decodedName)) {
                     names.push(decodedName);
                   }
                   return [3, 5];
                 case 3:
-                  if (!(util_js_1.b64toString(appArgs[0]) === "accept_transfer"))
+                  if (!((0, util_js_12.b64toString)(appArgs[0]) === "accept_transfer"))
                     return [3, 5];
                   lsigAccount = txn["application-transaction"]["accounts"][0];
-                  return [
-                    4,
-                    this.indexer.lookupAccountByID(lsigAccount)["do"]()
-                  ];
+                  return [4, this.indexer.lookupAccountByID(lsigAccount)["do"]()];
                 case 4:
                   accountInfo = _a.sent();
                   accountInfo = accountInfo.account["apps-local-state"];
                   length_2 = accountInfo.length;
                   for (i_1 = 0; i_1 < length_2; i_1++) {
-                    if (accountInfo[i_1].id === constants_js_1.APP_ID) {
+                    if (accountInfo[i_1].id === constants_js_12.APP_ID) {
                       kvPairs = accountInfo[i_1]["key-value"];
                       domainInfo = this.decodeKvPairs(kvPairs).filter(function(domain) {
                         return domain.key === "name";
@@ -37811,9 +37808,9 @@
           });
         };
         Resolver2.prototype.owner = function() {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter2(this, void 0, void 0, function() {
             var domainInformation;
-            return __generator(this, function(_a) {
+            return __generator2(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolveName()];
@@ -37822,16 +37819,16 @@
                   if (domainInformation.found) {
                     return [2, domainInformation.address];
                   }
-                  throw new errors_js_1.NameNotRegisteredError(this.name.name);
+                  throw new errors_js_12.NameNotRegisteredError(this.name.name);
               }
             });
           });
         };
         Resolver2.prototype.text = function(key) {
           var _a, _b;
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter2(this, void 0, void 0, function() {
             var domainInformation, socialRecords, metadataRecords;
-            return __generator(this, function(_c) {
+            return __generator2(this, function(_c) {
               switch (_c.label) {
                 case 0:
                   return [4, this.resolveName()];
@@ -37854,44 +37851,41 @@
                       }
                     }
                   }
-                  throw new errors_js_1.NameNotRegisteredError(this.name.name);
+                  throw new errors_js_12.NameNotRegisteredError(this.name.name);
               }
             });
           });
         };
         Resolver2.prototype.expiry = function() {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter2(this, void 0, void 0, function() {
             var domainInformation;
-            return __generator(this, function(_a) {
+            return __generator2(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolveName()];
                 case 1:
                   domainInformation = _a.sent();
                   if (domainInformation.found) {
-                    return [
-                      2,
-                      new Date(parseInt((domainInformation === null || domainInformation === void 0 ? void 0 : domainInformation.metadata).filter(function(data) {
-                        return data.key === "expiry";
-                      })[0].value) * 1e3)
-                    ];
+                    return [2, new Date(parseInt(domainInformation === null || domainInformation === void 0 ? void 0 : domainInformation.metadata.filter(function(data) {
+                      return data.key === "expiry";
+                    })[0].value) * 1e3)];
                   }
-                  throw new errors_js_1.NameNotRegisteredError(this.name.name);
+                  throw new errors_js_12.NameNotRegisteredError(this.name.name);
               }
             });
           });
         };
         Resolver2.prototype.content = function() {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter2(this, void 0, void 0, function() {
             var domainInformation, contentRecords;
-            return __generator(this, function(_a) {
+            return __generator2(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolveName()];
                 case 1:
                   domainInformation = _a.sent();
                   if (domainInformation.found) {
-                    contentRecords = (domainInformation === null || domainInformation === void 0 ? void 0 : domainInformation.metadata).filter(function(kv) {
+                    contentRecords = domainInformation === null || domainInformation === void 0 ? void 0 : domainInformation.metadata.filter(function(kv) {
                       return kv.key === "content";
                     });
                     if (contentRecords.length > 0) {
@@ -37899,33 +37893,37 @@
                     }
                     return [2, "Content field is not set"];
                   }
-                  throw new errors_js_1.NameNotRegisteredError(this._name);
+                  throw new errors_js_12.NameNotRegisteredError(this._name);
               }
             });
           });
         };
         return Resolver2;
       }(cachedApi_js_1["default"]);
-      exports2.Resolver = Resolver;
+      exports.Resolver = Resolver;
     }
   });
 
   // src/transactions.js
-  var require_transactions = __commonJS({
-    "src/transactions.js"(exports2) {
+  var transactions_exports = {};
+  var __extends3, __awaiter3, __generator3, algosdk_14, constants_js_13, cachedApi_js_12, util_js_13, name_js_1, Transactions;
+  var init_transactions2 = __esm({
+    "src/transactions.js"() {
       "use strict";
-      var __extends = exports2 && exports2.__extends || function() {
+      __extends3 = function() {
         var extendStatics = function(d, b) {
           extendStatics = Object.setPrototypeOf || { __proto__: [] } instanceof Array && function(d2, b2) {
             d2.__proto__ = b2;
           } || function(d2, b2) {
             for (var p in b2)
-              if (b2.hasOwnProperty(p))
+              if (Object.prototype.hasOwnProperty.call(b2, p))
                 d2[p] = b2[p];
           };
           return extendStatics(d, b);
         };
         return function(d, b) {
+          if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
           extendStatics(d, b);
           function __() {
             this.constructor = d;
@@ -37933,7 +37931,7 @@
           d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
         };
       }();
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      __awaiter3 = function(thisArg, _arguments, P, generator) {
         function adopt(value) {
           return value instanceof P ? value : new P(function(resolve) {
             resolve(value);
@@ -37960,18 +37958,13 @@
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
       };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+      __generator3 = function(thisArg, body) {
+        var _ = { label: 0, sent: function() {
+          if (t[0] & 1)
+            throw t[1];
+          return t[1];
+        }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
           return this;
         }), g;
         function verb(n) {
@@ -38041,14 +38034,15 @@
           return { value: op[0] ? op[1] : void 0, done: true };
         }
       };
-      exports2.__esModule = true;
-      var algosdk_1 = (init_esm(), __toCommonJS(esm_exports));
-      var constants_js_1 = require_constants2();
-      var cachedApi_js_1 = require_cachedApi();
-      var util_js_1 = require_util();
-      var name_js_1 = require_name();
-      var Transactions = function(_super) {
-        __extends(Transactions2, _super);
+      exports.__esModule = true;
+      exports.Transactions = void 0;
+      algosdk_14 = (init_esm(), __toCommonJS(esm_exports));
+      constants_js_13 = (init_constants(), __toCommonJS(constants_exports));
+      cachedApi_js_12 = (init_cachedApi(), __toCommonJS(cachedApi_exports));
+      util_js_13 = (init_util(), __toCommonJS(util_exports));
+      name_js_1 = (init_name(), __toCommonJS(name_exports));
+      Transactions = function(_super) {
+        __extends3(Transactions2, _super);
         function Transactions2(client, indexer, name) {
           var _this = _super.call(this, client, indexer) || this;
           if (name instanceof name_js_1.Name) {
@@ -38061,18 +38055,18 @@
         Transactions2.prototype.calculatePrice = function(period) {
           var amount = 0;
           if (this.name.length === 3) {
-            amount = constants_js_1.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
+            amount = constants_js_13.REGISTRATION_PRICE.CHAR_3_AMOUNT * period;
           } else if (this.name.length === 4) {
-            amount = constants_js_1.REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
+            amount = constants_js_13.REGISTRATION_PRICE.CHAR_4_AMOUNT * period;
           } else if (this.name.length >= 5) {
-            amount = constants_js_1.REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
+            amount = constants_js_13.REGISTRATION_PRICE.CHAR_5_AMOUNT * period;
           }
           return amount;
         };
         Transactions2.prototype.prepareNameRegistrationTransactions = function(address, period) {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter3(this, void 0, void 0, function() {
             var algodClient, amount, lsig, params, receiver, sender, closeToRemaninder, note, txn1, groupTxns, txn2, txn3, method2, appArgs, txn4, signedOptinTxn;
-            return __generator(this, function(_a) {
+            return __generator3(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   algodClient = this.rpc;
@@ -38085,7 +38079,7 @@
                   params = _a.sent();
                   params.fee = 1e3;
                   params.flatFee = true;
-                  receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
+                  receiver = algosdk_14["default"].getApplicationAddress(constants_js_13.APP_ID);
                   sender = address;
                   if (period === void 0) {
                     period = 1;
@@ -38093,55 +38087,46 @@
                   amount = this.calculatePrice(period);
                   closeToRemaninder = void 0;
                   note = void 0;
-                  txn1 = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
+                  txn1 = algosdk_14["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
                   groupTxns = [];
                   groupTxns.push(txn1);
                   sender = address;
                   receiver = lsig.address();
                   amount = 915e3;
-                  txn2 = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
+                  txn2 = algosdk_14["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amount, closeToRemaninder, note, params);
                   groupTxns.push(txn2);
-                  return [
-                    4,
-                    algosdk_1["default"].makeApplicationOptInTxnFromObject({
-                      from: lsig.address(),
-                      suggestedParams: params,
-                      appIndex: constants_js_1.APP_ID
-                    })
-                  ];
+                  return [4, algosdk_14["default"].makeApplicationOptInTxnFromObject({
+                    from: lsig.address(),
+                    suggestedParams: params,
+                    appIndex: constants_js_13.APP_ID
+                  })];
                 case 3:
                   txn3 = _a.sent();
                   groupTxns.push(txn3);
                   method2 = "register_name";
                   appArgs = [];
-                  appArgs.push(util_js_1.toIntArray(method2));
-                  appArgs.push(util_js_1.toIntArray(this.name));
-                  appArgs.push(algosdk_1["default"].encodeUint64(period));
-                  return [
-                    4,
-                    algosdk_1["default"].makeApplicationNoOpTxn(address, params, constants_js_1.APP_ID, appArgs, [lsig.address()])
-                  ];
+                  appArgs.push((0, util_js_13.toIntArray)(method2));
+                  appArgs.push((0, util_js_13.toIntArray)(this.name));
+                  appArgs.push(algosdk_14["default"].encodeUint64(period));
+                  return [4, algosdk_14["default"].makeApplicationNoOpTxn(address, params, constants_js_13.APP_ID, appArgs, [lsig.address()])];
                 case 4:
                   txn4 = _a.sent();
                   groupTxns.push(txn4);
-                  algosdk_1["default"].assignGroupID(groupTxns);
-                  signedOptinTxn = algosdk_1["default"].signLogicSigTransaction(groupTxns[2], lsig);
-                  return [
-                    2,
-                    {
-                      optinTxn: signedOptinTxn,
-                      txns: groupTxns,
-                      unsignedOptinTxn: groupTxns[2]
-                    }
-                  ];
+                  algosdk_14["default"].assignGroupID(groupTxns);
+                  signedOptinTxn = algosdk_14["default"].signLogicSigTransaction(groupTxns[2], lsig);
+                  return [2, {
+                    optinTxn: signedOptinTxn,
+                    txns: groupTxns,
+                    unsignedOptinTxn: groupTxns[2]
+                  }];
               }
             });
           });
         };
         Transactions2.prototype.prepareUpdateNamePropertyTransactions = function(address, editedHandles) {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter3(this, void 0, void 0, function() {
             var lsig, params, method2, groupTxns, _a, _b, _i, key, appArgs, network, handle, txn;
-            return __generator(this, function(_c) {
+            return __generator3(this, function(_c) {
               switch (_c.label) {
                 case 0:
                   return [4, this.getTeal(this.name)];
@@ -38166,13 +38151,10 @@
                   appArgs = [];
                   network = key;
                   handle = editedHandles[key];
-                  appArgs.push(util_js_1.toIntArray(method2));
-                  appArgs.push(util_js_1.toIntArray(network));
-                  appArgs.push(util_js_1.toIntArray(handle));
-                  return [
-                    4,
-                    algosdk_1["default"].makeApplicationNoOpTxn(address, params, constants_js_1.APP_ID, appArgs, [lsig.address()])
-                  ];
+                  appArgs.push((0, util_js_13.toIntArray)(method2));
+                  appArgs.push((0, util_js_13.toIntArray)(network));
+                  appArgs.push((0, util_js_13.toIntArray)(handle));
+                  return [4, algosdk_14["default"].makeApplicationNoOpTxn(address, params, constants_js_13.APP_ID, appArgs, [lsig.address()])];
                 case 4:
                   txn = _c.sent();
                   groupTxns.push(txn);
@@ -38182,7 +38164,7 @@
                   return [3, 3];
                 case 6:
                   if (Object.keys(editedHandles).length > 1) {
-                    algosdk_1["default"].assignGroupID(groupTxns);
+                    algosdk_14["default"].assignGroupID(groupTxns);
                   }
                   return [2, groupTxns];
               }
@@ -38190,38 +38172,38 @@
           });
         };
         Transactions2.prototype.prepareNameRenewalTxns = function(sender, years) {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter3(this, void 0, void 0, function() {
             var params, receiver, closeToRemaninder, note, paymentTxn, lsig, appArgs, applicationTxn;
-            return __generator(this, function(_a) {
+            return __generator3(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.rpc.getTransactionParams()["do"]()];
                 case 1:
                   params = _a.sent();
-                  receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
+                  receiver = algosdk_14["default"].getApplicationAddress(constants_js_13.APP_ID);
                   closeToRemaninder = void 0;
                   note = void 0;
-                  paymentTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(years), closeToRemaninder, note, params);
+                  paymentTxn = algosdk_14["default"].makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(years), closeToRemaninder, note, params);
                   return [4, this.getTeal(this.name)];
                 case 2:
                   lsig = _a.sent();
                   appArgs = [];
-                  appArgs.push(util_js_1.toIntArray("renew_name"));
-                  appArgs.push(algosdk_1["default"].encodeUint64(years));
-                  applicationTxn = algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [lsig.address()]);
-                  algosdk_1["default"].assignGroupID([paymentTxn, applicationTxn]);
+                  appArgs.push((0, util_js_13.toIntArray)("renew_name"));
+                  appArgs.push(algosdk_14["default"].encodeUint64(years));
+                  applicationTxn = algosdk_14["default"].makeApplicationNoOpTxn(sender, params, constants_js_13.APP_ID, appArgs, [lsig.address()]);
+                  algosdk_14["default"].assignGroupID([paymentTxn, applicationTxn]);
                   return [2, [paymentTxn, applicationTxn]];
               }
             });
           });
         };
         Transactions2.prototype.prepareInitiateNameTransferTransaction = function(sender, newOwner, price) {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter3(this, void 0, void 0, function() {
             var params, lsig, appArgs;
-            return __generator(this, function(_a) {
+            return __generator3(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  price = algosdk_1["default"].algosToMicroalgos(price);
+                  price = algosdk_14["default"].algosToMicroalgos(price);
                   return [4, this.rpc.getTransactionParams()["do"]()];
                 case 1:
                   params = _a.sent();
@@ -38229,61 +38211,60 @@
                 case 2:
                   lsig = _a.sent();
                   appArgs = [];
-                  appArgs.push(util_js_1.toIntArray("initiate_transfer"));
-                  appArgs.push(algosdk_1["default"].encodeUint64(price));
-                  return [
-                    2,
-                    algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [lsig.address(), newOwner])
-                  ];
+                  appArgs.push((0, util_js_13.toIntArray)("initiate_transfer"));
+                  appArgs.push(algosdk_14["default"].encodeUint64(price));
+                  return [2, algosdk_14["default"].makeApplicationNoOpTxn(sender, params, constants_js_13.APP_ID, appArgs, [
+                    lsig.address(),
+                    newOwner
+                  ])];
               }
             });
           });
         };
         Transactions2.prototype.prepareAcceptNameTransferTransactions = function(sender, receiver, amt) {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter3(this, void 0, void 0, function() {
             var params, closeToRemaninder, note, paymentToOwnerTxn, paymentToSmartContractTxn, lsig, appArgs, applicationTxn;
-            return __generator(this, function(_a) {
+            return __generator3(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  amt = algosdk_1["default"].algosToMicroalgos(amt);
+                  amt = algosdk_14["default"].algosToMicroalgos(amt);
                   return [4, this.rpc.getTransactionParams()["do"]()];
                 case 1:
                   params = _a.sent();
                   closeToRemaninder = void 0;
                   note = void 0;
-                  paymentToOwnerTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
-                  receiver = algosdk_1["default"].getApplicationAddress(constants_js_1.APP_ID);
-                  paymentToSmartContractTxn = algosdk_1["default"].makePaymentTxnWithSuggestedParams(sender, receiver, constants_js_1.TRANSFER_FEE, closeToRemaninder, note, params);
+                  paymentToOwnerTxn = algosdk_14["default"].makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
+                  receiver = algosdk_14["default"].getApplicationAddress(constants_js_13.APP_ID);
+                  paymentToSmartContractTxn = algosdk_14["default"].makePaymentTxnWithSuggestedParams(sender, receiver, constants_js_13.TRANSFER_FEE, closeToRemaninder, note, params);
                   return [4, this.getTeal(this.name)];
                 case 2:
                   lsig = _a.sent();
                   appArgs = [];
-                  appArgs.push(util_js_1.toIntArray("accept_transfer"));
-                  applicationTxn = algosdk_1["default"].makeApplicationNoOpTxn(sender, params, constants_js_1.APP_ID, appArgs, [lsig.address()]);
-                  algosdk_1["default"].assignGroupID([
+                  appArgs.push((0, util_js_13.toIntArray)("accept_transfer"));
+                  applicationTxn = algosdk_14["default"].makeApplicationNoOpTxn(sender, params, constants_js_13.APP_ID, appArgs, [lsig.address()]);
+                  algosdk_14["default"].assignGroupID([
                     paymentToOwnerTxn,
                     paymentToSmartContractTxn,
                     applicationTxn
                   ]);
-                  return [
-                    2,
-                    [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn]
-                  ];
+                  return [2, [paymentToOwnerTxn, paymentToSmartContractTxn, applicationTxn]];
               }
             });
           });
         };
         return Transactions2;
-      }(cachedApi_js_1["default"]);
-      exports2.Transactions = Transactions;
+      }(cachedApi_js_12["default"]);
+      exports.Transactions = Transactions;
     }
   });
 
   // src/name.js
-  var require_name = __commonJS({
-    "src/name.js"(exports2) {
+  var name_exports = {};
+  var __awaiter4, __generator4, resolver_js_1, transactions_js_1, errors_js_13, validation_js_1, Name;
+  var init_name = __esm({
+    "src/name.js"() {
       "use strict";
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
+      __awaiter4 = function(thisArg, _arguments, P, generator) {
         function adopt(value) {
           return value instanceof P ? value : new P(function(resolve) {
             resolve(value);
@@ -38310,18 +38291,13 @@
           step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
       };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+      __generator4 = function(thisArg, body) {
+        var _ = { label: 0, sent: function() {
+          if (t[0] & 1)
+            throw t[1];
+          return t[1];
+        }, trys: [], ops: [] }, f, y, t, g;
+        return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
           return this;
         }), g;
         function verb(n) {
@@ -38391,12 +38367,13 @@
           return { value: op[0] ? op[1] : void 0, done: true };
         }
       };
-      exports2.__esModule = true;
-      var resolver_js_1 = require_resolver();
-      var transactions_js_1 = require_transactions();
-      var errors_js_1 = require_errors();
-      var validation_js_1 = require_validation();
-      var Name2 = function() {
+      exports.__esModule = true;
+      exports.Name = void 0;
+      resolver_js_1 = (init_resolver(), __toCommonJS(resolver_exports));
+      transactions_js_1 = (init_transactions2(), __toCommonJS(transactions_exports));
+      errors_js_13 = (init_errors(), __toCommonJS(errors_exports));
+      validation_js_1 = (init_validation(), __toCommonJS(validation_exports));
+      Name = function() {
         function Name3(options) {
           var name = options.name, rpc = options.rpc, indexer = options.indexer;
           this._name = name;
@@ -38407,13 +38384,13 @@
           get: function() {
             return this._name;
           },
-          enumerable: true,
+          enumerable: false,
           configurable: true
         });
         Name3.prototype.isRegistered = function() {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter4(this, void 0, void 0, function() {
             var status;
-            return __generator(this, function(_a) {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolver.resolveName()];
@@ -38425,8 +38402,8 @@
           });
         };
         Name3.prototype.getOwner = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolver.owner()];
@@ -38437,8 +38414,8 @@
           });
         };
         Name3.prototype.getContent = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolver.content()];
@@ -38449,8 +38426,8 @@
           });
         };
         Name3.prototype.getText = function(key) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolver.text(key)];
@@ -38461,8 +38438,8 @@
           });
         };
         Name3.prototype.getAllInformation = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolver.resolveName()];
@@ -38473,8 +38450,8 @@
           });
         };
         Name3.prototype.getExpiry = function() {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.resolver.expiry()];
@@ -38485,43 +38462,43 @@
           });
         };
         Name3.prototype.isValidTransaction = function(sender, receiver, method2) {
-          return __awaiter(this, void 0, void 0, function() {
+          return __awaiter4(this, void 0, void 0, function() {
             var owner;
-            return __generator(this, function(_a) {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.isRegistered()];
                 case 1:
                   if (!_a.sent()) {
-                    throw new errors_js_1.NameNotRegisteredError(this._name);
+                    throw new errors_js_13.NameNotRegisteredError(this._name);
                   }
-                  if (!validation_js_1.isValidAddress(sender)) {
-                    throw new errors_js_1.AddressValidationError();
+                  if (!(0, validation_js_1.isValidAddress)(sender)) {
+                    throw new errors_js_13.AddressValidationError();
                   }
                   if (receiver) {
-                    if (!validation_js_1.isValidAddress(receiver))
-                      throw new errors_js_1.AddressValidationError();
+                    if (!(0, validation_js_1.isValidAddress)(receiver))
+                      throw new errors_js_13.AddressValidationError();
                   }
                   return [4, this.getOwner()];
                 case 2:
                   owner = _a.sent();
-                  return [4, validation_js_1.isValidAddress(sender)];
+                  return [4, (0, validation_js_1.isValidAddress)(sender)];
                 case 3:
                   if (!_a.sent()) {
-                    throw new errors_js_1.AddressValidationError();
+                    throw new errors_js_13.AddressValidationError();
                   }
                   if (!receiver && !method2) {
                     if (owner !== sender) {
-                      throw new errors_js_1.IncorrectOwnerError(this._name, sender);
+                      throw new errors_js_13.IncorrectOwnerError(this._name, sender);
                     }
                   } else if (sender && receiver) {
                     if (method2 === "initiate_transfer") {
                       if (owner !== sender) {
-                        throw new errors_js_1.IncorrectOwnerError(this._name, sender);
+                        throw new errors_js_13.IncorrectOwnerError(this._name, sender);
                       }
                     } else if (method2 === "accept_transfer") {
                       if (owner !== receiver) {
-                        throw new errors_js_1.IncorrectOwnerError(this._name, receiver);
+                        throw new errors_js_13.IncorrectOwnerError(this._name, receiver);
                       }
                     }
                   }
@@ -38531,8 +38508,8 @@
           });
         };
         Name3.prototype.register = function(address, period) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.isRegistered()];
@@ -38540,14 +38517,11 @@
                   if (_a.sent()) {
                     throw new Error("Name already registered");
                   }
-                  if (!!validation_js_1.isValidAddress(address))
+                  if (!!(0, validation_js_1.isValidAddress)(address))
                     return [3, 2];
-                  throw new errors_js_1.AddressValidationError();
+                  throw new errors_js_13.AddressValidationError();
                 case 2:
-                  return [
-                    4,
-                    this.transactions.prepareNameRegistrationTransactions(address, period)
-                  ];
+                  return [4, this.transactions.prepareNameRegistrationTransactions(address, period)];
                 case 3:
                   return [2, _a.sent()];
               }
@@ -38555,17 +38529,14 @@
           });
         };
         Name3.prototype.update = function(address, editedHandles) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.isValidTransaction(address)];
                 case 1:
                   _a.sent();
-                  return [
-                    4,
-                    this.transactions.prepareUpdateNamePropertyTransactions(address, editedHandles)
-                  ];
+                  return [4, this.transactions.prepareUpdateNamePropertyTransactions(address, editedHandles)];
                 case 2:
                   return [2, _a.sent()];
               }
@@ -38573,17 +38544,14 @@
           });
         };
         Name3.prototype.renew = function(address, years) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
                   return [4, this.isValidTransaction(address)];
                 case 1:
                   _a.sent();
-                  return [
-                    4,
-                    this.transactions.prepareNameRenewalTxns(address, years)
-                  ];
+                  return [4, this.transactions.prepareNameRenewalTxns(address, years)];
                 case 2:
                   return [2, _a.sent()];
               }
@@ -38591,20 +38559,14 @@
           });
         };
         Name3.prototype.initTransfer = function(owner, newOwner, price) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  return [
-                    4,
-                    this.isValidTransaction(owner, newOwner, "initiate_transfer")
-                  ];
+                  return [4, this.isValidTransaction(owner, newOwner, "initiate_transfer")];
                 case 1:
                   _a.sent();
-                  return [
-                    4,
-                    this.transactions.prepareInitiateNameTransferTransaction(owner, newOwner, price)
-                  ];
+                  return [4, this.transactions.prepareInitiateNameTransferTransaction(owner, newOwner, price)];
                 case 2:
                   return [2, _a.sent()];
               }
@@ -38612,20 +38574,14 @@
           });
         };
         Name3.prototype.acceptTransfer = function(newOwner, owner, price) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
+          return __awaiter4(this, void 0, void 0, function() {
+            return __generator4(this, function(_a) {
               switch (_a.label) {
                 case 0:
-                  return [
-                    4,
-                    this.isValidTransaction(newOwner, owner, "accept_transfer")
-                  ];
+                  return [4, this.isValidTransaction(newOwner, owner, "accept_transfer")];
                 case 1:
                   _a.sent();
-                  return [
-                    4,
-                    this.transactions.prepareAcceptNameTransferTransactions(newOwner, owner, price)
-                  ];
+                  return [4, this.transactions.prepareAcceptNameTransferTransactions(newOwner, owner, price)];
                 case 2:
                   return [2, _a.sent()];
               }
@@ -38634,175 +38590,160 @@
         };
         return Name3;
       }();
-      exports2.Name = Name2;
-    }
-  });
-
-  // src/address.js
-  var require_address = __commonJS({
-    "src/address.js"(exports2) {
-      "use strict";
-      var __awaiter = exports2 && exports2.__awaiter || function(thisArg, _arguments, P, generator) {
-        function adopt(value) {
-          return value instanceof P ? value : new P(function(resolve) {
-            resolve(value);
-          });
-        }
-        return new (P || (P = Promise))(function(resolve, reject) {
-          function fulfilled(value) {
-            try {
-              step(generator.next(value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function rejected(value) {
-            try {
-              step(generator["throw"](value));
-            } catch (e) {
-              reject(e);
-            }
-          }
-          function step(result) {
-            result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-          }
-          step((generator = generator.apply(thisArg, _arguments || [])).next());
-        });
-      };
-      var __generator = exports2 && exports2.__generator || function(thisArg, body) {
-        var _ = {
-          label: 0,
-          sent: function() {
-            if (t[0] & 1)
-              throw t[1];
-            return t[1];
-          },
-          trys: [],
-          ops: []
-        }, f, y, t, g;
-        return g = { next: verb(0), throw: verb(1), return: verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
-          return this;
-        }), g;
-        function verb(n) {
-          return function(v) {
-            return step([n, v]);
-          };
-        }
-        function step(op) {
-          if (f)
-            throw new TypeError("Generator is already executing.");
-          while (_)
-            try {
-              if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
-                return t;
-              if (y = 0, t)
-                op = [op[0] & 2, t.value];
-              switch (op[0]) {
-                case 0:
-                case 1:
-                  t = op;
-                  break;
-                case 4:
-                  _.label++;
-                  return { value: op[1], done: false };
-                case 5:
-                  _.label++;
-                  y = op[1];
-                  op = [0];
-                  continue;
-                case 7:
-                  op = _.ops.pop();
-                  _.trys.pop();
-                  continue;
-                default:
-                  if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
-                    _ = 0;
-                    continue;
-                  }
-                  if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
-                    _.label = op[1];
-                    break;
-                  }
-                  if (op[0] === 6 && _.label < t[1]) {
-                    _.label = t[1];
-                    t = op;
-                    break;
-                  }
-                  if (t && _.label < t[2]) {
-                    _.label = t[2];
-                    _.ops.push(op);
-                    break;
-                  }
-                  if (t[2])
-                    _.ops.pop();
-                  _.trys.pop();
-                  continue;
-              }
-              op = body.call(thisArg, _);
-            } catch (e) {
-              op = [6, e];
-              y = 0;
-            } finally {
-              f = t = 0;
-            }
-          if (op[0] & 5)
-            throw op[1];
-          return { value: op[0] ? op[1] : void 0, done: true };
-        }
-      };
-      exports2.__esModule = true;
-      var resolver_js_1 = require_resolver();
-      var Address2 = function() {
-        function Address3(options) {
-          var address = options.address, rpc = options.rpc, indexer = options.indexer;
-          this.address = address;
-          this.resolver = new resolver_js_1.Resolver(rpc, indexer);
-        }
-        Address3.prototype.getNames = function(options) {
-          return __awaiter(this, void 0, void 0, function() {
-            return __generator(this, function(_a) {
-              switch (_a.label) {
-                case 0:
-                  return [
-                    4,
-                    this.resolver.getNamesOwnedByAddress(this.address, options === null || options === void 0 ? void 0 : options.socials, options === null || options === void 0 ? void 0 : options.metadata, options === null || options === void 0 ? void 0 : options.limit)
-                  ];
-                case 1:
-                  return [2, _a.sent()];
-              }
-            });
-          });
-        };
-        return Address3;
-      }();
-      exports2.Address = Address2;
+      exports.Name = Name;
     }
   });
 
   // src/index.ts
-  var import_errors = __toESM(require_errors());
-  var import_validation = __toESM(require_validation());
-  var import_name = __toESM(require_name());
-  var import_address4 = __toESM(require_address());
-  var import_cachedApi = __toESM(require_cachedApi());
-  var ANS = class extends import_cachedApi.default {
-    constructor(client, indexer) {
-      super(client, indexer);
-      this.indexer = indexer;
+  init_errors();
+  init_validation();
+  init_name();
+
+  // src/address.js
+  var __awaiter5 = function(thisArg, _arguments, P, generator) {
+    function adopt(value) {
+      return value instanceof P ? value : new P(function(resolve) {
+        resolve(value);
+      });
     }
+    return new (P || (P = Promise))(function(resolve, reject) {
+      function fulfilled(value) {
+        try {
+          step(generator.next(value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function rejected(value) {
+        try {
+          step(generator["throw"](value));
+        } catch (e) {
+          reject(e);
+        }
+      }
+      function step(result) {
+        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
+      }
+      step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+  };
+  var __generator5 = function(thisArg, body) {
+    var _ = { label: 0, sent: function() {
+      if (t[0] & 1)
+        throw t[1];
+      return t[1];
+    }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() {
+      return this;
+    }), g;
+    function verb(n) {
+      return function(v) {
+        return step([n, v]);
+      };
+    }
+    function step(op) {
+      if (f)
+        throw new TypeError("Generator is already executing.");
+      while (_)
+        try {
+          if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done)
+            return t;
+          if (y = 0, t)
+            op = [op[0] & 2, t.value];
+          switch (op[0]) {
+            case 0:
+            case 1:
+              t = op;
+              break;
+            case 4:
+              _.label++;
+              return { value: op[1], done: false };
+            case 5:
+              _.label++;
+              y = op[1];
+              op = [0];
+              continue;
+            case 7:
+              op = _.ops.pop();
+              _.trys.pop();
+              continue;
+            default:
+              if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) {
+                _ = 0;
+                continue;
+              }
+              if (op[0] === 3 && (!t || op[1] > t[0] && op[1] < t[3])) {
+                _.label = op[1];
+                break;
+              }
+              if (op[0] === 6 && _.label < t[1]) {
+                _.label = t[1];
+                t = op;
+                break;
+              }
+              if (t && _.label < t[2]) {
+                _.label = t[2];
+                _.ops.push(op);
+                break;
+              }
+              if (t[2])
+                _.ops.pop();
+              _.trys.pop();
+              continue;
+          }
+          op = body.call(thisArg, _);
+        } catch (e) {
+          op = [6, e];
+          y = 0;
+        } finally {
+          f = t = 0;
+        }
+      if (op[0] & 5)
+        throw op[1];
+      return { value: op[0] ? op[1] : void 0, done: true };
+    }
+  };
+  exports.__esModule = true;
+  exports.Address = void 0;
+  var resolver_js_12 = (init_resolver(), __toCommonJS(resolver_exports));
+  var Address = function() {
+    function Address3(options) {
+      var address = options.address, rpc = options.rpc, indexer = options.indexer;
+      this.address = address;
+      this.resolver = new resolver_js_12.Resolver(rpc, indexer);
+    }
+    Address3.prototype.getNames = function(options) {
+      return __awaiter5(this, void 0, void 0, function() {
+        return __generator5(this, function(_a) {
+          switch (_a.label) {
+            case 0:
+              return [4, this.resolver.getNamesOwnedByAddress(this.address, options === null || options === void 0 ? void 0 : options.socials, options === null || options === void 0 ? void 0 : options.metadata, options === null || options === void 0 ? void 0 : options.limit)];
+            case 1:
+              return [2, _a.sent()];
+          }
+        });
+      });
+    };
+    return Address3;
+  }();
+  exports.Address = Address;
+
+  // src/index.ts
+  init_cachedApi();
+  var ANS = class extends (void 0) {
     name(name) {
-      name = (0, import_validation.normalizeName)(name);
-      return new import_name.Name({
+      name = (void 0)(name);
+      return new (void 0)({
         rpc: this.rpc,
         indexer: this.indexer,
         name
       });
     }
     address(address) {
-      if (!(0, import_validation.isValidAddress)(address)) {
-        throw new import_errors.AddressValidationError();
+      if (!(void 0)(address)) {
+        throw new (void 0)();
       }
-      return new import_address4.Address({
+      return new (void 0)({
         rpc: this.rpc,
         indexer: this.indexer,
         address

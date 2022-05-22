@@ -1,9 +1,8 @@
 import algosdk from "algosdk";
 import { describe, it, beforeEach } from "mocha";
-const { assert } = require("chai");
-
-const { ANS } = require("../src/index.js");
-const APIKEY = require("./api_key");
+import { assert } from "chai";
+import { ANS } from '../src/index.js';
+import API_KEY from "./api_key";
 
 let indexerClient: algosdk.Indexer,
   algodClient: algosdk.Algodv2,
@@ -13,13 +12,13 @@ let indexerClient: algosdk.Indexer,
 describe("Testing name resolution methods", function () {
   beforeEach("Creating Client and Indexer instances", function () {
     algodClient = new algosdk.Algodv2(
-      { "X-API-KEY": APIKEY },
+      { "X-API-KEY": API_KEY },
       "https://mainnet-algorand.api.purestake.io/ps2",
       ""
     );
 
     indexerClient = new algosdk.Indexer(
-      { "X-API-KEY": APIKEY },
+      { "X-API-KEY": API_KEY },
       "https://mainnet-algorand.api.purestake.io/idx2",
       ""
     );
