@@ -1,13 +1,18 @@
 {
-  "include": ["src/**/*"],
   "compilerOptions": {
-    "allowJs": false,                
-    "target": "ESNEXT",
-    "module": "commonjs",
     "declaration": true,
-    "outDir": "types",
     "strict": true,
-    "esModuleInterop": true, 
-    "forceConsistentCasingInFileNames": true 
-  }
+    "module": "esnext",
+    "target": "esnext",
+    "esModuleInterop": true,
+    "sourceMap": false,
+    "outDir": "dist/esm",
+    "typeRoots": ["node_modules/@types"],
+    "moduleResolution": "node",
+    "declarationMap": true,
+    "declarationDir": "dist/esm",
+    "emitDeclarationOnly": false,
+    "allowJs": true
+  },
+  "include": ["src", "test"]
 }
