@@ -1,5 +1,5 @@
 import algosdk from "algosdk";
-import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
+import { REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
 import CachedApi from "./cachedApi.js";
 import { toIntArray } from "./util.js";
 import { Name } from "./name.js";
@@ -31,7 +31,7 @@ export class Transactions extends CachedApi {
         const params = await algodClient.getTransactionParams().do();
         params.fee = 1000;
         params.flatFee = true;
-        let receiver = algosdk.getApplicationAddress(APP_ID);
+        let receiver = algosdk.getApplicationAddress(this.APP);
         let sender = address;
         if (period === undefined) {
             period = 1;
@@ -52,7 +52,7 @@ export class Transactions extends CachedApi {
         const txn3 = await algosdk.makeApplicationOptInTxnFromObject({
             from: lsig.address(),
             suggestedParams: params,
-            appIndex: APP_ID,
+            appIndex: this.APP,
         });
         groupTxns.push(txn3);
         /* 4th Txn - Account registers name */
@@ -61,7 +61,7 @@ export class Transactions extends CachedApi {
         appArgs.push(toIntArray(method));
         appArgs.push(toIntArray(this.name));
         appArgs.push(algosdk.encodeUint64(period));
-        const txn4 = await algosdk.makeApplicationNoOpTxn(address, params, APP_ID, appArgs, [lsig.address()]);
+        const txn4 = await algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [lsig.address()]);
         groupTxns.push(txn4);
         algosdk.assignGroupID(groupTxns);
         const signedOptinTxn = algosdk.signLogicSigTransaction(groupTxns[2], lsig);
@@ -85,7 +85,7 @@ export class Transactions extends CachedApi {
             appArgs.push(toIntArray(method));
             appArgs.push(toIntArray(network));
             appArgs.push(toIntArray(handle));
-            const txn = await algosdk.makeApplicationNoOpTxn(address, params, APP_ID, appArgs, [lsig.address()]);
+            const txn = await algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [lsig.address()]);
             groupTxns.push(txn);
         }
         if (Object.keys(editedHandles).length > 1) {
@@ -95,7 +95,7 @@ export class Transactions extends CachedApi {
     }
     async prepareNameRenewalTxns(sender, years) {
         const params = await this.rpc.getTransactionParams().do();
-        const receiver = algosdk.getApplicationAddress(APP_ID);
+        const receiver = algosdk.getApplicationAddress(this.APP);
         const closeToRemaninder = undefined;
         const note = undefined;
         const paymentTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(years), closeToRemaninder, note, params);
@@ -103,9 +103,19 @@ export class Transactions extends CachedApi {
         const appArgs = [];
         appArgs.push(toIntArray("renew_name"));
         appArgs.push(algosdk.encodeUint64(years));
-        const applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [lsig.address()]);
+        const applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, this.APP, appArgs, [lsig.address()]);
         algosdk.assignGroupID([paymentTxn, applicationTxn]);
         return [paymentTxn, applicationTxn];
+    }
+    async prepareUpdateValueTxn(address, value) {
+        const params = await this.rpc.getTransactionParams().do();
+        const lsig = await this.getTeal(this.name);
+        const appArgs = [];
+        appArgs.push(toIntArray("update_resolver_account"));
+        return algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
+            lsig.address(),
+            value,
+        ]);
     }
     async prepareInitiateNameTransferTransaction(sender, newOwner, price) {
         price = algosdk.algosToMicroalgos(price);
@@ -114,7 +124,7 @@ export class Transactions extends CachedApi {
         const appArgs = [];
         appArgs.push(toIntArray("initiate_transfer"));
         appArgs.push(algosdk.encodeUint64(price));
-        return algosdk.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [
+        return algosdk.makeApplicationNoOpTxn(sender, params, this.APP, appArgs, [
             lsig.address(),
             newOwner,
         ]);
@@ -125,12 +135,12 @@ export class Transactions extends CachedApi {
         const closeToRemaninder = undefined;
         const note = undefined;
         const paymentToOwnerTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
-        receiver = algosdk.getApplicationAddress(APP_ID);
+        receiver = algosdk.getApplicationAddress(this.APP);
         const paymentToSmartContractTxn = algosdk.makePaymentTxnWithSuggestedParams(sender, receiver, TRANSFER_FEE, closeToRemaninder, note, params);
         const lsig = await this.getTeal(this.name);
         const appArgs = [];
         appArgs.push(toIntArray("accept_transfer"));
-        const applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [lsig.address()]);
+        const applicationTxn = algosdk.makeApplicationNoOpTxn(sender, params, this.APP, appArgs, [lsig.address()]);
         algosdk.assignGroupID([
             paymentToOwnerTxn,
             paymentToSmartContractTxn,

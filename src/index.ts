@@ -3,18 +3,20 @@ import { isValidAddress, normalizeName } from "./validation.js";
 import { Name } from "./name.js";
 import { Address } from "./address.js";
 import CachedApi from "./cachedApi.js";
+import algosdk from "algosdk";
 
 export { Resolver } from "./resolver.js";
 export { Transactions } from "./transactions.js";
 export * from "./errors.js";
 
 export default class ANS extends CachedApi {
+
   name(name: string): Name {
     name = normalizeName(name);
     return new Name({
       rpc: this.rpc,
       indexer: this.indexer,
-      name,
+      name
     });
   }
 
@@ -25,7 +27,7 @@ export default class ANS extends CachedApi {
     return new Address({
       rpc: this.rpc,
       indexer: this.indexer,
-      address,
+      address
     });
   }
 }

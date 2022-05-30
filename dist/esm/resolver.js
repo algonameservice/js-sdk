@@ -1,5 +1,5 @@
 import algosdk from "algosdk";
-import { ALLOWED_SOCIALS, APP_ID } from "./constants.js";
+import { ALLOWED_SOCIALS } from "./constants.js";
 import { AddressValidationError, NameNotRegisteredError, PropertyNotSetError, } from "./errors.js";
 import CachedApi from "./cachedApi.js";
 import { b64toString } from "./util.js";
@@ -9,8 +9,6 @@ export class Resolver extends CachedApi {
     resolvedData;
     constructor(client, indexer, name) {
         super(client, indexer);
-        this.rpc = client;
-        this.indexer = indexer;
         this.name = name;
     }
     checkName(name) {
@@ -31,6 +29,7 @@ export class Resolver extends CachedApi {
             socials: [],
             metadata: [],
             address: "Not Registered",
+            value: "Not Registered"
         };
         try {
             if (!this.resolvedData || name !== this.name?.name) {
@@ -41,11 +40,11 @@ export class Resolver extends CachedApi {
             let accountInfo = this.resolvedData;
             accountInfo = accountInfo.account["apps-local-state"];
             const length = accountInfo.length;
-            let address;
+            let address, value;
             let socials = [], metadata = [];
             for (let i = 0; i < length; i++) {
                 const app = accountInfo[i];
-                if (app.id === APP_ID) {
+                if (app.id === this.APP) {
                     const kv = app["key-value"];
                     const decodedKvPairs = this.decodeKvPairs(kv);
                     socials = this.filterKvPairs(decodedKvPairs, "socials");
@@ -53,6 +52,13 @@ export class Resolver extends CachedApi {
                     found = true;
                     address = metadata.filter((kv) => kv.key === "owner")[0]
                         .value;
+                    value = metadata.filter((kv) => (kv.key === "account") || (kv.key === "value"));
+                    if (value.length > 0) {
+                        value = value[0].value;
+                    }
+                    else {
+                        value = address;
+                    }
                 }
             }
             if (found) {
@@ -61,6 +67,7 @@ export class Resolver extends CachedApi {
                     address,
                     socials,
                     metadata,
+                    value
                 };
             }
             return error;
@@ -84,7 +91,7 @@ export class Resolver extends CachedApi {
                     .addressRole("sender")
                     .afterTime("2022-02-24")
                     .txType("appl")
-                    .applicationID(APP_ID)
+                    .applicationID(this.APP)
                     .nextToken(nextToken)
                     .do();
                 txnLength = info.transactions.length;
@@ -167,7 +174,7 @@ export class Resolver extends CachedApi {
             const { value } = kvPair;
             key = Buffer.from(key, "base64").toString();
             decodedKvPair.key = key;
-            if (key === "owner") {
+            if (key === "owner" || key === 'transfer_to' || key === 'account' || key === 'value') {
                 decodedKvPair.value = algosdk.encodeAddress(
                 // @ts-ignore
                 new Uint8Array(Buffer.from(value.bytes, "base64")));
@@ -193,7 +200,7 @@ export class Resolver extends CachedApi {
                 const txn = txns[i];
                 if (txn["tx-type"] === "appl") {
                     // @ts-ignore
-                    if (txn["application-transaction"]["application-id"] === APP_ID) {
+                    if (txn["application-transaction"]["application-id"] === this.APP) {
                         // @ts-ignore
                         const appArgs = txn["application-transaction"]["application-args"];
                         if (Buffer.from(appArgs[0], "base64").toString() === "register_name") {
@@ -211,7 +218,7 @@ export class Resolver extends CachedApi {
                             accountInfo = accountInfo.account["apps-local-state"];
                             const length = accountInfo.length;
                             for (let i = 0; i < length; i++) {
-                                if (accountInfo[i].id === APP_ID) {
+                                if (accountInfo[i].id === this.APP) {
                                     const kvPairs = accountInfo[i]["key-value"];
                                     const domainInfo = this.decodeKvPairs(kvPairs).filter((domain) => domain.key === "name");
                                     if (!names.includes(domainInfo[0].value)) {
@@ -229,11 +236,78 @@ export class Resolver extends CachedApi {
         }
         return names;
     }
+    async getDefaultDomain(address) {
+        let nextToken = "";
+        let txnLength = 1;
+        let txns = [];
+        while (txnLength > 0) {
+            try {
+                const info = await this.indexer
+                    .searchForTransactions()
+                    .address(address)
+                    .addressRole("sender")
+                    .afterTime("2022-02-24")
+                    .txType("appl")
+                    .applicationID(this.APP)
+                    .nextToken(nextToken)
+                    .do();
+                txnLength = info.transactions.length;
+                if (txnLength > 0) {
+                    nextToken = info["next-token"];
+                    txns.push(info.transactions);
+                }
+            }
+            catch (err) {
+                throw Error('No transactions found');
+            }
+        }
+        let accountTxns = [];
+        for (let i = 0; i < txns.length; i++) {
+            accountTxns = accountTxns.concat(txns[i]);
+        }
+        txns = accountTxns;
+        const appArgs = txns.map((txn) => txn['application-transaction']['application-args'][0]);
+        const appAccounts = txns.map((txn) => txn['application-transaction']['accounts']);
+        for (const i in appArgs) {
+            if (Buffer.from(appArgs[i], 'base64').toString() === 'set_default_account') {
+                const account = appAccounts[i];
+                let accountInfo = await this.indexer
+                    .lookupAccountByID(account)
+                    .do();
+                accountInfo = accountInfo['account']['apps-local-state'];
+                for (const i in accountInfo) {
+                    if (accountInfo[i].id === this.APP) {
+                        const domain = this.decodeKvPairs(accountInfo[i]['key-value']).filter((kv) => kv.key === 'name');
+                        if (domain.length > 0) {
+                            return domain[0].value + '.algo';
+                        }
+                        else {
+                            throw Error('Default domain not set');
+                        }
+                    }
+                }
+            }
+        }
+        const domains = await this.getNamesOwnedByAddress(address, false, false, 1);
+        if (domains.length > 0) {
+            return domains[0].name;
+        }
+        throw Error('No domains owned by this address');
+    }
     async owner() {
         const domainInformation = await this.resolveName();
         if (domainInformation.found) {
             // @ts-ignore
             return domainInformation.address;
+        }
+        // @ts-ignore
+        throw new NameNotRegisteredError(this.name.name);
+    }
+    async value() {
+        const domainInformation = await this.resolveName();
+        if (domainInformation.found) {
+            // @ts-ignore
+            return domainInformation.value;
         }
         // @ts-ignore
         throw new NameNotRegisteredError(this.name.name);

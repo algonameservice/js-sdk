@@ -22,6 +22,9 @@ export class Name {
     async getOwner() {
         return await this.resolver.owner();
     }
+    async getValue() {
+        return await this.resolver.value();
+    }
     async getContent() {
         return await this.resolver.content();
     }
@@ -84,6 +87,10 @@ export class Name {
     async renew(address, years) {
         await this.isValidTransaction(address);
         return await this.transactions.prepareNameRenewalTxns(address, years);
+    }
+    async setValue(address, value) {
+        await this.isValidTransaction(address);
+        return await this.transactions.prepareUpdateValueTxn(address, value);
     }
     async initTransfer(owner, newOwner, price) {
         await this.isValidTransaction(owner, newOwner, "initiate_transfer");

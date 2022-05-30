@@ -4,5 +4,6 @@ export declare class Address {
     private resolver;
     constructor(options: AddressConstructor);
     getNames(options?: DomainOptions): Promise<Domain[]>;
+    getDefaultDomain(): Promise<string | Error>;
 }
 //# sourceMappingURL=address.d.ts.map

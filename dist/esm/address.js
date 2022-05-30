@@ -10,5 +10,8 @@ export class Address {
     async getNames(options) {
         return await this.resolver.getNamesOwnedByAddress(this.address, options?.socials, options?.metadata, options?.limit);
     }
+    async getDefaultDomain() {
+        return await this.resolver.getDefaultDomain(this.address);
+    }
 }
 //# sourceMappingURL=address.js.map

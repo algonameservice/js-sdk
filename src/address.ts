@@ -1,5 +1,7 @@
 import { Resolver } from "./resolver.js";
 import { AddressConstructor, Domain, DomainOptions } from "./interfaces.js";
+import { Transaction } from "algosdk";
+import { Transactions } from "./transactions.js";
 
 export class Address {
   private address: string;
@@ -18,5 +20,9 @@ export class Address {
       options?.metadata,
       options?.limit
     );
+  }
+
+  async getDefaultDomain() : Promise<string | Error> {
+    return await this.resolver.getDefaultDomain(this.address);
   }
 }

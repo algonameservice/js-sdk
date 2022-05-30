@@ -4,6 +4,11 @@ import { assert } from "chai";
 import ANS from "../src/index.js";
 import API_KEY from "./api_key.js";
 
+const DOMAIN = 'randomdomain2.algo';
+const OWNER = '3DGH7YRKUVKGZ25TCJMRZJBAJU53C7GBOOHFZY2OJKQTVTUSS2QURCYL7U';
+const VALUE = 'VXFHVD2CBXSVJPZYENADADIJZOK7WFDDAK5OJHOUUNUZEWCRMURZAFJXEQ';
+//const OWNER = 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU';
+
 let indexerClient: algosdk.Indexer,
   algodClient: algosdk.Algodv2,
   sdk: ANS,
@@ -13,47 +18,61 @@ describe("Testing name resolution methods", function () {
   beforeEach("Creating Client and Indexer instances", function () {
     algodClient = new algosdk.Algodv2(
       { "X-API-KEY": API_KEY },
-      "https://mainnet-algorand.api.purestake.io/ps2",
+      "https://testnet-algorand.api.purestake.io/ps2",
       ""
     );
 
     indexerClient = new algosdk.Indexer(
       { "X-API-KEY": API_KEY },
-      "https://mainnet-algorand.api.purestake.io/idx2",
+      "https://testnet-algorand.api.purestake.io/idx2",
       ""
     );
 
     sdk = new ANS(algodClient, indexerClient);
   });
 
-  it("Resolves a .algo name", async function () {
-    name = sdk.name("lalith.algo");
+  
+  it("Retrieves the owner of .algo name", async function () {
+    this.timeout(10000);
+    name = sdk.name(DOMAIN);
     const address = await name.getOwner();
     assert.equal(
       address,
-      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      OWNER,
       "Name resolution failed"
     );
   });
 
+  it("Gets the value of .algo name", async function () {
+    this.timeout(10000);
+    const address = await name.getValue();
+    assert.equal(
+      address,
+      VALUE,
+      "Name resolution failed"
+    )
+  });
+  
+  
   it("Get all information about name", async function () {
     const information = await name.getAllInformation();
     assert.equal(
       information.address,
-      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      OWNER,
       "Could not fetch all information"
     );
   });
 
   it("Gets a specific text record", async function () {
     const text = await name.getText("discord");
-    assert.equal(text, "Lalith Medury#0811", "Could not fetch text record");
+    assert.notEqual(text, undefined, "Could not fetch text record");
   });
 
   it("Gets expiry of domain", async function () {
     const expiry = await name.getExpiry();
     assert.notEqual(expiry, null, "Could not fetch expiry of domain");
   });
+
 
   it("Gets the list of .algo names owned by an address", async function () {
     this.timeout(100000);
@@ -63,21 +82,34 @@ describe("Testing name resolution methods", function () {
       limit: 1,
     };
     const nameInfo = await sdk
-      .address("WYWRYK42XADLY3O62N52BOLT27DMPRA3WNBT2OBRT65N6OEZQWD4OSH6PI")
+      .address(OWNER)
       .getNames(options);
+    
     assert.isAtLeast(
       nameInfo.length,
       1,
       "Error: Doesn't retrieve the names owned by the address"
     );
   });
+  
 
+  it("Gets the default domain of an address", async function () {
+    this.timeout(100000);
+    const defaultDomain = await sdk
+      .address(OWNER)
+      .getDefaultDomain();
+    
+    assert.notEqual(defaultDomain, undefined, 'Default domain not retrieved');
+    
+  });
+
+  
   it("Prepares a list of transactions to register a name", async function () {
     this.timeout(100000);
     const nameRegistrationTxns = await sdk
       .name("ansone.algo")
       .register(
-        "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+        OWNER,
         1
       );
 
@@ -91,7 +123,7 @@ describe("Testing name resolution methods", function () {
   it("Prepares a list of transactions to set properties", async function () {
     this.timeout(100000);
     const updatePropertyTxns = await name.update(
-      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      OWNER,
       {
         discord: "ansdiscord",
         github: "ansgithub",
@@ -118,7 +150,7 @@ describe("Testing name resolution methods", function () {
   it("Prepares a list of transactions to renew name", async function () {
     this.timeout(100000);
     const nameRenewalTxns = await name.renew(
-      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      OWNER,
       2
     );
 
@@ -132,7 +164,7 @@ describe("Testing name resolution methods", function () {
   it("Prepares a transaction to initiate name transfer", async function () {
     this.timeout(100000);
     const nameTransferTxn = await name.initTransfer(
-      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      OWNER,
       "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
       1
     );
@@ -147,7 +179,7 @@ describe("Testing name resolution methods", function () {
   it("Prepares a transaction to accept name transfer", async function () {
     const acceptNameTranserTxn = await name.acceptTransfer(
       "RANDGVRRYGVKI3WSDG6OGTZQ7MHDLIN5RYKJBABL46K5RQVHUFV3NY5DUE",
-      "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU",
+      OWNER,
       1
     );
 
@@ -157,4 +189,5 @@ describe("Testing name resolution methods", function () {
       "Not returning 3 transactions for accepting name"
     );
   });
+  
 });

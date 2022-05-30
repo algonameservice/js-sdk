@@ -12,7 +12,7 @@ export default class ANS extends CachedApi {
         return new Name({
             rpc: this.rpc,
             indexer: this.indexer,
-            name,
+            name
         });
     }
     address(address) {
@@ -22,7 +22,7 @@ export default class ANS extends CachedApi {
         return new Address({
             rpc: this.rpc,
             indexer: this.indexer,
-            address,
+            address
         });
     }
 }

@@ -12,7 +12,9 @@ export declare class Resolver extends CachedApi {
     filterKvPairs(kvPairs: Record[], type: string): Record[];
     decodeKvPairs(kvPairs: Record[]): Record[];
     filterDomainRegistrationTxns(txns: Transaction[]): Promise<string[]>;
+    getDefaultDomain(address: string): Promise<string | Error>;
     owner(): Promise<string>;
+    value(): Promise<string>;
     text(key: string): Promise<string>;
     expiry(): Promise<Date>;
     content(): Promise<string>;

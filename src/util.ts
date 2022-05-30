@@ -1,4 +1,4 @@
-export function generateTeal(name: string) {
+export function generateTeal(name: string, escrow?:string, app?: number) {
   return `#pragma version 4
     byte "${name}"
     len
@@ -47,7 +47,7 @@ export function generateTeal(name: string) {
     ==
     assert
     gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+    addr ${escrow}
     ==
     assert
     global GroupSize
@@ -70,7 +70,7 @@ export function generateTeal(name: string) {
     gtxn 2 Sender
     ==
     gtxn 2 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 2 OnCompletion
@@ -78,7 +78,7 @@ export function generateTeal(name: string) {
     ==
     &&
     gtxn 3 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 3 Sender
@@ -97,7 +97,7 @@ export function generateTeal(name: string) {
     b main_l9
     main_l11:
     gtxn 1 ApplicationID
-    int 628095415
+    int ${app}
     ==
     gtxna 1 ApplicationArgs 0
     byte "register_name"
@@ -170,7 +170,7 @@ export function generateTeal(name: string) {
     ==
     assert
     gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+    addr ${escrow}
     ==
     assert
     global GroupSize
@@ -193,7 +193,7 @@ export function generateTeal(name: string) {
     gtxn 2 Sender
     ==
     gtxn 2 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 2 OnCompletion
@@ -201,7 +201,7 @@ export function generateTeal(name: string) {
     ==
     &&
     gtxn 3 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 3 Sender
@@ -220,7 +220,7 @@ export function generateTeal(name: string) {
     b main_l18
     main_l20:
     gtxn 1 ApplicationID
-    int 628095415
+    int ${app}
     ==
     gtxna 1 ApplicationArgs 0
     byte "register_name"
@@ -293,7 +293,7 @@ export function generateTeal(name: string) {
     ==
     assert
     gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+    addr ${escrow}
     ==
     assert
     global GroupSize
@@ -316,7 +316,7 @@ export function generateTeal(name: string) {
     gtxn 2 Sender
     ==
     gtxn 2 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 2 OnCompletion
@@ -324,7 +324,7 @@ export function generateTeal(name: string) {
     ==
     &&
     gtxn 3 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 3 Sender
@@ -343,7 +343,7 @@ export function generateTeal(name: string) {
     b main_l27
     main_l29:
     gtxn 1 ApplicationID
-    int 628095415
+    int ${app}
     ==
     gtxna 1 ApplicationArgs 0
     byte "register_name"

@@ -44,4 +44,5 @@ export interface NameResponse {
   address?: string;
   socials?: Record[];
   metadata?: Record[];
+  value?: string;
 }

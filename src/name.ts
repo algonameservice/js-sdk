@@ -21,7 +21,7 @@ export class Name {
   private _name: string;
 
   constructor(options: NameConstructor) {
-    const { name, rpc, indexer } = options;
+    const { name, rpc, indexer} = options;
     this._name = name;
     this.resolver = new Resolver(rpc, indexer, this);
     this.transactions = new Transactions(rpc, indexer, this);
@@ -38,6 +38,10 @@ export class Name {
 
   async getOwner(): Promise<string> {
     return await this.resolver.owner();
+  }
+
+  async getValue(): Promise<string> {
+    return await this.resolver.value();
   }
 
   async getContent(): Promise<string> {
@@ -125,6 +129,11 @@ export class Name {
   async renew(address: string, years: number): Promise<Transaction[]> {
     await this.isValidTransaction(address);
     return await this.transactions.prepareNameRenewalTxns(address, years);
+  }
+
+  async setValue(address:string, value:string) : Promise<Transaction> {
+    await this.isValidTransaction(address);
+    return await this.transactions.prepareUpdateValueTxn(address, value);
   }
 
   async initTransfer(

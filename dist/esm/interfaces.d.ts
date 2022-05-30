@@ -37,5 +37,6 @@ export interface NameResponse {
     address?: string;
     socials?: Record[];
     metadata?: Record[];
+    value?: string;
 }
 //# sourceMappingURL=interfaces.d.ts.map
