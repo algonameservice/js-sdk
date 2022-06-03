@@ -5,7 +5,7 @@ export default class CachedApi {
     protected indexer: algosdk.Indexer;
     protected ESCROW: string;
     protected APP: number;
-    constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer);
+    constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer, network?: string);
     protected getTeal(name: string): Promise<LogicSigAccount>;
 }
 //# sourceMappingURL=cachedApi.d.ts.map

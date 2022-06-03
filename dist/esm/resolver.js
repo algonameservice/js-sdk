@@ -7,8 +7,8 @@ export class Resolver extends CachedApi {
     name;
     // @ts-ignore
     resolvedData;
-    constructor(client, indexer, name) {
-        super(client, indexer);
+    constructor(client, indexer, name, network) {
+        super(client, indexer, network);
         this.name = name;
     }
     checkName(name) {

@@ -4,10 +4,10 @@ import { assert } from "chai";
 import ANS from "../src/index.js";
 import API_KEY from "./api_key.js";
 
-const DOMAIN = 'randomdomain2.algo';
-const OWNER = '3DGH7YRKUVKGZ25TCJMRZJBAJU53C7GBOOHFZY2OJKQTVTUSS2QURCYL7U';
-const VALUE = 'VXFHVD2CBXSVJPZYENADADIJZOK7WFDDAK5OJHOUUNUZEWCRMURZAFJXEQ';
-//const OWNER = 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU';
+const DOMAIN = "lalith.algo";
+//const OWNER = "3DGH7YRKUVKGZ25TCJMRZJBAJU53C7GBOOHFZY2OJKQTVTUSS2QURCYL7U";
+//const VALUE = 'VXFHVD2CBXSVJPZYENADADIJZOK7WFDDAK5OJHOUUNUZEWCRMURZAFJXEQ';
+const OWNER = 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU';
 
 let indexerClient: algosdk.Indexer,
   algodClient: algosdk.Algodv2,
@@ -18,31 +18,26 @@ describe("Testing name resolution methods", function () {
   beforeEach("Creating Client and Indexer instances", function () {
     algodClient = new algosdk.Algodv2(
       { "X-API-KEY": API_KEY },
-      "https://testnet-algorand.api.purestake.io/ps2",
+      "https://mainnet-algorand.api.purestake.io/ps2",
       ""
     );
 
     indexerClient = new algosdk.Indexer(
       { "X-API-KEY": API_KEY },
-      "https://testnet-algorand.api.purestake.io/idx2",
+      "https://mainnet-algorand.api.purestake.io/idx2",
       ""
     );
 
     sdk = new ANS(algodClient, indexerClient);
   });
 
-  
   it("Retrieves the owner of .algo name", async function () {
     this.timeout(10000);
     name = sdk.name(DOMAIN);
     const address = await name.getOwner();
-    assert.equal(
-      address,
-      OWNER,
-      "Name resolution failed"
-    );
+    assert.equal(address, OWNER, "Name resolution failed");
   });
-
+  /*
   it("Gets the value of .algo name", async function () {
     this.timeout(10000);
     const address = await name.getValue();
@@ -52,15 +47,11 @@ describe("Testing name resolution methods", function () {
       "Name resolution failed"
     )
   });
-  
-  
+  */
+
   it("Get all information about name", async function () {
     const information = await name.getAllInformation();
-    assert.equal(
-      information.address,
-      OWNER,
-      "Could not fetch all information"
-    );
+    assert.equal(information.address, OWNER, "Could not fetch all information");
   });
 
   it("Gets a specific text record", async function () {
@@ -73,7 +64,6 @@ describe("Testing name resolution methods", function () {
     assert.notEqual(expiry, null, "Could not fetch expiry of domain");
   });
 
-
   it("Gets the list of .algo names owned by an address", async function () {
     this.timeout(100000);
     const options = {
@@ -81,37 +71,27 @@ describe("Testing name resolution methods", function () {
       metadata: false,
       limit: 1,
     };
-    const nameInfo = await sdk
-      .address(OWNER)
-      .getNames(options);
-    
+    const nameInfo = await sdk.address(OWNER).getNames(options);
+
     assert.isAtLeast(
       nameInfo.length,
       1,
       "Error: Doesn't retrieve the names owned by the address"
     );
   });
-  
 
   it("Gets the default domain of an address", async function () {
     this.timeout(100000);
-    const defaultDomain = await sdk
-      .address(OWNER)
-      .getDefaultDomain();
-    
-    assert.notEqual(defaultDomain, undefined, 'Default domain not retrieved');
-    
+    const defaultDomain = await sdk.address(OWNER).getDefaultDomain();
+
+    assert.notEqual(defaultDomain, undefined, "Default domain not retrieved");
   });
 
-  
   it("Prepares a list of transactions to register a name", async function () {
     this.timeout(100000);
     const nameRegistrationTxns = await sdk
       .name("ansone.algo")
-      .register(
-        OWNER,
-        1
-      );
+      .register(OWNER, 1);
 
     assert.isAtLeast(
       nameRegistrationTxns.txns.length,
@@ -122,13 +102,10 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a list of transactions to set properties", async function () {
     this.timeout(100000);
-    const updatePropertyTxns = await name.update(
-      OWNER,
-      {
-        discord: "ansdiscord",
-        github: "ansgithub",
-      }
-    );
+    const updatePropertyTxns = await name.update(OWNER, {
+      discord: "ansdiscord",
+      github: "ansgithub",
+    });
 
     assert.notEqual(
       updatePropertyTxns[0].group,
@@ -149,10 +126,7 @@ describe("Testing name resolution methods", function () {
 
   it("Prepares a list of transactions to renew name", async function () {
     this.timeout(100000);
-    const nameRenewalTxns = await name.renew(
-      OWNER,
-      2
-    );
+    const nameRenewalTxns = await name.renew(OWNER, 2);
 
     assert.equal(
       nameRenewalTxns.length,
@@ -189,5 +163,4 @@ describe("Testing name resolution methods", function () {
       "Not returning 3 transactions for accepting name"
     );
   });
-  
 });

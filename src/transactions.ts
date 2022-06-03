@@ -12,9 +12,10 @@ export class Transactions extends CachedApi {
   constructor(
     client: algosdk.Algodv2,
     indexer: algosdk.Indexer,
-    name: Name | string
+    name: Name | string,
+    network?: string
   ) {
-    super(client, indexer);
+    super(client, indexer, network);
     if (name instanceof Name) {
       this.name = name.name;
     } else {
@@ -201,14 +202,14 @@ export class Transactions extends CachedApi {
     return [paymentTxn, applicationTxn];
   }
 
-  async prepareUpdateValueTxn(address:string, value:string) {
+  async prepareUpdateValueTxn(address: string, value: string) {
     const params = await this.rpc.getTransactionParams().do();
 
     const lsig = await this.getTeal(this.name);
 
     const appArgs = [];
     appArgs.push(toIntArray("update_resolver_account"));
-  
+
     return algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
       lsig.address(),
       value,

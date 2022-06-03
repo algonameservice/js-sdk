@@ -1,4 +1,4 @@
-export function generateTeal(name: string, escrow?:string, app?: number) {
+export function generateTeal(name: string, escrow?: string, app?: number) {
   return `#pragma version 4
     byte "${name}"
     len

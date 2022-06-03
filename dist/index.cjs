@@ -84,6 +84,7 @@ var PropertyNotSetError = class extends Error {
 var import_algosdk = __toESM(require("algosdk"), 1);
 
 // src/constants.ts
+var APP_ID = 628095415;
 var TESTNET_APP_ID = 75101786;
 var REGISTRATION_PRICE = {
   CHAR_3_AMOUNT: 15e7,
@@ -106,6 +107,7 @@ var ALLOWED_SOCIALS = [
   "discord"
 ];
 var TESTNET_ESCROW = "ACFFHRILZQ6W2UDNYYTHV55YS6MZWJR4PEDVBFAL575FFK4AT4UBCO3SXE";
+var MAINNET_ESCROW = "SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4";
 var ALLOWED_TLDS = ["algo"];
 
 // src/validation.ts
@@ -540,11 +542,15 @@ var CachedApi = class {
   cache = {};
   rpc;
   indexer;
-  ESCROW = TESTNET_ESCROW;
-  APP = TESTNET_APP_ID;
-  constructor(client, indexer) {
+  ESCROW = MAINNET_ESCROW;
+  APP = APP_ID;
+  constructor(client, indexer, network) {
     this.rpc = client;
     this.indexer = indexer;
+    if (network === "testnet") {
+      this.ESCROW = TESTNET_ESCROW;
+      this.APP = TESTNET_APP_ID;
+    }
   }
   async getTeal(name) {
     if (name in this.cache) {
@@ -561,8 +567,8 @@ var CachedApi = class {
 var Resolver = class extends CachedApi {
   name;
   resolvedData;
-  constructor(client, indexer, name) {
-    super(client, indexer);
+  constructor(client, indexer, name, network) {
+    super(client, indexer, network);
     this.name = name;
   }
   checkName(name) {
@@ -863,8 +869,8 @@ var Resolver = class extends CachedApi {
 var import_algosdk4 = __toESM(require("algosdk"), 1);
 var Transactions = class extends CachedApi {
   name;
-  constructor(client, indexer, name) {
-    super(client, indexer);
+  constructor(client, indexer, name, network) {
+    super(client, indexer, network);
     if (name instanceof Name) {
       this.name = name.name;
     } else {
@@ -1009,10 +1015,10 @@ var Name = class {
   transactions;
   _name;
   constructor(options) {
-    const { name, rpc, indexer } = options;
+    const { name, rpc, indexer, network } = options;
     this._name = name;
-    this.resolver = new Resolver(rpc, indexer, this);
-    this.transactions = new Transactions(rpc, indexer, this);
+    this.resolver = new Resolver(rpc, indexer, this, network);
+    this.transactions = new Transactions(rpc, indexer, this, network);
   }
   get name() {
     return this._name;
@@ -1107,9 +1113,9 @@ var Address = class {
   address;
   resolver;
   constructor(options) {
-    const { address, rpc, indexer } = options;
+    const { address, rpc, indexer, network } = options;
     this.address = address;
-    this.resolver = new Resolver(rpc, indexer);
+    this.resolver = new Resolver(rpc, indexer, void 0, network);
   }
   async getNames(options) {
     return await this.resolver.getNamesOwnedByAddress(this.address, options == null ? void 0 : options.socials, options == null ? void 0 : options.metadata, options == null ? void 0 : options.limit);
@@ -1121,12 +1127,20 @@ var Address = class {
 
 // src/index.ts
 var ANS = class extends CachedApi {
+  network = "mainnet";
+  constructor(client, indexer, network) {
+    super(client, indexer, network);
+    if (network === "testnet") {
+      this.network = "testnet";
+    }
+  }
   name(name) {
     name = normalizeName(name);
     return new Name({
       rpc: this.rpc,
       indexer: this.indexer,
-      name
+      name,
+      network: this.network
     });
   }
   address(address) {
@@ -1136,7 +1150,8 @@ var ANS = class extends CachedApi {
     return new Address({
       rpc: this.rpc,
       indexer: this.indexer,
-      address
+      address,
+      network: this.network
     });
   }
 };

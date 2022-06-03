@@ -7,10 +7,10 @@ export class Name {
     transactions;
     _name;
     constructor(options) {
-        const { name, rpc, indexer } = options;
+        const { name, rpc, indexer, network } = options;
         this._name = name;
-        this.resolver = new Resolver(rpc, indexer, this);
-        this.transactions = new Transactions(rpc, indexer, this);
+        this.resolver = new Resolver(rpc, indexer, this, network);
+        this.transactions = new Transactions(rpc, indexer, this, network);
     }
     get name() {
         return this._name;

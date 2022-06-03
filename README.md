@@ -35,14 +35,14 @@ const ANS = require('@algonameservice/sdk/dist/index.cjs').default
 ### Setup
 
 ```
-//Example setup of client and indexer 
+//Example setup of client and indexer
 
 const client = new algosdk.Algodv2({'X-API-KEY': 'xGdsgkThisDoesntWorka32sasfd'},
-        'https://mainnet-algorand.api.purestake.io/ps2', 
+        'https://mainnet-algorand.api.purestake.io/ps2',
         '');
 
 const indexer = new algosdk.Indexer({'X-API-KEY': 'xGdsgkThisDoesntWorksa32sasfd'},
-        'https://mainnet-algorand.api.purestake.io/idx2', 
+        'https://mainnet-algorand.api.purestake.io/idx2',
         '');
 
 //indexer and client must point to mainnet

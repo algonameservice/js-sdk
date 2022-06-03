@@ -1,15 +1,19 @@
 import algosdk from "algosdk";
 import { generateTeal } from "./util.js";
-import { TESTNET_ESCROW, TESTNET_APP_ID } from "./constants.js";
+import { MAINNET_ESCROW, APP_ID, TESTNET_ESCROW, TESTNET_APP_ID } from "./constants.js";
 export default class CachedApi {
     cache = {};
     rpc;
     indexer;
-    ESCROW = TESTNET_ESCROW;
-    APP = TESTNET_APP_ID;
-    constructor(client, indexer) {
+    ESCROW = MAINNET_ESCROW;
+    APP = APP_ID;
+    constructor(client, indexer, network) {
         this.rpc = client;
         this.indexer = indexer;
+        if (network === 'testnet') {
+            this.ESCROW = TESTNET_ESCROW;
+            this.APP = TESTNET_APP_ID;
+        }
     }
     async getTeal(name) {
         if (name in this.cache) {

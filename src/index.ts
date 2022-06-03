@@ -10,13 +10,26 @@ export { Transactions } from "./transactions.js";
 export * from "./errors.js";
 
 export default class ANS extends CachedApi {
+  protected network = "mainnet";
+
+  constructor(
+    client: algosdk.Algodv2,
+    indexer: algosdk.Indexer,
+    network?: string
+  ) {
+    super(client, indexer, network);
+    if (network === "testnet") {
+      this.network = "testnet";
+    }
+  }
 
   name(name: string): Name {
     name = normalizeName(name);
     return new Name({
       rpc: this.rpc,
       indexer: this.indexer,
-      name
+      name,
+      network: this.network,
     });
   }
 
@@ -27,7 +40,8 @@ export default class ANS extends CachedApi {
     return new Address({
       rpc: this.rpc,
       indexer: this.indexer,
-      address
+      address,
+      network: this.network,
     });
   }
 }

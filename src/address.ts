@@ -1,16 +1,14 @@
 import { Resolver } from "./resolver.js";
 import { AddressConstructor, Domain, DomainOptions } from "./interfaces.js";
-import { Transaction } from "algosdk";
-import { Transactions } from "./transactions.js";
 
 export class Address {
   private address: string;
   private resolver: Resolver;
 
   constructor(options: AddressConstructor) {
-    const { address, rpc, indexer } = options;
+    const { address, rpc, indexer, network } = options;
     this.address = address;
-    this.resolver = new Resolver(rpc, indexer);
+    this.resolver = new Resolver(rpc, indexer, undefined, network);
   }
 
   async getNames(options?: DomainOptions): Promise<Domain[]> {
@@ -22,7 +20,7 @@ export class Address {
     );
   }
 
-  async getDefaultDomain() : Promise<string | Error> {
+  async getDefaultDomain(): Promise<string | Error> {
     return await this.resolver.getDefaultDomain(this.address);
   }
 }

@@ -5,7 +5,7 @@ import { Name } from "./name.js";
 export declare class Resolver extends CachedApi {
     private name?;
     private resolvedData?;
-    constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer, name?: Name);
+    constructor(client: algosdk.Algodv2, indexer: algosdk.Indexer, name?: Name, network?: string);
     private checkName;
     resolveName(name?: string): Promise<NameResponse>;
     getNamesOwnedByAddress(address: string, socials?: boolean, metadata?: boolean, limit?: number): Promise<Domain[]>;
