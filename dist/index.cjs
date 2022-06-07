@@ -22,21 +22,19 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.ts
 var src_exports = {};
 __export(src_exports, {
+  ANS: () => ANS,
   AddressValidationError: () => AddressValidationError,
   IncorrectOwnerError: () => IncorrectOwnerError,
   InvalidNameError: () => InvalidNameError,
   NameNotRegisteredError: () => NameNotRegisteredError,
   PropertyNotSetError: () => PropertyNotSetError,
   Resolver: () => Resolver,
-  Transactions: () => Transactions,
-  default: () => ANS
+  Transactions: () => Transactions
 });
 module.exports = __toCommonJS(src_exports);
 
 // src/errors.ts
 var AddressValidationError = class extends Error {
-  name;
-  type;
   constructor() {
     super(`This is not a valid Algorand address`);
     this.name = "InvalidAddressError";
@@ -44,8 +42,6 @@ var AddressValidationError = class extends Error {
   }
 };
 var InvalidNameError = class extends Error {
-  name;
-  type;
   constructor() {
     super(`The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters`);
     this.name = "InvalidNameError";
@@ -53,8 +49,6 @@ var InvalidNameError = class extends Error {
   }
 };
 var NameNotRegisteredError = class extends Error {
-  name;
-  type;
   constructor(name) {
     super(`Name ${name}.algo is not registered`);
     this.name = "NameNotRegisteredError";
@@ -62,8 +56,6 @@ var NameNotRegisteredError = class extends Error {
   }
 };
 var IncorrectOwnerError = class extends Error {
-  name;
-  type;
   constructor(name, address) {
     super(`Name ${name}.algo is not owned by ${address}`);
     this.name = "IncorrectOwnerError";
@@ -71,8 +63,6 @@ var IncorrectOwnerError = class extends Error {
   }
 };
 var PropertyNotSetError = class extends Error {
-  name;
-  type;
   constructor(property) {
     super(`Property ${property} is not set`);
     this.name = "PropertyNotSetError";
@@ -539,12 +529,10 @@ function toIntArray(data) {
 
 // src/cachedApi.ts
 var CachedApi = class {
-  cache = {};
-  rpc;
-  indexer;
-  ESCROW = MAINNET_ESCROW;
-  APP = APP_ID;
   constructor(client, indexer, network) {
+    this.cache = {};
+    this.ESCROW = MAINNET_ESCROW;
+    this.APP = APP_ID;
     this.rpc = client;
     this.indexer = indexer;
     if (network === "testnet") {
@@ -565,8 +553,6 @@ var CachedApi = class {
 
 // src/resolver.ts
 var Resolver = class extends CachedApi {
-  name;
-  resolvedData;
   constructor(client, indexer, name, network) {
     super(client, indexer, network);
     this.name = name;
@@ -868,7 +854,6 @@ var Resolver = class extends CachedApi {
 // src/transactions.ts
 var import_algosdk4 = __toESM(require("algosdk"), 1);
 var Transactions = class extends CachedApi {
-  name;
   constructor(client, indexer, name, network) {
     super(client, indexer, network);
     if (name instanceof Name) {
@@ -970,10 +955,19 @@ var Transactions = class extends CachedApi {
     const params = await this.rpc.getTransactionParams().do();
     const lsig = await this.getTeal(this.name);
     const appArgs = [];
-    appArgs.push(toIntArray("update_resolver_account"));
+    appArgs.push(toIntArray("set_default_account"));
     return import_algosdk4.default.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
       lsig.address(),
       value
+    ]);
+  }
+  async prepareSetDefaultDomainTxn(address) {
+    const params = await this.rpc.getTransactionParams().do();
+    const lsig = await this.getTeal(this.name);
+    const appArgs = [];
+    appArgs.push(toIntArray("set_default_account"));
+    return import_algosdk4.default.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
+      lsig.address()
     ]);
   }
   async prepareInitiateNameTransferTransaction(sender, newOwner, price) {
@@ -1011,9 +1005,6 @@ var Transactions = class extends CachedApi {
 
 // src/name.ts
 var Name = class {
-  resolver;
-  transactions;
-  _name;
   constructor(options) {
     const { name, rpc, indexer, network } = options;
     this._name = name;
@@ -1098,6 +1089,10 @@ var Name = class {
     await this.isValidTransaction(address);
     return await this.transactions.prepareUpdateValueTxn(address, value);
   }
+  async setDefaultDomain(address) {
+    await this.isValidTransaction(address);
+    return await this.transactions.prepareSetDefaultDomainTxn(address);
+  }
   async initTransfer(owner, newOwner, price) {
     await this.isValidTransaction(owner, newOwner, "initiate_transfer");
     return await this.transactions.prepareInitiateNameTransferTransaction(owner, newOwner, price);
@@ -1110,8 +1105,6 @@ var Name = class {
 
 // src/address.ts
 var Address = class {
-  address;
-  resolver;
   constructor(options) {
     const { address, rpc, indexer, network } = options;
     this.address = address;
@@ -1127,9 +1120,9 @@ var Address = class {
 
 // src/index.ts
 var ANS = class extends CachedApi {
-  network = "mainnet";
   constructor(client, indexer, network) {
     super(client, indexer, network);
+    this.network = "mainnet";
     if (network === "testnet") {
       this.network = "testnet";
     }
@@ -1157,6 +1150,7 @@ var ANS = class extends CachedApi {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  ANS,
   AddressValidationError,
   IncorrectOwnerError,
   InvalidNameError,

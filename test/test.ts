@@ -1,13 +1,13 @@
 import algosdk from "algosdk";
 import { describe, it, beforeEach } from "mocha";
 import { assert } from "chai";
-import ANS from "../src/index.js";
+import { ANS } from "../src/index.js";
 import API_KEY from "./api_key.js";
 
 const DOMAIN = "lalith.algo";
-//const OWNER = "3DGH7YRKUVKGZ25TCJMRZJBAJU53C7GBOOHFZY2OJKQTVTUSS2QURCYL7U";
+//const OWNER = "33IA2RTOTZDD3KNDBOBUUGF43RJ4MJXDL6GZENBFHS2KO6HYN43ZKCBYDA";
 //const VALUE = 'VXFHVD2CBXSVJPZYENADADIJZOK7WFDDAK5OJHOUUNUZEWCRMURZAFJXEQ';
-const OWNER = 'PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU';
+const OWNER = "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU";
 
 let indexerClient: algosdk.Indexer,
   algodClient: algosdk.Algodv2,

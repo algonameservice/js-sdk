@@ -1,11 +1,17 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { Resolver } from "./resolver.js";
 import { Transactions } from "./transactions.js";
 import { AddressValidationError, IncorrectOwnerError, NameNotRegisteredError, } from "./errors.js";
 import { isValidAddress } from "./validation.js";
 export class Name {
-    resolver;
-    transactions;
-    _name;
     constructor(options) {
         const { name, rpc, indexer, network } = options;
         this._name = name;
@@ -15,90 +21,124 @@ export class Name {
     get name() {
         return this._name;
     }
-    async isRegistered() {
-        const status = await this.resolver.resolveName();
-        return status.found;
+    isRegistered() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const status = yield this.resolver.resolveName();
+            return status.found;
+        });
     }
-    async getOwner() {
-        return await this.resolver.owner();
+    getOwner() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.resolver.owner();
+        });
     }
-    async getValue() {
-        return await this.resolver.value();
+    getValue() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.resolver.value();
+        });
     }
-    async getContent() {
-        return await this.resolver.content();
+    getContent() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.resolver.content();
+        });
     }
-    async getText(key) {
-        return await this.resolver.text(key);
+    getText(key) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.resolver.text(key);
+        });
     }
-    async getAllInformation() {
-        return await this.resolver.resolveName();
+    getAllInformation() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.resolver.resolveName();
+        });
     }
-    async getExpiry() {
-        return await this.resolver.expiry();
+    getExpiry() {
+        return __awaiter(this, void 0, void 0, function* () {
+            return yield this.resolver.expiry();
+        });
     }
-    async isValidTransaction(sender, receiver, method) {
-        if (!(await this.isRegistered())) {
-            throw new NameNotRegisteredError(this._name);
-        }
-        if (!isValidAddress(sender)) {
-            throw new AddressValidationError();
-        }
-        if (receiver) {
-            if (!isValidAddress(receiver))
-                throw new AddressValidationError();
-        }
-        const owner = await this.getOwner();
-        if (!(await isValidAddress(sender))) {
-            throw new AddressValidationError();
-        }
-        if (!receiver && !method) {
-            if (owner !== sender) {
-                throw new IncorrectOwnerError(this._name, sender);
+    isValidTransaction(sender, receiver, method) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!(yield this.isRegistered())) {
+                throw new NameNotRegisteredError(this._name);
             }
-        }
-        else if (sender && receiver) {
-            if (method === "initiate_transfer") {
+            if (!isValidAddress(sender)) {
+                throw new AddressValidationError();
+            }
+            if (receiver) {
+                if (!isValidAddress(receiver))
+                    throw new AddressValidationError();
+            }
+            const owner = yield this.getOwner();
+            if (!(yield isValidAddress(sender))) {
+                throw new AddressValidationError();
+            }
+            if (!receiver && !method) {
                 if (owner !== sender) {
                     throw new IncorrectOwnerError(this._name, sender);
                 }
             }
-            else if (method === "accept_transfer") {
-                if (owner !== receiver) {
-                    throw new IncorrectOwnerError(this._name, receiver);
+            else if (sender && receiver) {
+                if (method === "initiate_transfer") {
+                    if (owner !== sender) {
+                        throw new IncorrectOwnerError(this._name, sender);
+                    }
+                }
+                else if (method === "accept_transfer") {
+                    if (owner !== receiver) {
+                        throw new IncorrectOwnerError(this._name, receiver);
+                    }
                 }
             }
-        }
-        return true;
+            return true;
+        });
     }
-    async register(address, period) {
-        if (await this.isRegistered()) {
-            throw new Error("Name already registered");
-        }
-        if (!isValidAddress(address)) {
-            throw new AddressValidationError();
-        }
-        return await this.transactions.prepareNameRegistrationTransactions(address, period);
+    register(address, period) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (yield this.isRegistered()) {
+                throw new Error("Name already registered");
+            }
+            if (!isValidAddress(address)) {
+                throw new AddressValidationError();
+            }
+            return yield this.transactions.prepareNameRegistrationTransactions(address, period);
+        });
     }
-    async update(address, editedHandles) {
-        await this.isValidTransaction(address);
-        return await this.transactions.prepareUpdateNamePropertyTransactions(address, editedHandles);
+    update(address, editedHandles) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.isValidTransaction(address);
+            return yield this.transactions.prepareUpdateNamePropertyTransactions(address, editedHandles);
+        });
     }
-    async renew(address, years) {
-        await this.isValidTransaction(address);
-        return await this.transactions.prepareNameRenewalTxns(address, years);
+    renew(address, years) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.isValidTransaction(address);
+            return yield this.transactions.prepareNameRenewalTxns(address, years);
+        });
     }
-    async setValue(address, value) {
-        await this.isValidTransaction(address);
-        return await this.transactions.prepareUpdateValueTxn(address, value);
+    setValue(address, value) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.isValidTransaction(address);
+            return yield this.transactions.prepareUpdateValueTxn(address, value);
+        });
     }
-    async initTransfer(owner, newOwner, price) {
-        await this.isValidTransaction(owner, newOwner, "initiate_transfer");
-        return await this.transactions.prepareInitiateNameTransferTransaction(owner, newOwner, price);
+    setDefaultDomain(address) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.isValidTransaction(address);
+            return yield this.transactions.prepareSetDefaultDomainTxn(address);
+        });
     }
-    async acceptTransfer(newOwner, owner, price) {
-        await this.isValidTransaction(newOwner, owner, "accept_transfer");
-        return await this.transactions.prepareAcceptNameTransferTransactions(newOwner, owner, price);
+    initTransfer(owner, newOwner, price) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.isValidTransaction(owner, newOwner, "initiate_transfer");
+            return yield this.transactions.prepareInitiateNameTransferTransaction(owner, newOwner, price);
+        });
+    }
+    acceptTransfer(newOwner, owner, price) {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.isValidTransaction(newOwner, owner, "accept_transfer");
+            return yield this.transactions.prepareAcceptNameTransferTransactions(newOwner, owner, price);
+        });
     }
 }
 //# sourceMappingURL=name.js.map

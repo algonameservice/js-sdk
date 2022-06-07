@@ -31151,8 +31151,6 @@
 
   // src/errors.ts
   var AddressValidationError = class extends Error {
-    name;
-    type;
     constructor() {
       super(`This is not a valid Algorand address`);
       this.name = "InvalidAddressError";
@@ -31160,8 +31158,6 @@
     }
   };
   var InvalidNameError = class extends Error {
-    name;
-    type;
     constructor() {
       super(`The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters`);
       this.name = "InvalidNameError";
@@ -31169,8 +31165,6 @@
     }
   };
   var NameNotRegisteredError = class extends Error {
-    name;
-    type;
     constructor(name) {
       super(`Name ${name}.algo is not registered`);
       this.name = "NameNotRegisteredError";
@@ -31178,8 +31172,6 @@
     }
   };
   var IncorrectOwnerError = class extends Error {
-    name;
-    type;
     constructor(name, address) {
       super(`Name ${name}.algo is not owned by ${address}`);
       this.name = "IncorrectOwnerError";
@@ -31187,8 +31179,6 @@
     }
   };
   var PropertyNotSetError = class extends Error {
-    name;
-    type;
     constructor(property) {
       super(`Property ${property} is not set`);
       this.name = "PropertyNotSetError";
@@ -37233,12 +37223,10 @@
 
   // src/cachedApi.ts
   var CachedApi = class {
-    cache = {};
-    rpc;
-    indexer;
-    ESCROW = MAINNET_ESCROW;
-    APP = APP_ID;
     constructor(client, indexer, network) {
+      this.cache = {};
+      this.ESCROW = MAINNET_ESCROW;
+      this.APP = APP_ID;
       this.rpc = client;
       this.indexer = indexer;
       if (network === "testnet") {
@@ -37259,8 +37247,6 @@
 
   // src/resolver.ts
   var Resolver = class extends CachedApi {
-    name;
-    resolvedData;
     constructor(client, indexer, name, network) {
       super(client, indexer, network);
       this.name = name;
@@ -37561,7 +37547,6 @@
 
   // src/transactions.ts
   var Transactions = class extends CachedApi {
-    name;
     constructor(client, indexer, name, network) {
       super(client, indexer, network);
       if (name instanceof Name) {
@@ -37663,10 +37648,19 @@
       const params = await this.rpc.getTransactionParams().do();
       const lsig = await this.getTeal(this.name);
       const appArgs = [];
-      appArgs.push(toIntArray("update_resolver_account"));
+      appArgs.push(toIntArray("set_default_account"));
       return esm_default.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
         lsig.address(),
         value
+      ]);
+    }
+    async prepareSetDefaultDomainTxn(address) {
+      const params = await this.rpc.getTransactionParams().do();
+      const lsig = await this.getTeal(this.name);
+      const appArgs = [];
+      appArgs.push(toIntArray("set_default_account"));
+      return esm_default.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
+        lsig.address()
       ]);
     }
     async prepareInitiateNameTransferTransaction(sender, newOwner, price) {
@@ -37704,9 +37698,6 @@
 
   // src/name.ts
   var Name = class {
-    resolver;
-    transactions;
-    _name;
     constructor(options) {
       const { name, rpc, indexer, network } = options;
       this._name = name;
@@ -37791,6 +37782,10 @@
       await this.isValidTransaction(address);
       return await this.transactions.prepareUpdateValueTxn(address, value);
     }
+    async setDefaultDomain(address) {
+      await this.isValidTransaction(address);
+      return await this.transactions.prepareSetDefaultDomainTxn(address);
+    }
     async initTransfer(owner, newOwner, price) {
       await this.isValidTransaction(owner, newOwner, "initiate_transfer");
       return await this.transactions.prepareInitiateNameTransferTransaction(owner, newOwner, price);
@@ -37803,8 +37798,6 @@
 
   // src/address.ts
   var Address = class {
-    address;
-    resolver;
     constructor(options) {
       const { address, rpc, indexer, network } = options;
       this.address = address;
@@ -37820,9 +37813,9 @@
 
   // src/index.ts
   var ANS = class extends CachedApi {
-    network = "mainnet";
     constructor(client, indexer, network) {
       super(client, indexer, network);
+      this.network = "mainnet";
       if (network === "testnet") {
         this.network = "testnet";
       }

@@ -135,6 +135,11 @@ export class Name {
     return await this.transactions.prepareUpdateValueTxn(address, value);
   }
 
+  async setDefaultDomain(address: string): Promise<Transaction> {
+    await this.isValidTransaction(address);
+    return await this.transactions.prepareSetDefaultDomainTxn(address);
+  }
+
   async initTransfer(
     owner: string,
     newOwner: string,

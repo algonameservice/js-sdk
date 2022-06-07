@@ -11,6 +11,7 @@ export declare class Transactions extends CachedApi {
     prepareUpdateNamePropertyTransactions(address: string, editedHandles: Record): Promise<Transaction[]>;
     prepareNameRenewalTxns(sender: string, years: number): Promise<Transaction[]>;
     prepareUpdateValueTxn(address: string, value: string): Promise<algosdk.Transaction>;
+    prepareSetDefaultDomainTxn(address: string): Promise<algosdk.Transaction>;
     prepareInitiateNameTransferTransaction(sender: string, newOwner: string, price: number): Promise<Transaction>;
     prepareAcceptNameTransferTransactions(sender: string, receiver: string, amt: number): Promise<Transaction[]>;
 }

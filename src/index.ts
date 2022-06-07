@@ -9,7 +9,7 @@ export { Resolver } from "./resolver.js";
 export { Transactions } from "./transactions.js";
 export * from "./errors.js";
 
-export default class ANS extends CachedApi {
+export class ANS extends CachedApi {
   protected network = "mainnet";
 
   constructor(

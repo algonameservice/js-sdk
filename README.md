@@ -23,13 +23,13 @@ yarn add @algonameservice/sdk
 **`ESM`** import
 
 ```
-import ANS from '@algonameservice/sdk'
+import { ANS } from '@algonameservice/sdk'
 ```
 
 **`CJS`** require
 
 ```
-const ANS = require('@algonameservice/sdk/dist/index.cjs').default
+const { ANS } = require('@algonameservice/sdk/dist/index.cjs').default
 ```
 
 ### Setup

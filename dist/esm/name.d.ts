@@ -20,6 +20,7 @@ export declare class Name {
     update(address: string, editedHandles: Record): Promise<Transaction[]>;
     renew(address: string, years: number): Promise<Transaction[]>;
     setValue(address: string, value: string): Promise<Transaction>;
+    setDefaultDomain(address: string): Promise<Transaction>;
     initTransfer(owner: string, newOwner: string, price: number): Promise<Transaction>;
     acceptTransfer(newOwner: string, owner: string, price: number): Promise<Transaction[]>;
 }
