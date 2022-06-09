@@ -10,6 +10,7 @@ export declare class Name {
     get name(): string;
     isRegistered(): Promise<boolean>;
     getOwner(): Promise<string>;
+    getValue(): Promise<string>;
     getContent(): Promise<string>;
     getText(key: string): Promise<string>;
     getAllInformation(): Promise<NameResponse>;
@@ -18,6 +19,8 @@ export declare class Name {
     register(address: string, period: number): Promise<RegistrationTxns>;
     update(address: string, editedHandles: Record): Promise<Transaction[]>;
     renew(address: string, years: number): Promise<Transaction[]>;
+    setValue(address: string, value: string): Promise<Transaction>;
+    setDefaultDomain(address: string): Promise<Transaction>;
     initTransfer(owner: string, newOwner: string, price: number): Promise<Transaction>;
     acceptTransfer(newOwner: string, owner: string, price: number): Promise<Transaction[]>;
 }

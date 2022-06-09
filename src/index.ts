@@ -3,18 +3,33 @@ import { isValidAddress, normalizeName } from "./validation.js";
 import { Name } from "./name.js";
 import { Address } from "./address.js";
 import CachedApi from "./cachedApi.js";
+import algosdk from "algosdk";
 
 export { Resolver } from "./resolver.js";
 export { Transactions } from "./transactions.js";
 export * from "./errors.js";
 
-export default class ANS extends CachedApi {
+export class ANS extends CachedApi {
+  protected network = "mainnet";
+
+  constructor(
+    client: algosdk.Algodv2,
+    indexer: algosdk.Indexer,
+    network?: string
+  ) {
+    super(client, indexer, network);
+    if (network === "testnet") {
+      this.network = "testnet";
+    }
+  }
+
   name(name: string): Name {
     name = normalizeName(name);
     return new Name({
       rpc: this.rpc,
       indexer: this.indexer,
       name,
+      network: this.network,
     });
   }
 
@@ -26,6 +41,7 @@ export default class ANS extends CachedApi {
       rpc: this.rpc,
       indexer: this.indexer,
       address,
+      network: this.network,
     });
   }
 }

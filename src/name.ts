@@ -21,10 +21,10 @@ export class Name {
   private _name: string;
 
   constructor(options: NameConstructor) {
-    const { name, rpc, indexer } = options;
+    const { name, rpc, indexer, network } = options;
     this._name = name;
-    this.resolver = new Resolver(rpc, indexer, this);
-    this.transactions = new Transactions(rpc, indexer, this);
+    this.resolver = new Resolver(rpc, indexer, this, network);
+    this.transactions = new Transactions(rpc, indexer, this, network);
   }
 
   get name(): string {
@@ -38,6 +38,10 @@ export class Name {
 
   async getOwner(): Promise<string> {
     return await this.resolver.owner();
+  }
+
+  async getValue(): Promise<string> {
+    return await this.resolver.value();
   }
 
   async getContent(): Promise<string> {
@@ -105,13 +109,12 @@ export class Name {
     }
     if (!isValidAddress(address)) {
       throw new AddressValidationError();
-    } 
-    
+    }
+
     return await this.transactions.prepareNameRegistrationTransactions(
       address,
       period
     );
-    
   }
 
   async update(address: string, editedHandles: Record): Promise<Transaction[]> {
@@ -125,6 +128,16 @@ export class Name {
   async renew(address: string, years: number): Promise<Transaction[]> {
     await this.isValidTransaction(address);
     return await this.transactions.prepareNameRenewalTxns(address, years);
+  }
+
+  async setValue(address: string, value: string): Promise<Transaction> {
+    await this.isValidTransaction(address);
+    return await this.transactions.prepareUpdateValueTxn(address, value);
+  }
+
+  async setDefaultDomain(address: string): Promise<Transaction> {
+    await this.isValidTransaction(address);
+    return await this.transactions.prepareSetDefaultDomainTxn(address);
   }
 
   async initTransfer(

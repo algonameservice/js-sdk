@@ -31151,8 +31151,6 @@
 
   // src/errors.ts
   var AddressValidationError = class extends Error {
-    name;
-    type;
     constructor() {
       super(`This is not a valid Algorand address`);
       this.name = "InvalidAddressError";
@@ -31160,8 +31158,6 @@
     }
   };
   var InvalidNameError = class extends Error {
-    name;
-    type;
     constructor() {
       super(`The name must be between 3 and 64 characters and must only contain a-z and 0-9 characters`);
       this.name = "InvalidNameError";
@@ -31169,8 +31165,6 @@
     }
   };
   var NameNotRegisteredError = class extends Error {
-    name;
-    type;
     constructor(name) {
       super(`Name ${name}.algo is not registered`);
       this.name = "NameNotRegisteredError";
@@ -31178,8 +31172,6 @@
     }
   };
   var IncorrectOwnerError = class extends Error {
-    name;
-    type;
     constructor(name, address) {
       super(`Name ${name}.algo is not owned by ${address}`);
       this.name = "IncorrectOwnerError";
@@ -31187,8 +31179,6 @@
     }
   };
   var PropertyNotSetError = class extends Error {
-    name;
-    type;
     constructor(property) {
       super(`Property ${property} is not set`);
       this.name = "PropertyNotSetError";
@@ -36785,6 +36775,7 @@
 
   // src/constants.ts
   var APP_ID = 628095415;
+  var TESTNET_APP_ID = 75101786;
   var REGISTRATION_PRICE = {
     CHAR_3_AMOUNT: 15e7,
     CHAR_4_AMOUNT: 5e7,
@@ -36805,6 +36796,8 @@
     "reddit",
     "discord"
   ];
+  var TESTNET_ESCROW = "ACFFHRILZQ6W2UDNYYTHV55YS6MZWJR4PEDVBFAL575FFK4AT4UBCO3SXE";
+  var MAINNET_ESCROW = "SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4";
   var ALLOWED_TLDS = ["algo"];
 
   // src/validation.ts
@@ -36831,7 +36824,7 @@
   }
 
   // src/util.ts
-  function generateTeal(name) {
+  function generateTeal(name, escrow, app) {
     return `#pragma version 4
     byte "${name}"
     len
@@ -36880,7 +36873,7 @@
     ==
     assert
     gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+    addr ${escrow}
     ==
     assert
     global GroupSize
@@ -36903,7 +36896,7 @@
     gtxn 2 Sender
     ==
     gtxn 2 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 2 OnCompletion
@@ -36911,7 +36904,7 @@
     ==
     &&
     gtxn 3 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 3 Sender
@@ -36930,7 +36923,7 @@
     b main_l9
     main_l11:
     gtxn 1 ApplicationID
-    int 628095415
+    int ${app}
     ==
     gtxna 1 ApplicationArgs 0
     byte "register_name"
@@ -37003,7 +36996,7 @@
     ==
     assert
     gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+    addr ${escrow}
     ==
     assert
     global GroupSize
@@ -37026,7 +37019,7 @@
     gtxn 2 Sender
     ==
     gtxn 2 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 2 OnCompletion
@@ -37034,7 +37027,7 @@
     ==
     &&
     gtxn 3 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 3 Sender
@@ -37053,7 +37046,7 @@
     b main_l18
     main_l20:
     gtxn 1 ApplicationID
-    int 628095415
+    int ${app}
     ==
     gtxna 1 ApplicationArgs 0
     byte "register_name"
@@ -37126,7 +37119,7 @@
     ==
     assert
     gtxn 0 Receiver
-    addr SYGCDTWGBXKV4ZL5YAWSYAVOUC25U2XDB6SMQHLRCTYVF566TQZ3EOABH4
+    addr ${escrow}
     ==
     assert
     global GroupSize
@@ -37149,7 +37142,7 @@
     gtxn 2 Sender
     ==
     gtxn 2 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 2 OnCompletion
@@ -37157,7 +37150,7 @@
     ==
     &&
     gtxn 3 ApplicationID
-    int 628095415
+    int ${app}
     ==
     &&
     gtxn 3 Sender
@@ -37176,7 +37169,7 @@
     b main_l27
     main_l29:
     gtxn 1 ApplicationID
-    int 628095415
+    int ${app}
     ==
     gtxna 1 ApplicationArgs 0
     byte "register_name"
@@ -37230,18 +37223,22 @@
 
   // src/cachedApi.ts
   var CachedApi = class {
-    cache = {};
-    rpc;
-    indexer;
-    constructor(client, indexer) {
+    constructor(client, indexer, network) {
+      this.cache = {};
+      this.ESCROW = MAINNET_ESCROW;
+      this.APP = APP_ID;
       this.rpc = client;
       this.indexer = indexer;
+      if (network === "testnet") {
+        this.ESCROW = TESTNET_ESCROW;
+        this.APP = TESTNET_APP_ID;
+      }
     }
     async getTeal(name) {
       if (name in this.cache) {
         return this.cache[name];
       }
-      let program = await this.rpc.compile(generateTeal(name)).do();
+      let program = await this.rpc.compile(generateTeal(name, this.ESCROW, this.APP)).do();
       program = new Uint8Array(Buffer.from(program.result, "base64"));
       this.cache[name] = new esm_default.LogicSigAccount(program);
       return this.cache[name];
@@ -37250,12 +37247,8 @@
 
   // src/resolver.ts
   var Resolver = class extends CachedApi {
-    name;
-    resolvedData;
-    constructor(client, indexer, name) {
-      super(client, indexer);
-      this.rpc = client;
-      this.indexer = indexer;
+    constructor(client, indexer, name, network) {
+      super(client, indexer, network);
       this.name = name;
     }
     checkName(name) {
@@ -37275,7 +37268,8 @@
         found: false,
         socials: [],
         metadata: [],
-        address: "Not Registered"
+        address: "Not Registered",
+        value: "Not Registered"
       };
       try {
         if (!this.resolvedData || name !== ((_a = this.name) == null ? void 0 : _a.name)) {
@@ -37284,17 +37278,23 @@
         let accountInfo = this.resolvedData;
         accountInfo = accountInfo.account["apps-local-state"];
         const length = accountInfo.length;
-        let address;
+        let address, value;
         let socials = [], metadata = [];
         for (let i = 0; i < length; i++) {
           const app = accountInfo[i];
-          if (app.id === APP_ID) {
+          if (app.id === this.APP) {
             const kv = app["key-value"];
             const decodedKvPairs = this.decodeKvPairs(kv);
             socials = this.filterKvPairs(decodedKvPairs, "socials");
             metadata = this.filterKvPairs(decodedKvPairs, "metadata");
             found = true;
             address = metadata.filter((kv2) => kv2.key === "owner")[0].value;
+            value = metadata.filter((kv2) => kv2.key === "account" || kv2.key === "value");
+            if (value.length > 0) {
+              value = value[0].value;
+            } else {
+              value = address;
+            }
           }
         }
         if (found) {
@@ -37302,7 +37302,8 @@
             found,
             address,
             socials,
-            metadata
+            metadata,
+            value
           };
         }
         return error;
@@ -37319,7 +37320,7 @@
       let txns = [];
       while (txnLength > 0) {
         try {
-          const info = await this.indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(APP_ID).nextToken(nextToken).do();
+          const info = await this.indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(this.APP).nextToken(nextToken).do();
           txnLength = info.transactions.length;
           if (txnLength > 0) {
             nextToken = info["next-token"];
@@ -37399,7 +37400,7 @@
         const { value } = kvPair;
         key = Buffer.from(key, "base64").toString();
         decodedKvPair.key = key;
-        if (key === "owner") {
+        if (key === "owner" || key === "transfer_to" || key === "account" || key === "value") {
           decodedKvPair.value = esm_default.encodeAddress(new Uint8Array(Buffer.from(value.bytes, "base64")));
           return decodedKvPair;
         }
@@ -37418,7 +37419,7 @@
         for (let i = 0; i < txns.length; i++) {
           const txn = txns[i];
           if (txn["tx-type"] === "appl") {
-            if (txn["application-transaction"]["application-id"] === APP_ID) {
+            if (txn["application-transaction"]["application-id"] === this.APP) {
               const appArgs = txn["application-transaction"]["application-args"];
               if (Buffer.from(appArgs[0], "base64").toString() === "register_name") {
                 const decodedName = b64toString(appArgs[1]);
@@ -37431,7 +37432,7 @@
                 accountInfo = accountInfo.account["apps-local-state"];
                 const length = accountInfo.length;
                 for (let i2 = 0; i2 < length; i2++) {
-                  if (accountInfo[i2].id === APP_ID) {
+                  if (accountInfo[i2].id === this.APP) {
                     const kvPairs = accountInfo[i2]["key-value"];
                     const domainInfo = this.decodeKvPairs(kvPairs).filter((domain) => domain.key === "name");
                     if (!names.includes(domainInfo[0].value)) {
@@ -37448,10 +37449,63 @@
       }
       return names;
     }
+    async getDefaultDomain(address) {
+      let nextToken = "";
+      let txnLength = 1;
+      let txns = [];
+      while (txnLength > 0) {
+        try {
+          const info = await this.indexer.searchForTransactions().address(address).addressRole("sender").afterTime("2022-02-24").txType("appl").applicationID(this.APP).nextToken(nextToken).do();
+          txnLength = info.transactions.length;
+          if (txnLength > 0) {
+            nextToken = info["next-token"];
+            txns.push(info.transactions);
+          }
+        } catch (err) {
+          throw Error("No transactions found");
+        }
+      }
+      let accountTxns = [];
+      for (let i = 0; i < txns.length; i++) {
+        accountTxns = accountTxns.concat(txns[i]);
+      }
+      txns = accountTxns;
+      const appArgs = txns.map((txn) => txn["application-transaction"]["application-args"][0]);
+      const appAccounts = txns.map((txn) => txn["application-transaction"]["accounts"]);
+      for (const i in appArgs) {
+        if (Buffer.from(appArgs[i], "base64").toString() === "set_default_account") {
+          const account = appAccounts[i];
+          let accountInfo = await this.indexer.lookupAccountByID(account).do();
+          accountInfo = accountInfo["account"]["apps-local-state"];
+          for (const i2 in accountInfo) {
+            if (accountInfo[i2].id === this.APP) {
+              const domain = this.decodeKvPairs(accountInfo[i2]["key-value"]).filter((kv) => kv.key === "name");
+              if (domain.length > 0) {
+                return domain[0].value + ".algo";
+              } else {
+                throw Error("Default domain not set");
+              }
+            }
+          }
+        }
+      }
+      const domains = await this.getNamesOwnedByAddress(address, false, false, 1);
+      if (domains.length > 0) {
+        return domains[0].name;
+      }
+      throw Error("No domains owned by this address");
+    }
     async owner() {
       const domainInformation = await this.resolveName();
       if (domainInformation.found) {
         return domainInformation.address;
+      }
+      throw new NameNotRegisteredError(this.name.name);
+    }
+    async value() {
+      const domainInformation = await this.resolveName();
+      if (domainInformation.found) {
+        return domainInformation.value;
       }
       throw new NameNotRegisteredError(this.name.name);
     }
@@ -37493,9 +37547,8 @@
 
   // src/transactions.ts
   var Transactions = class extends CachedApi {
-    name;
-    constructor(client, indexer, name) {
-      super(client, indexer);
+    constructor(client, indexer, name, network) {
+      super(client, indexer, network);
       if (name instanceof Name) {
         this.name = name.name;
       } else {
@@ -37518,7 +37571,7 @@
       const params = await algodClient.getTransactionParams().do();
       params.fee = 1e3;
       params.flatFee = true;
-      let receiver = esm_default.getApplicationAddress(APP_ID);
+      let receiver = esm_default.getApplicationAddress(this.APP);
       let sender = address;
       if (period === void 0) {
         period = 1;
@@ -37537,7 +37590,7 @@
       const txn3 = await esm_default.makeApplicationOptInTxnFromObject({
         from: lsig.address(),
         suggestedParams: params,
-        appIndex: APP_ID
+        appIndex: this.APP
       });
       groupTxns.push(txn3);
       const method2 = "register_name";
@@ -37545,7 +37598,7 @@
       appArgs.push(toIntArray(method2));
       appArgs.push(toIntArray(this.name));
       appArgs.push(esm_default.encodeUint64(period));
-      const txn4 = await esm_default.makeApplicationNoOpTxn(address, params, APP_ID, appArgs, [lsig.address()]);
+      const txn4 = await esm_default.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [lsig.address()]);
       groupTxns.push(txn4);
       esm_default.assignGroupID(groupTxns);
       const signedOptinTxn = esm_default.signLogicSigTransaction(groupTxns[2], lsig);
@@ -37569,7 +37622,7 @@
         appArgs.push(toIntArray(method2));
         appArgs.push(toIntArray(network));
         appArgs.push(toIntArray(handle));
-        const txn = await esm_default.makeApplicationNoOpTxn(address, params, APP_ID, appArgs, [lsig.address()]);
+        const txn = await esm_default.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [lsig.address()]);
         groupTxns.push(txn);
       }
       if (Object.keys(editedHandles).length > 1) {
@@ -37579,7 +37632,7 @@
     }
     async prepareNameRenewalTxns(sender, years) {
       const params = await this.rpc.getTransactionParams().do();
-      const receiver = esm_default.getApplicationAddress(APP_ID);
+      const receiver = esm_default.getApplicationAddress(this.APP);
       const closeToRemaninder = void 0;
       const note = void 0;
       const paymentTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, this.calculatePrice(years), closeToRemaninder, note, params);
@@ -37587,9 +37640,28 @@
       const appArgs = [];
       appArgs.push(toIntArray("renew_name"));
       appArgs.push(esm_default.encodeUint64(years));
-      const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [lsig.address()]);
+      const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, this.APP, appArgs, [lsig.address()]);
       esm_default.assignGroupID([paymentTxn, applicationTxn]);
       return [paymentTxn, applicationTxn];
+    }
+    async prepareUpdateValueTxn(address, value) {
+      const params = await this.rpc.getTransactionParams().do();
+      const lsig = await this.getTeal(this.name);
+      const appArgs = [];
+      appArgs.push(toIntArray("set_default_account"));
+      return esm_default.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
+        lsig.address(),
+        value
+      ]);
+    }
+    async prepareSetDefaultDomainTxn(address) {
+      const params = await this.rpc.getTransactionParams().do();
+      const lsig = await this.getTeal(this.name);
+      const appArgs = [];
+      appArgs.push(toIntArray("set_default_account"));
+      return esm_default.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
+        lsig.address()
+      ]);
     }
     async prepareInitiateNameTransferTransaction(sender, newOwner, price) {
       price = esm_default.algosToMicroalgos(price);
@@ -37598,7 +37670,7 @@
       const appArgs = [];
       appArgs.push(toIntArray("initiate_transfer"));
       appArgs.push(esm_default.encodeUint64(price));
-      return esm_default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [
+      return esm_default.makeApplicationNoOpTxn(sender, params, this.APP, appArgs, [
         lsig.address(),
         newOwner
       ]);
@@ -37609,12 +37681,12 @@
       const closeToRemaninder = void 0;
       const note = void 0;
       const paymentToOwnerTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, amt, closeToRemaninder, note, params);
-      receiver = esm_default.getApplicationAddress(APP_ID);
+      receiver = esm_default.getApplicationAddress(this.APP);
       const paymentToSmartContractTxn = esm_default.makePaymentTxnWithSuggestedParams(sender, receiver, TRANSFER_FEE, closeToRemaninder, note, params);
       const lsig = await this.getTeal(this.name);
       const appArgs = [];
       appArgs.push(toIntArray("accept_transfer"));
-      const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [lsig.address()]);
+      const applicationTxn = esm_default.makeApplicationNoOpTxn(sender, params, this.APP, appArgs, [lsig.address()]);
       esm_default.assignGroupID([
         paymentToOwnerTxn,
         paymentToSmartContractTxn,
@@ -37626,14 +37698,11 @@
 
   // src/name.ts
   var Name = class {
-    resolver;
-    transactions;
-    _name;
     constructor(options) {
-      const { name, rpc, indexer } = options;
+      const { name, rpc, indexer, network } = options;
       this._name = name;
-      this.resolver = new Resolver(rpc, indexer, this);
-      this.transactions = new Transactions(rpc, indexer, this);
+      this.resolver = new Resolver(rpc, indexer, this, network);
+      this.transactions = new Transactions(rpc, indexer, this, network);
     }
     get name() {
       return this._name;
@@ -37644,6 +37713,9 @@
     }
     async getOwner() {
       return await this.resolver.owner();
+    }
+    async getValue() {
+      return await this.resolver.value();
     }
     async getContent() {
       return await this.resolver.content();
@@ -37706,6 +37778,14 @@
       await this.isValidTransaction(address);
       return await this.transactions.prepareNameRenewalTxns(address, years);
     }
+    async setValue(address, value) {
+      await this.isValidTransaction(address);
+      return await this.transactions.prepareUpdateValueTxn(address, value);
+    }
+    async setDefaultDomain(address) {
+      await this.isValidTransaction(address);
+      return await this.transactions.prepareSetDefaultDomainTxn(address);
+    }
     async initTransfer(owner, newOwner, price) {
       await this.isValidTransaction(owner, newOwner, "initiate_transfer");
       return await this.transactions.prepareInitiateNameTransferTransaction(owner, newOwner, price);
@@ -37718,26 +37798,35 @@
 
   // src/address.ts
   var Address = class {
-    address;
-    resolver;
     constructor(options) {
-      const { address, rpc, indexer } = options;
+      const { address, rpc, indexer, network } = options;
       this.address = address;
-      this.resolver = new Resolver(rpc, indexer);
+      this.resolver = new Resolver(rpc, indexer, void 0, network);
     }
     async getNames(options) {
       return await this.resolver.getNamesOwnedByAddress(this.address, options == null ? void 0 : options.socials, options == null ? void 0 : options.metadata, options == null ? void 0 : options.limit);
+    }
+    async getDefaultDomain() {
+      return await this.resolver.getDefaultDomain(this.address);
     }
   };
 
   // src/index.ts
   var ANS = class extends CachedApi {
+    constructor(client, indexer, network) {
+      super(client, indexer, network);
+      this.network = "mainnet";
+      if (network === "testnet") {
+        this.network = "testnet";
+      }
+    }
     name(name) {
       name = normalizeName(name);
       return new Name({
         rpc: this.rpc,
         indexer: this.indexer,
-        name
+        name,
+        network: this.network
       });
     }
     address(address) {
@@ -37747,7 +37836,8 @@
       return new Address({
         rpc: this.rpc,
         indexer: this.indexer,
-        address
+        address,
+        network: this.network
       });
     }
   };

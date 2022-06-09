@@ -3,11 +3,13 @@ export interface NameConstructor {
     rpc: Algodv2;
     indexer: Indexer;
     name: string;
+    network?: string;
 }
 export interface AddressConstructor {
     address: string;
     rpc: Algodv2;
     indexer: Indexer;
+    network?: string;
 }
 export interface DomainOptions {
     socials?: boolean;
@@ -37,5 +39,6 @@ export interface NameResponse {
     address?: string;
     socials?: Record[];
     metadata?: Record[];
+    value?: string;
 }
 //# sourceMappingURL=interfaces.d.ts.map

@@ -2,8 +2,9 @@
   "compilerOptions": {
     "declaration": true,
     "strict": true,
-    "module": "esnext",
-    "target": "esnext",
+    "module": "ES6",
+    "target": "ES6",
+    "lib": ["DOM", "ES6", "DOM.Iterable", "ScriptHost", "ES2016.Array.Include"],
     "esModuleInterop": true,
     "sourceMap": true,
     "outDir": "dist/esm",

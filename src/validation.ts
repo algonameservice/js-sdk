@@ -8,7 +8,7 @@ export function isValidAddress(address: string): boolean {
 
 export function normalizeName(name: string): string {
   const tld: string = name.split(".").pop() as string;
-  if(!ALLOWED_TLDS.includes(tld)) {
+  if (!ALLOWED_TLDS.includes(tld)) {
     throw new Error("TLD not supported");
   }
   name = name.split(".")[0].toLowerCase();

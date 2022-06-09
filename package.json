@@ -1,8 +1,9 @@
 {
   "name": "@algonameservice/sdk",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "JavaScript SDK to resolve ANS .algo names",
-  "main": "dist/esm/index.js",
+  "main": "dist/index.cjs",
+  "module": "dist/esm/index.js",
   "types": "dist/esm",
   "type": "module",
   "author": "Algorand Name Service",

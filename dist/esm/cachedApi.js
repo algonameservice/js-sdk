@@ -1,21 +1,39 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import algosdk from "algosdk";
 import { generateTeal } from "./util.js";
+import { MAINNET_ESCROW, APP_ID, TESTNET_ESCROW, TESTNET_APP_ID, } from "./constants.js";
 export default class CachedApi {
-    cache = {};
-    rpc;
-    indexer;
-    constructor(client, indexer) {
+    constructor(client, indexer, network) {
+        this.cache = {};
+        this.ESCROW = MAINNET_ESCROW;
+        this.APP = APP_ID;
         this.rpc = client;
         this.indexer = indexer;
-    }
-    async getTeal(name) {
-        if (name in this.cache) {
-            return this.cache[name];
+        if (network === "testnet") {
+            this.ESCROW = TESTNET_ESCROW;
+            this.APP = TESTNET_APP_ID;
         }
-        let program = await this.rpc.compile(generateTeal(name)).do();
-        program = new Uint8Array(Buffer.from(program.result, "base64"));
-        this.cache[name] = new algosdk.LogicSigAccount(program);
-        return this.cache[name];
+    }
+    getTeal(name) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (name in this.cache) {
+                return this.cache[name];
+            }
+            let program = yield this.rpc
+                .compile(generateTeal(name, this.ESCROW, this.APP))
+                .do();
+            program = new Uint8Array(Buffer.from(program.result, "base64"));
+            this.cache[name] = new algosdk.LogicSigAccount(program);
+            return this.cache[name];
+        });
     }
 }
 //# sourceMappingURL=cachedApi.js.map

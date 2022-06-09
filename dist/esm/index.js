@@ -6,13 +6,21 @@ import CachedApi from "./cachedApi.js";
 export { Resolver } from "./resolver.js";
 export { Transactions } from "./transactions.js";
 export * from "./errors.js";
-export default class ANS extends CachedApi {
+export class ANS extends CachedApi {
+    constructor(client, indexer, network) {
+        super(client, indexer, network);
+        this.network = "mainnet";
+        if (network === "testnet") {
+            this.network = "testnet";
+        }
+    }
     name(name) {
         name = normalizeName(name);
         return new Name({
             rpc: this.rpc,
             indexer: this.indexer,
             name,
+            network: this.network,
         });
     }
     address(address) {
@@ -23,6 +31,7 @@ export default class ANS extends CachedApi {
             rpc: this.rpc,
             indexer: this.indexer,
             address,
+            network: this.network,
         });
     }
 }

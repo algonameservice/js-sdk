@@ -1,5 +1,5 @@
 import algosdk, { Transaction } from "algosdk";
-import { APP_ID, REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
+import { REGISTRATION_PRICE, TRANSFER_FEE } from "./constants.js";
 import CachedApi from "./cachedApi.js";
 import { toIntArray } from "./util.js";
 import { RegistrationTxns } from "./interfaces.js";
@@ -12,9 +12,10 @@ export class Transactions extends CachedApi {
   constructor(
     client: algosdk.Algodv2,
     indexer: algosdk.Indexer,
-    name: Name | string
+    name: Name | string,
+    network?: string
   ) {
-    super(client, indexer);
+    super(client, indexer, network);
     if (name instanceof Name) {
       this.name = name.name;
     } else {
@@ -39,7 +40,6 @@ export class Transactions extends CachedApi {
   ): Promise<RegistrationTxns> {
     const algodClient = this.rpc;
     /* 1st Txn - Payment to Smart Contract */
-
     let amount = 0;
     const lsig = await this.getTeal(this.name);
     const params = await algodClient.getTransactionParams().do();
@@ -47,7 +47,7 @@ export class Transactions extends CachedApi {
     params.fee = 1000;
     params.flatFee = true;
 
-    let receiver = algosdk.getApplicationAddress(APP_ID);
+    let receiver = algosdk.getApplicationAddress(this.APP);
     let sender = address;
 
     if (period === undefined) {
@@ -93,7 +93,7 @@ export class Transactions extends CachedApi {
     const txn3 = await algosdk.makeApplicationOptInTxnFromObject({
       from: lsig.address(),
       suggestedParams: params,
-      appIndex: APP_ID,
+      appIndex: this.APP,
     });
 
     groupTxns.push(txn3);
@@ -110,7 +110,7 @@ export class Transactions extends CachedApi {
     const txn4 = await algosdk.makeApplicationNoOpTxn(
       address,
       params,
-      APP_ID,
+      this.APP,
       appArgs,
       [lsig.address()]
     );
@@ -152,7 +152,7 @@ export class Transactions extends CachedApi {
       const txn = await algosdk.makeApplicationNoOpTxn(
         address,
         params,
-        APP_ID,
+        this.APP,
         appArgs,
         [lsig.address()]
       );
@@ -171,7 +171,7 @@ export class Transactions extends CachedApi {
     years: number
   ): Promise<Transaction[]> {
     const params = await this.rpc.getTransactionParams().do();
-    const receiver = algosdk.getApplicationAddress(APP_ID);
+    const receiver = algosdk.getApplicationAddress(this.APP);
     const closeToRemaninder = undefined;
     const note = undefined;
     const paymentTxn = algosdk.makePaymentTxnWithSuggestedParams(
@@ -192,7 +192,7 @@ export class Transactions extends CachedApi {
     const applicationTxn = algosdk.makeApplicationNoOpTxn(
       sender,
       params,
-      APP_ID,
+      this.APP,
       appArgs,
       [lsig.address()]
     );
@@ -200,6 +200,33 @@ export class Transactions extends CachedApi {
     algosdk.assignGroupID([paymentTxn, applicationTxn]);
 
     return [paymentTxn, applicationTxn];
+  }
+
+  async prepareUpdateValueTxn(address: string, value: string) {
+    const params = await this.rpc.getTransactionParams().do();
+
+    const lsig = await this.getTeal(this.name);
+
+    const appArgs = [];
+    appArgs.push(toIntArray("set_default_account"));
+
+    return algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
+      lsig.address(),
+      value,
+    ]);
+  }
+
+  async prepareSetDefaultDomainTxn(address: string) {
+    const params = await this.rpc.getTransactionParams().do();
+
+    const lsig = await this.getTeal(this.name);
+
+    const appArgs = [];
+    appArgs.push(toIntArray("set_default_account"));
+
+    return algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
+      lsig.address(),
+    ]);
   }
 
   async prepareInitiateNameTransferTransaction(
@@ -216,7 +243,7 @@ export class Transactions extends CachedApi {
     appArgs.push(toIntArray("initiate_transfer"));
     appArgs.push(algosdk.encodeUint64(price));
 
-    return algosdk.makeApplicationNoOpTxn(sender, params, APP_ID, appArgs, [
+    return algosdk.makeApplicationNoOpTxn(sender, params, this.APP, appArgs, [
       lsig.address(),
       newOwner,
     ]);
@@ -241,7 +268,7 @@ export class Transactions extends CachedApi {
       params
     );
 
-    receiver = algosdk.getApplicationAddress(APP_ID);
+    receiver = algosdk.getApplicationAddress(this.APP);
 
     const paymentToSmartContractTxn = algosdk.makePaymentTxnWithSuggestedParams(
       sender,
@@ -259,7 +286,7 @@ export class Transactions extends CachedApi {
     const applicationTxn = algosdk.makeApplicationNoOpTxn(
       sender,
       params,
-      APP_ID,
+      this.APP,
       appArgs,
       [lsig.address()]
     );
