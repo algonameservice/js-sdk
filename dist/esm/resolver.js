@@ -13,8 +13,8 @@ import { AddressValidationError, NameNotRegisteredError, PropertyNotSetError, } 
 import CachedApi from "./cachedApi.js";
 import { b64toString } from "./util.js";
 export class Resolver extends CachedApi {
-    constructor(client, indexer, name, network) {
-        super(client, indexer, network);
+    constructor(client, indexer, name, network, app) {
+        super(client, indexer, network, app);
         this.name = name;
     }
     checkName(name) {

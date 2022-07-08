@@ -7,8 +7,8 @@ export { Resolver } from "./resolver.js";
 export { Transactions } from "./transactions.js";
 export * from "./errors.js";
 export class ANS extends CachedApi {
-    constructor(client, indexer, network) {
-        super(client, indexer, network);
+    constructor(client, indexer, network, appId) {
+        super(client, indexer, network, appId);
         this.network = "mainnet";
         if (network === "testnet") {
             this.network = "testnet";
@@ -21,6 +21,7 @@ export class ANS extends CachedApi {
             indexer: this.indexer,
             name,
             network: this.network,
+            app: this.APP
         });
     }
     address(address) {
@@ -32,6 +33,7 @@ export class ANS extends CachedApi {
             indexer: this.indexer,
             address,
             network: this.network,
+            app: this.APP
         });
     }
 }

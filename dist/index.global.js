@@ -37223,15 +37223,16 @@
 
   // src/cachedApi.ts
   var CachedApi = class {
-    constructor(client, indexer, network) {
+    constructor(client, indexer, network, appId) {
       this.cache = {};
       this.ESCROW = MAINNET_ESCROW;
       this.APP = APP_ID;
+      var _a;
       this.rpc = client;
       this.indexer = indexer;
       if (network === "testnet") {
-        this.ESCROW = TESTNET_ESCROW;
-        this.APP = TESTNET_APP_ID;
+        this.ESCROW = (_a = esm_default.getApplicationAddress(appId != null ? appId : TESTNET_APP_ID)) != null ? _a : TESTNET_ESCROW;
+        this.APP = appId != null ? appId : TESTNET_APP_ID;
       }
     }
     async getTeal(name) {
@@ -37247,8 +37248,8 @@
 
   // src/resolver.ts
   var Resolver = class extends CachedApi {
-    constructor(client, indexer, name, network) {
-      super(client, indexer, network);
+    constructor(client, indexer, name, network, app) {
+      super(client, indexer, network, app);
       this.name = name;
     }
     checkName(name) {
@@ -37547,8 +37548,8 @@
 
   // src/transactions.ts
   var Transactions = class extends CachedApi {
-    constructor(client, indexer, name, network) {
-      super(client, indexer, network);
+    constructor(client, indexer, name, network, app) {
+      super(client, indexer, network, app);
       if (name instanceof Name) {
         this.name = name.name;
       } else {
@@ -37699,10 +37700,10 @@
   // src/name.ts
   var Name = class {
     constructor(options) {
-      const { name, rpc, indexer, network } = options;
+      const { name, rpc, indexer, network, app } = options;
       this._name = name;
-      this.resolver = new Resolver(rpc, indexer, this, network);
-      this.transactions = new Transactions(rpc, indexer, this, network);
+      this.resolver = new Resolver(rpc, indexer, this, network, app);
+      this.transactions = new Transactions(rpc, indexer, this, network, app);
     }
     get name() {
       return this._name;
@@ -37799,9 +37800,9 @@
   // src/address.ts
   var Address = class {
     constructor(options) {
-      const { address, rpc, indexer, network } = options;
+      const { address, rpc, indexer, network, app } = options;
       this.address = address;
-      this.resolver = new Resolver(rpc, indexer, void 0, network);
+      this.resolver = new Resolver(rpc, indexer, void 0, network, app);
     }
     async getNames(options) {
       return await this.resolver.getNamesOwnedByAddress(this.address, options == null ? void 0 : options.socials, options == null ? void 0 : options.metadata, options == null ? void 0 : options.limit);
@@ -37813,8 +37814,8 @@
 
   // src/index.ts
   var ANS = class extends CachedApi {
-    constructor(client, indexer, network) {
-      super(client, indexer, network);
+    constructor(client, indexer, network, appId) {
+      super(client, indexer, network, appId);
       this.network = "mainnet";
       if (network === "testnet") {
         this.network = "testnet";
@@ -37826,7 +37827,8 @@
         rpc: this.rpc,
         indexer: this.indexer,
         name,
-        network: this.network
+        network: this.network,
+        app: this.APP
       });
     }
     address(address) {
@@ -37837,7 +37839,8 @@
         rpc: this.rpc,
         indexer: this.indexer,
         address,
-        network: this.network
+        network: this.network,
+        app: this.APP
       });
     }
   };

@@ -2,7 +2,6 @@ import algosdk from "algosdk";
 import { describe, it, beforeEach } from "mocha";
 import { assert } from "chai";
 import { ANS } from "../src/index.js";
-import API_KEY from "./api_key.js";
 
 const DOMAIN = "lalith.algo";
 //const OWNER = "33IA2RTOTZDD3KNDBOBUUGF43RJ4MJXDL6GZENBFHS2KO6HYN43ZKCBYDA";
@@ -17,14 +16,14 @@ let indexerClient: algosdk.Indexer,
 describe("Testing name resolution methods", function () {
   beforeEach("Creating Client and Indexer instances", function () {
     algodClient = new algosdk.Algodv2(
-      { "X-API-KEY": API_KEY },
-      "https://mainnet-algorand.api.purestake.io/ps2",
+      "",
+      "https://mainnet-api.algonode.cloud",
       ""
     );
 
     indexerClient = new algosdk.Indexer(
-      { "X-API-KEY": API_KEY },
-      "https://mainnet-algorand.api.purestake.io/idx2",
+      "",
+      "	https://mainnet-idx.algonode.cloud",
       ""
     );
 

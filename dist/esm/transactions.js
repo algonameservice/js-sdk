@@ -13,8 +13,8 @@ import CachedApi from "./cachedApi.js";
 import { toIntArray } from "./util.js";
 import { Name } from "./name.js";
 export class Transactions extends CachedApi {
-    constructor(client, indexer, name, network) {
-        super(client, indexer, network);
+    constructor(client, indexer, name, network, app) {
+        super(client, indexer, network, app);
         if (name instanceof Name) {
             this.name = name.name;
         }

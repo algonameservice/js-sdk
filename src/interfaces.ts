@@ -5,6 +5,7 @@ export interface NameConstructor {
   indexer: Indexer;
   name: string;
   network?: string;
+  app: number
 }
 
 export interface AddressConstructor {
@@ -12,6 +13,7 @@ export interface AddressConstructor {
   rpc: Algodv2;
   indexer: Indexer;
   network?: string;
+  app: number
 }
 
 export interface DomainOptions {

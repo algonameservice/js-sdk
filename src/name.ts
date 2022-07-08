@@ -21,10 +21,10 @@ export class Name {
   private _name: string;
 
   constructor(options: NameConstructor) {
-    const { name, rpc, indexer, network } = options;
+    const { name, rpc, indexer, network, app } = options;
     this._name = name;
-    this.resolver = new Resolver(rpc, indexer, this, network);
-    this.transactions = new Transactions(rpc, indexer, this, network);
+    this.resolver = new Resolver(rpc, indexer, this, network, app);
+    this.transactions = new Transactions(rpc, indexer, this, network, app);
   }
 
   get name(): string {

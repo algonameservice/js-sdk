@@ -21,9 +21,10 @@ export class Resolver extends CachedApi {
     client: algosdk.Algodv2,
     indexer: algosdk.Indexer,
     name?: Name,
-    network?: string
+    network?: string,
+    app?: number
   ) {
-    super(client, indexer, network);
+    super(client, indexer, network, app);
     this.name = name;
   }
 

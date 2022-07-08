@@ -13,9 +13,10 @@ export class Transactions extends CachedApi {
     client: algosdk.Algodv2,
     indexer: algosdk.Indexer,
     name: Name | string,
-    network?: string
+    network?: string,
+    app?: number
   ) {
-    super(client, indexer, network);
+    super(client, indexer, network, app);
     if (name instanceof Name) {
       this.name = name.name;
     } else {
