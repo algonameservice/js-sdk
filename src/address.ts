@@ -6,9 +6,9 @@ export class Address {
   private resolver: Resolver;
 
   constructor(options: AddressConstructor) {
-    const { address, rpc, indexer, network } = options;
+    const { address, rpc, indexer, network, app } = options;
     this.address = address;
-    this.resolver = new Resolver(rpc, indexer, undefined, network);
+    this.resolver = new Resolver(rpc, indexer, undefined, network, app);
   }
 
   async getNames(options?: DomainOptions): Promise<Domain[]> {

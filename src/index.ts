@@ -15,9 +15,10 @@ export class ANS extends CachedApi {
   constructor(
     client: algosdk.Algodv2,
     indexer: algosdk.Indexer,
-    network?: string
+    network?: string,
+    appId?: number
   ) {
-    super(client, indexer, network);
+    super(client, indexer, network, appId);
     if (network === "testnet") {
       this.network = "testnet";
     }
@@ -30,6 +31,7 @@ export class ANS extends CachedApi {
       indexer: this.indexer,
       name,
       network: this.network,
+      app: this.APP
     });
   }
 
@@ -42,6 +44,7 @@ export class ANS extends CachedApi {
       indexer: this.indexer,
       address,
       network: this.network,
+      app: this.APP
     });
   }
 }

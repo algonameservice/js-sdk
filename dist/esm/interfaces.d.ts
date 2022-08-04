@@ -4,12 +4,14 @@ export interface NameConstructor {
     indexer: Indexer;
     name: string;
     network?: string;
+    app: number;
 }
 export interface AddressConstructor {
     address: string;
     rpc: Algodv2;
     indexer: Indexer;
     network?: string;
+    app: number;
 }
 export interface DomainOptions {
     socials?: boolean;

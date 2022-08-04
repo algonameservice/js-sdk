@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import { Resolver } from "./resolver.js";
 export class Address {
     constructor(options) {
-        const { address, rpc, indexer, network } = options;
+        const { address, rpc, indexer, network, app } = options;
         this.address = address;
-        this.resolver = new Resolver(rpc, indexer, undefined, network);
+        this.resolver = new Resolver(rpc, indexer, undefined, network, app);
     }
     getNames(options) {
         return __awaiter(this, void 0, void 0, function* () {

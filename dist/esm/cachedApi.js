@@ -11,15 +11,16 @@ import algosdk from "algosdk";
 import { generateTeal } from "./util.js";
 import { MAINNET_ESCROW, APP_ID, TESTNET_ESCROW, TESTNET_APP_ID, } from "./constants.js";
 export default class CachedApi {
-    constructor(client, indexer, network) {
+    constructor(client, indexer, network, appId) {
+        var _a;
         this.cache = {};
         this.ESCROW = MAINNET_ESCROW;
         this.APP = APP_ID;
         this.rpc = client;
         this.indexer = indexer;
         if (network === "testnet") {
-            this.ESCROW = TESTNET_ESCROW;
-            this.APP = TESTNET_APP_ID;
+            this.ESCROW = (_a = algosdk.getApplicationAddress(appId !== null && appId !== void 0 ? appId : TESTNET_APP_ID)) !== null && _a !== void 0 ? _a : TESTNET_ESCROW;
+            this.APP = appId !== null && appId !== void 0 ? appId : TESTNET_APP_ID;
         }
     }
     getTeal(name) {

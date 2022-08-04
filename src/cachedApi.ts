@@ -18,13 +18,14 @@ export default class CachedApi {
   constructor(
     client: algosdk.Algodv2,
     indexer: algosdk.Indexer,
-    network?: string
+    network?: string,
+    appId?: number
   ) {
     this.rpc = client;
     this.indexer = indexer;
     if (network === "testnet") {
-      this.ESCROW = TESTNET_ESCROW;
-      this.APP = TESTNET_APP_ID;
+      this.ESCROW = algosdk.getApplicationAddress(appId ?? TESTNET_APP_ID) ?? TESTNET_ESCROW;
+      this.APP = appId ?? TESTNET_APP_ID;
     }
   }
 
