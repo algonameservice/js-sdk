@@ -1,6 +1,6 @@
 {
   "name": "@algonameservice/sdk",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "JavaScript SDK to resolve ANS .algo names",
   "main": "dist/index.cjs",
   "module": "dist/esm/index.js",

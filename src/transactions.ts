@@ -209,7 +209,7 @@ export class Transactions extends CachedApi {
     const lsig = await this.getTeal(this.name);
 
     const appArgs = [];
-    appArgs.push(toIntArray("set_default_account"));
+    appArgs.push(toIntArray("update_resolver_account"));
 
     return algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
       lsig.address(),
@@ -225,6 +225,19 @@ export class Transactions extends CachedApi {
     const appArgs = [];
     appArgs.push(toIntArray("set_default_account"));
 
+    return algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
+      lsig.address(),
+    ]);
+  }
+
+  async prepareDeletePropertyTxn(address: string, property: string) {
+    const params = await this.rpc.getTransactionParams().do();
+
+    const lsig = await this.getTeal(this.name);
+
+    const appArgs = [];
+    appArgs.push(toIntArray("remove_property"));
+    appArgs.push(toIntArray(property));
     return algosdk.makeApplicationNoOpTxn(address, params, this.APP, appArgs, [
       lsig.address(),
     ]);

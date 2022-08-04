@@ -140,6 +140,11 @@ export class Name {
     return await this.transactions.prepareSetDefaultDomainTxn(address);
   }
 
+  async deleteProperty(address: string, property: string): Promise<Transaction> {
+    await this.isValidTransaction(address);
+    return await this.transactions.prepareDeletePropertyTxn(address, property);
+  }
+
   async initTransfer(
     owner: string,
     newOwner: string,

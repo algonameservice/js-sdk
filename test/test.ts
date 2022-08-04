@@ -3,10 +3,10 @@ import { describe, it, beforeEach } from "mocha";
 import { assert } from "chai";
 import { ANS } from "../src/index.js";
 
-const DOMAIN = "lalith.algo";
-//const OWNER = "33IA2RTOTZDD3KNDBOBUUGF43RJ4MJXDL6GZENBFHS2KO6HYN43ZKCBYDA";
-//const VALUE = 'VXFHVD2CBXSVJPZYENADADIJZOK7WFDDAK5OJHOUUNUZEWCRMURZAFJXEQ';
-const OWNER = "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU";
+const DOMAIN = "testacc02.algo";
+const OWNER = "O2W244PFC765AQKOR7QLBCDBK6HETD4ADPOGLUBEQXZ53TL2WNSK4XIHM4";
+const VALUE = "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU";
+//const OWNER = "PD2CGHFAZZQNYBRPZH7HNTA275K3FKZPENRSUXWZHBIVNPHVDFHLNIUSXU";
 
 let indexerClient: algosdk.Indexer,
   algodClient: algosdk.Algodv2,
@@ -17,17 +17,17 @@ describe("Testing name resolution methods", function () {
   beforeEach("Creating Client and Indexer instances", function () {
     algodClient = new algosdk.Algodv2(
       "",
-      "https://mainnet-api.algonode.cloud",
+      "https://testnet-api.algonode.cloud",
       ""
     );
 
     indexerClient = new algosdk.Indexer(
       "",
-      "	https://mainnet-idx.algonode.cloud",
+      "	https://testnet-idx.algonode.cloud",
       ""
     );
 
-    sdk = new ANS(algodClient, indexerClient);
+    sdk = new ANS(algodClient, indexerClient, 'testnet', 98956662);
   });
 
   it("Retrieves the owner of .algo name", async function () {
@@ -36,7 +36,7 @@ describe("Testing name resolution methods", function () {
     const address = await name.getOwner();
     assert.equal(address, OWNER, "Name resolution failed");
   });
-  /*
+  
   it("Gets the value of .algo name", async function () {
     this.timeout(10000);
     const address = await name.getValue();
@@ -46,7 +46,7 @@ describe("Testing name resolution methods", function () {
       "Name resolution failed"
     )
   });
-  */
+  
 
   it("Get all information about name", async function () {
     const information = await name.getAllInformation();
@@ -54,7 +54,7 @@ describe("Testing name resolution methods", function () {
   });
 
   it("Gets a specific text record", async function () {
-    const text = await name.getText("discord");
+    const text = await name.getText("name");
     assert.notEqual(text, undefined, "Could not fetch text record");
   });
 
@@ -81,8 +81,8 @@ describe("Testing name resolution methods", function () {
 
   it("Gets the default domain of an address", async function () {
     this.timeout(100000);
-    const defaultDomain = await sdk.address(OWNER).getDefaultDomain();
-
+    const defaultDomain = await
+    sdk.address(OWNER).getDefaultDomain();
     assert.notEqual(defaultDomain, undefined, "Default domain not retrieved");
   });
 
@@ -131,6 +131,20 @@ describe("Testing name resolution methods", function () {
       nameRenewalTxns.length,
       2,
       "Not returning 2 transactions for renewing name"
+    );
+  });
+
+  it("Prepares a transaction to delete property", async function () {
+    this.timeout(100000);
+    const nameTransferTxn = await name.deleteProperty(
+      OWNER,
+      "is_default"
+    );
+
+    assert.equal(
+      nameTransferTxn["type"],
+      "appl",
+      "Not returning the delete property transaction"
     );
   });
 
