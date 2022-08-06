@@ -167,6 +167,75 @@ try{
 }
 ```
 
+## Update Value (Set name properties)
+
+Value property is set by the owner of a domain if they wish to have their domain resolved to a different account.
+Only the owner address can authorize any transactions on their domain
+
+Get the transactions to update the value property associated with a .algo name
+
+```
+try{
+
+    let name = '' // .algo name
+    let address = '' // owner's algorand wallet address
+    let value = '' // value address (as defined above)
+
+    const setValueTxn = await sdk.name(name).setValue(address, value);
+
+    // Returns a transaction
+    // Sign and send to network
+
+} catch (err) {
+
+}
+```
+
+## Set default domain
+
+Default domain, if set by the user, will be displayed instead of wallet addresses in ANS and services that have integrated ANS.
+
+Get the transactions to update the default domain associated with a .algo name
+
+```
+try{
+
+    let name = '' // .algo name
+    let address = '' // owner's algorand wallet address
+
+    const setDefaultDomainTxn = await sdk.name(name).setDefaultDomain(address);
+
+    // Returns a transaction
+    // Sign and send to network
+
+} catch (err) {
+
+}
+```
+
+## Delete property
+
+Properties set by the domain owner (socials and hosting information) can be deleted by the owner
+
+Get the transactions to delete a value property associated with a .algo name
+
+```
+try{
+
+    let name = '' // .algo name
+    let address = '' // owner's algorand wallet address
+    let property = '' // social media handle or hosting property (discord, twitter, sia, ipfs, ...etc)
+
+    const deletePropertyTxn = await sdk.name(name).deleteProperty(address, property);
+
+    // Returns a transaction
+    // Sign and send to network
+
+} catch (err) {
+
+}
+```
+
 ## Renew Name
 
 Retrieve transactions to renew a name. The ANS registry currently supports renewal only by the owner hence the transactions will fail if the input address is not the current owner of the name.
